@@ -44,7 +44,7 @@ export default function AuthPage() {
     reset,
     formState: { errors, isValid },
   } = useForm<SignupFormValues>({
-    resolver: zodResolver(authMode === 'login' ? loginSchema : signupSchema),
+    resolver: zodResolver(authMode === 'login' ? loginSchema : signupSchema) as any,
     mode: "onChange",
     defaultValues: {
         email: "",
