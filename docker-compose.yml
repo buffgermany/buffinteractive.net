@@ -1,15 +1,7 @@
 version: "3.9"
 
 # ============================================================
-# Platform Docker Compose
-#
-# Prerequisites:
-#   - PostgreSQL 16 (already hosted externally — env: DATABASE_URL)
-#   - Redis 7     (already hosted externally — env: REDIS_URL)
-#   - SeaweedFS   (already hosted externally — env: SEAWEEDFS_*)
-#
-# Run:
-#   docker compose up -d
+# Platform Cloud-Optimized Docker Compose
 # ============================================================
 
 networks:
@@ -18,28 +10,35 @@ networks:
 
 services:
   # ------------------------------------------------------------
-  # API — ElysiaJS on Bun (compiled binary)
+  # API Engine — ElysiaJS on Bun (Compiled Binary)
   # ------------------------------------------------------------
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     container_name: platform-api
-    restart: unless-stopped
+    restart: always
     networks:
       - platform
+    # Exposing ports internally for the Coolify proxy
+    expose:
+      - "3001"
+    # Port mapping kept for direct access if needed (optional)
     ports:
       - "3001:3001"
-    env_file:
-      - .env
     environment:
       - NODE_ENV=production
       - API_PORT=3001
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:3001/v1/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD-SHELL", "wget --quiet --spider http://localhost:3001/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
       start_period: 20s
 
   # ------------------------------------------------------------
@@ -50,22 +49,28 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
     container_name: platform-web
-    restart: unless-stopped
+    restart: always
     networks:
       - platform
+    expose:
+      - "3000"
     ports:
       - "3000:3000"
-    env_file:
-      - .env
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://api:3001
+      # SSR fallback to internal network; override in Coolify for Client-side
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://api:3001}
     depends_on:
       api:
         condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD-SHELL", "wget --quiet --spider http://localhost:3000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
       start_period: 30s
