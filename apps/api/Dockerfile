@@ -6,7 +6,9 @@ WORKDIR /app
 COPY package.json bun.lockb ./
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/db/package.json ./packages/db/
+COPY packages/client-sdk/package.json ./packages/client-sdk/
 COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
 
 RUN bun install --frozen-lockfile
 
