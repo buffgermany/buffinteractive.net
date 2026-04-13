@@ -18,9 +18,13 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@platform/shared": ["../../packages/shared/src/index.ts"],
+      "@platform/shared/*": ["../../packages/shared/src/*"],
+      "@platform/db": ["../../packages/db/src/index.ts"],
+      "@platform/db/*": ["../../packages/db/src/*"],
+      "@platform/client-sdk": ["../../packages/client-sdk/src/index.ts"],
+      "@platform/client-sdk/*": ["../../packages/client-sdk/src/*"]
     },
     "allowJs": true,
     "resolveJsonModule": true
