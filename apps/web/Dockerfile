@@ -25,6 +25,7 @@ COPY --from=deps /app /app
 COPY packages/shared/ ./packages/shared/
 COPY packages/db/ ./packages/db/
 COPY packages/client-sdk/ ./packages/client-sdk/
+COPY apps/api/ ./apps/api/
 COPY apps/web/ ./apps/web/
 COPY tsconfig.base.json ./
 COPY turbo.json ./

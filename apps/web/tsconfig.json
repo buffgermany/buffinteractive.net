@@ -19,6 +19,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
+      "@platform/api": ["../../apps/api/src/index.ts"],
+      "@platform/api/*": ["../../apps/api/src/*"],
       "@platform/shared": ["../../packages/shared/src/index.ts"],
       "@platform/shared/*": ["../../packages/shared/src/*"],
       "@platform/db": ["../../packages/db/src/index.ts"],
