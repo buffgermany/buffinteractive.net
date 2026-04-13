@@ -1,0 +1,213 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-foreground-muted: hsl(var(--foreground-muted));
+  
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-surface: hsl(var(--surface));
+  --color-border: hsl(var(--border));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading), var(--font-sans);
+  --font-serif: var(--font-serif, "Instrument Serif", serif);
+}
+
+@layer base {
+  :root {
+    /* Buff Primary Dark Mode - Deep Void Black (Default) */
+    --background: 0 0% 4%; /* #0A0A0A */
+    --background-build: 220 30% 6%; /* Deep cool blue/indigo for The Build state */
+    --background-growth: 280 45% 5%; /* Deep growth purple for The Growth state */
+
+    --foreground: 0 0% 97%; /* #F8F8F8 */
+    --foreground-muted: 240 9% 66%; /* #A0A0B0 */
+
+    --primary: 72 100% 50%; /* #CCFF00 */
+    --primary-foreground: 0 0% 4%; /* #0A0A0A */
+
+    --surface: 0 0% 17%; /* #2C2C2C */
+    --border: 0 0% 17%;
+
+    --card: 0 0% 17%;
+    --card-foreground: 0 0% 97%;
+    --popover: 0 0% 17%;
+    --popover-foreground: 0 0% 97%;
+    --secondary: 0 0% 17%;
+    --secondary-foreground: 0 0% 97%;
+    --muted: 0 0% 17%;
+    --muted-foreground: 240 9% 66%;
+    --accent: 72 100% 50%;
+    --accent-foreground: 0 0% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 97%;
+    --input: 0 0% 17%;
+    --ring: 72 100% 50%;
+
+    --radius: 1rem;
+  }
+
+  .light {
+    /* Buff Primary Light Mode (Alternative) */
+    --background: 0 0% 97%; /* #F8F8F8 */
+    --foreground: 0 0% 4%; /* #0A0A0A */
+    --foreground-muted: 240 9% 66%; /* #A0A0B0 */
+    
+    --primary: 72 100% 50%; /* #CCFF00 */
+    --primary-foreground: 0 0% 4%; /* #0A0A0A */
+
+    --surface: 0 0% 90%; 
+    --border: 0 0% 85%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 4%;
+    --secondary: 0 0% 92%;
+    --secondary-foreground: 0 0% 4%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 240 9% 40%;
+    --accent: 72 100% 50%;
+    --accent-foreground: 0 0% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 97%;
+    --input: 0 0% 85%;
+    --ring: 72 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans);
+    position: relative;
+    /* Transition for The Build vs The Growth */
+    transition: background-color 0.8s ease-in-out;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.025em; /* tight tracking */
+  }
+
+  /* Slow moving mesh gradient for the default dark state */
+  body::after {
+    content: "";
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    z-index: -1;
+    background: radial-gradient(circle at 80% 20%, rgba(44, 44, 44, 0.4) 0%, transparent 30%);
+    animation: mesh-rotate 40s linear infinite;
+    pointer-events: none;
+  }
+
+  /* Selection */
+  ::selection {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
+    background-color: hsl(var(--surface) / 0.7);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+      0 4px 30px rgba(0, 0, 0, 0.1),
+      inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  }
+
+  .flashlight-mask {
+    /* Set from JS dynamically using CSS variables, but we define defaults */
+    --cursor-x: 50%;
+    --cursor-y: 50%;
+    mask-image: radial-gradient(circle 120px at var(--cursor-x) var(--cursor-y), black 0%, transparent 100%);
+    -webkit-mask-image: radial-gradient(circle 120px at var(--cursor-x) var(--cursor-y), black 0%, transparent 100%);
+  }
+
+  .interactive-pill {
+    @apply rounded-full font-medium transition-all duration-300;
+  }
+
+  .heading-massive {
+    @apply font-heading font-bold text-4xl md:text-8xl tracking-tighter leading-none;
+  }
+
+  .responsive-header-pill {
+    @apply w-[calc(100%-2rem)] md:w-[800px];
+  }
+
+  /* "The Build" alternative background state class */
+  .bg-theme-build {
+    background-color: hsl(var(--background-build)) !important;
+  }
+
+  /* "The Growth" alternative background state class */
+  .bg-theme-growth {
+    background-color: hsl(var(--background-growth)) !important;
+  }
+}
+
+@keyframes mesh-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+

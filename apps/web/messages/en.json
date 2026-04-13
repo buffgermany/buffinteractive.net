@@ -1,0 +1,108 @@
+{
+  "Hero": {
+    "title_part1": "Make your",
+    "title_part2": "competitors nervous",
+    "description": "Safe choices don't win markets. We engineer the tech that runs your business and the marketing that scales it to give your brand an unfair, undeniable advantage.",
+    "cta": "Prove us wrong."
+  },
+  "RealityCheck": {
+    "text": "You’ve hit a wall. The tactics that got you here are now breaking your infrastructure. Your code is crumbling under the traffic, or your marketing is failing to bring it in.",
+    "highlightPhrase": "You’ve hit a wall."
+  },
+  "Header": {
+    "nav_products": "Products",
+    "nav_services": "Services",
+    "nav_about": "About Us",
+    "nav_login": "Login",
+    "nav_dashboard": "Dashboard",
+    "cta": "Start",
+    "mobile_products": "Products",
+    "mobile_services": "Services",
+    "mobile_about": "About Us",
+    "mobile_contact": "Contact"
+  },
+  "Auth": {
+    "login_title": "Welcome back.",
+    "signup_title": "Start executing.",
+    "email_label": "EMAIL",
+    "email_placeholder": "you@company.com",
+    "password_label": "PASSWORD",
+    "password_placeholder": "••••••••",
+    "name_label": "NAME",
+    "name_placeholder": "John Doe",
+    "company_label": "COMPANY",
+    "company_placeholder": "Your Company",
+    "submit_login": "Sign in",
+    "submit_signup": "Create account",
+    "divider": "OR",
+    "toggle_login": "Sign In",
+    "toggle_signup": "Sign Up",
+    "show_password": "Show",
+    "hide_password": "Hide",
+    "error_invalid_email": "Invalid email address.",
+    "error_password_min": "Password must be at least 10 characters long.",
+    "error_name_min": "Name must be at least 2 characters long.",
+    "signup_disabled_title": "Registration disabled",
+    "signup_disabled_description": "Signups are temporarily disabled. Please contact us for access."
+  },
+  "Contact": {
+    "title": "Let's cut the small talk.",
+    "subtext": "Tell us what's broken or what you want to conquer. If it's ambitious, we're in. If it's boring, we'll pass."
+  },
+  "Arsenal": {
+    "build_title": "Raw Tech",
+    "growth_title": "We build attention",
+    "build_description": "Custom Software, High-Performance Hosting, and SaaS infrastructures that don't crash when traffic spikes.",
+    "growth_description": "A great product is useless if nobody uses it. We engineer the attention your brand deserves. From cut-throat performance marketing to seamless fulfillment—we make sure the market pays attention. And pays you.",
+    "build_tab_label": "The Build",
+    "growth_tab_label": "The Growth"
+  },
+  "EnterpriseBento": {
+    "section_headline": "Built for Europe's largest corporation.",
+    "nda_hint": "Further undisclosed market leaders under NDA",
+    "card1_headline": "Scaling sales operations for T-Mobile on a national level.",
+    "card2_title": "Zero-second latency.",
+    "card2_text": "Built for real-time customer interactions. This means zero tolerance for lag or errors. The tool never gets in the way. High-speed performance wasn't a feature—it was the core design principle.",
+    "card3_title": "Complexity, made invisible.",
+    "card3_text": "Engineered for non-stop use across Germany. The frontend is effortlessly intuitive, while the backend is a digital fortress. Full access control, strict compliance, and maximum resilience."
+  },
+  "Legal": {
+    "imprint_title": "Imprint",
+    "imprint_content": "Buff Digital Agency\nAcid Lime Street 42\n10115 Berlin\n\nRepresented by:\nJohn Doe\n\nContact:\nEmail: legal@buff.test\nPhone: +49 123 456 789\n\nDisclaimer:\nThe contents of these pages were created with great care. However, we cannot guarantee the accuracy, completeness, and timeliness of the content.",
+    "privacy_title": "Privacy Policy",
+    "privacy_content": "1. Data Protection at a Glance\nWe take the protection of your personal data very seriously. We treat your personal data confidentially and in accordance with the statutory data protection regulations and this privacy policy.\n\n2. Data Collection on Our Website\nWe only store a strictly necessary cookie to save your language preference. No third-party trackers are running without your consent.\n\n3. Your Rights\nYou have the right to receive information about the origin, recipient, and purpose of your stored personal data at any time free of charge.",
+    "terms_title": "Terms of Service",
+    "terms_content": "1. Scope of Application\nThese Terms of Service apply to all interactions with Buff.\n\n2. Services Provided\nWe provide technical backbone, creative punch, and strategic clarity.\n\n3. Liability\nWe build high-performance products. If it breaks, we fix it.\n\n4. Final Provisions\nStop accepting average stuff."
+  },
+  "Brand": {
+    "title": "Branding & Assets",
+    "description": "Download official Buff assets, logos, and check out our visual identity guidelines. No bullshit, just pure aesthetics.",
+    "download_btn": "Download Brandkit (.zip)",
+    "colors_title": "Design System",
+    "typography_title": "Typography"
+  },
+  "Footer": {
+    "title": "We are Buff.",
+    "description": "We provide the technical backbone, the creative punch, and the strategic clarity your brand is currently missing.",
+    "no_bullshit": "No bullshit attached.",
+    "nav_title": "Navigation",
+    "nav_products": "Products",
+    "nav_services": "Services",
+    "nav_about": "About Us",
+    "nav_brandkit": "Brandkit & Assets",
+    "nav_start_project": "Start Project",
+    "legal_title": "Legal",
+    "legal_imprint": "Imprint",
+    "legal_privacy": "Privacy Policy",
+    "legal_terms": "Terms of Service",
+    "language_title": "Language",
+    "bitfog_tooltip": "Visit our sister brand bitfog.",
+    "copyright": "© 2026 Buff. No bullshit reserved."
+  },
+  "Loading": {
+    "step1": "Initializing raw tech...",
+    "step2": "Bypassing average...",
+    "step3": "Making competitors nervous...",
+    "step4": "Ready."
+  }
+}

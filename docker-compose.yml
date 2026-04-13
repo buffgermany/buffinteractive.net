@@ -1,0 +1,71 @@
+version: "3.9"
+
+# ============================================================
+# Platform Docker Compose
+#
+# Prerequisites:
+#   - PostgreSQL 16 (already hosted externally — env: DATABASE_URL)
+#   - Redis 7     (already hosted externally — env: REDIS_URL)
+#   - SeaweedFS   (already hosted externally — env: SEAWEEDFS_*)
+#
+# Run:
+#   docker compose up -d
+# ============================================================
+
+networks:
+  platform:
+    driver: bridge
+
+services:
+  # ------------------------------------------------------------
+  # API — ElysiaJS on Bun (compiled binary)
+  # ------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: platform-api
+    restart: unless-stopped
+    networks:
+      - platform
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - API_PORT=3001
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:3001/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # ------------------------------------------------------------
+  # Web — Next.js 15 Standalone
+  # ------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: platform-web
+    restart: unless-stopped
+    networks:
+      - platform
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://api:3001
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s

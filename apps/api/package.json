@@ -1,0 +1,34 @@
+{
+  "name": "@platform/api",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "dev": "bun run --env-file=../../.env --watch src/index.ts",
+    "build": "bun run --env-file=../../.env bun build src/index.ts --compile --outfile dist/api",
+    "start": "dist/api",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@elysiajs/cors": "^1.2.2",
+    "@elysiajs/swagger": "^1.2.1",
+    "elysia": "^1.2.25",
+    "ioredis": "^5.4.2",
+    "stripe": "^17.7.0",
+    "@platform/db": "workspace:*",
+    "@platform/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.7.3"
+  }
+}

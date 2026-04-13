@@ -1,0 +1,105 @@
+{
+  "Hero": {
+    "title_part1": "Tu estrategia digital",
+    "title_part2": "está perdiendo dinero",
+    "description": "El código promedio y las campañas genéricas no solo son aburridos, sino caros. Construimos infraestructura de alto rendimiento y marketing implacable.",
+    "cta": "Pruébanos."
+  },
+  "RealityCheck": {
+    "text": "Estás cansado de gestionar a cinco proveedores diferentes que se culpan mutuamente cuando algo se rompe. El resultado no es sinergia. Es parálisis.",
+    "highlightPhrase": "Es parálisis."
+  },
+  "Header": {
+    "nav_products": "Productos",
+    "nav_services": "Servicios",
+    "nav_about": "Sobre Nosotros",
+    "nav_login": "Iniciar sesión",
+    "nav_dashboard": "Dashboard",
+    "cta": "Empezar",
+    "mobile_products": "Productos",
+    "mobile_services": "Servicios",
+    "mobile_about": "Sobre Nosotros",
+    "mobile_contact": "Contacto"
+  },
+  "Auth": {
+    "login_title": "Bienvenido de nuevo.",
+    "signup_title": "Empieza a ejecutar.",
+    "email_label": "CORREO",
+    "email_placeholder": "tu@empresa.com",
+    "password_label": "CONTRASEÑA",
+    "password_placeholder": "••••••••",
+    "name_label": "NOMBRE",
+    "name_placeholder": "Juan Pérez",
+    "company_label": "EMPRESA",
+    "company_placeholder": "Tu Empresa",
+    "submit_login": "Iniciar sesión",
+    "submit_signup": "Crear cuenta",
+    "divider": "O",
+    "toggle_login": "Sign In",
+    "toggle_signup": "Sign Up",
+    "show_password": "Mostrar",
+    "hide_password": "Ocultar",
+    "error_invalid_email": "Dirección de correo no válida.",
+    "error_password_min": "La contraseña debe tener al menos 10 caracteres.",
+    "error_name_min": "El nombre debe tener al menos 2 caracteres.",
+    "signup_disabled_title": "Registro desactivado",
+    "signup_disabled_description": "Los registros están desactivados temporalmente. Por favor, contáctenos para obtener acceso."
+  },
+  "Contact": {
+    "title": "Dejémonos de charlas."
+  },
+  "Arsenal": {
+    "build_title": "Tecnología pura.",
+    "growth_title": "Construimos atención.",
+    "build_tab_label": "The Build",
+    "growth_tab_label": "The Growth"
+  },
+  "EnterpriseBento": {
+    "section_headline": "Construido para la mayor corporación de Europa.",
+    "nda_hint": "Otros líderes del mercado no revelados bajo NDA",
+    "card1_headline": "Escalamos la gestión de ventas de T-Mobile en toda Alemania.",
+    "card2_title": "Tiempo de respuesta: Cero.",
+    "card2_text": "Implementado en tiempo real durante la atención al cliente. Cero tolerancia a esperas o errores. La herramienta fluye sin interrupciones. La máxima velocidad no fue una opción, sino el principio fundamental de su diseño.",
+    "card3_title": "Complejidad invisible.",
+    "card3_text": "Diseñado para un uso intensivo en toda Alemania. Una interfaz intuitiva con un backend que es una auténtica fortaleza. Control total de permisos, cumplimiento riguroso y máxima disponibilidad."
+  },
+  "Legal": {
+    "imprint_title": "Aviso Legal",
+    "imprint_content": "Buff Digital Agency\nAcid Lime Street 42\n10115 Berlín\n\nRepresentado por:\nJohn Doe\n\nContacto:\nEmail: legal@buff.test\nTeléfono: +49 123 456 789\n\nDescargo de responsabilidad:\nEl contenido de estas páginas ha sido creado con gran cuidado. Sin embargo, no podemos garantizar la exactitud, exhaustividad o actualidad del contenido.",
+    "privacy_title": "Política de Privacidad",
+    "privacy_content": "1. Protección de Datos en un Vistazo\nNos tomamos muy en serio la protección de sus datos personales. Tratamos sus datos de forma confidencial y de acuerdo con las normativas legales de protección de datos.\n\n2. Recopilación de Datos en Nuestro Sitio Web\nSolo almacenamos una cookie estrictamente necesaria para guardar sus preferencias de idioma. No se ejecutan rastreadores de terceros sin su consentimiento.\n\n3. Sus Derechos\nUsted tiene derecho a recibir información sobre el origen, destinatario y propósito de sus datos personales almacenados en cualquier momento de forma gratuita.",
+    "terms_title": "Términos de Servicio",
+    "terms_content": "1. Ámbito de Aplicación\nEstos Términos de Servicio se aplican a todas las interacciones con Buff.\n\n2. Servicios Proporcionados\nProporcionamos infraestructura técnica, impacto creativo y claridad estratégica.\n\n3. Responsabilidad\nConstruimos productos de alto rendimiento. Si se rompe, lo arreglamos.\n\n4. Disposiciones Finales\nDeja de aceptar cosas promedio."
+  },
+  "Brand": {
+    "title": "Branding & Assets",
+    "description": "Descarga los recursos oficiales de Buff, logotipos y descubre nuestra identidad visual. Sin tonterías, pura estética.",
+    "download_btn": "Descargar Brandkit (.zip)",
+    "colors_title": "Sistema de Diseño",
+    "typography_title": "Tipografía"
+  },
+  "Footer": {
+    "title": "Somos Buff.",
+    "description": "Proporcionamos la infraestructura técnica, el impacto creativo y la claridad estratégica que le falta a tu marca.",
+    "no_bullshit": "Sin tonterías.",
+    "nav_title": "Navegación",
+    "nav_products": "Productos",
+    "nav_services": "Servicios",
+    "nav_about": "Sobre Nosotros",
+    "nav_brandkit": "Brandkit y Recursos",
+    "nav_start_project": "Iniciar Proyecto",
+    "legal_title": "Legal",
+    "legal_imprint": "Aviso Legal",
+    "legal_privacy": "Política de Privacidad",
+    "legal_terms": "Términos de Servicio",
+    "language_title": "Idioma",
+    "bitfog_tooltip": "Visita nuestra marca hermana bitfog.",
+    "copyright": "© 2026 Buff. Reservados sin tonterías."
+  },
+  "Loading": {
+    "step1": "Inicializando tecnología pura...",
+    "step2": "Evitando el promedio...",
+    "step3": "Poniendo nerviosa a la competencia...",
+    "step4": "Listo."
+  }
+}

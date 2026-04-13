@@ -1,0 +1,108 @@
+{
+  "Hero": {
+    "title_part1": "Macht eure",
+    "title_part2": "Konkurrenz nervös",
+    "description": "Wer auf Nummer sicher geht, gewinnt keine Märkte. Wir bauen die Tech, die euer Business antreibt, und das Marketing, das es skaliert. Für euren unfairen, unübersehbaren Vorteil.",
+    "cta": "Beweis es uns."
+  },
+  "RealityCheck": {
+    "text": "Die Taktiken, die euch bis hierher gebracht haben, sprengen jetzt eure Infrastruktur. Entweder crasht euer Code unter dem Traffic, oder das Marketing schafft es nicht, ihn reinzuholen.",
+    "highlightPhrase": "sprengen jetzt eure Infrastruktur"
+  },
+  "Header": {
+    "nav_products": "Products",
+    "nav_services": "Services",
+    "nav_about": "About Us",
+    "nav_login": "Login",
+    "nav_dashboard": "Dashboard",
+    "cta": "Start",
+    "mobile_products": "Products",
+    "mobile_services": "Services",
+    "mobile_about": "About Us",
+    "mobile_contact": "Contact"
+  },
+  "Auth": {
+    "login_title": "Willkommen zurück.",
+    "signup_title": "Zeit zu liefern.",
+    "email_label": "E-MAIL",
+    "email_placeholder": "du@firma.de",
+    "password_label": "PASSWORT",
+    "password_placeholder": "••••••••",
+    "name_label": "NAME",
+    "name_placeholder": "Dein Name",
+    "company_label": "FIRMA",
+    "company_placeholder": "Deine Firma",
+    "submit_login": "Anmelden",
+    "submit_signup": "Account erstellen",
+    "divider": "ODER",
+    "toggle_login": "Sign In",
+    "toggle_signup": "Sign Up",
+    "show_password": "Show",
+    "hide_password": "Hide",
+    "error_invalid_email": "Ungültige E-Mail Adresse.",
+    "error_password_min": "Passwort muss mindestens 10 Zeichen lang sein.",
+    "error_name_min": "Name muss mindestens 2 Zeichen lang sein.",
+    "signup_disabled_title": "Registrierung deaktiviert",
+    "signup_disabled_description": "Signups sind temporär deaktiviert. Bitte kontaktieren Sie uns für Zugang."
+  },
+  "Contact": {
+    "title": "Sparen wir uns den Smalltalk.",
+    "subtext": "Sagt uns, was nicht funktioniert oder was ihr erreichen wollt. Wir sind dabei, wenn es ehrgeizig ist. Wenn es langweilig ist, lassen wir es."
+  },
+  "Arsenal": {
+    "build_title": "Der Motor",
+    "growth_title": "Kompromissloses Wachstum",
+    "build_description": "Custom Software, High-Performance Hosting und SaaS-Infrastrukturen, die nicht sofort einknicken, wenn der Traffic durch die Decke geht.",
+    "growth_description": "Ein tolles Produkt ist wertlos, wenn es niemand nutzt. Wir erzwingen die Aufmerksamkeit, die eure Brand verdient. Von Performance-Marketing bis zum nahtlosen Fulfillment – wir sorgen dafür, dass der Markt euch sieht. Und bezahlt.",
+    "build_tab_label": "The Build",
+    "growth_tab_label": "The Growth"
+  },
+  "EnterpriseBento": {
+    "section_headline": "Gebaut für Europas größten Konzern.",
+    "nda_hint": "Weitere verschwiegene Marktführer unter NDA",
+    "card1_headline": "Wir skalieren die Vertriebssteuerung der Deutschen Telekom bundesweit.",
+    "card2_title": "Null Sekunden Bedenkzeit.",
+    "card2_text": "Eingesetzt live im Kundengespräch. Das bedeutet: Null Toleranz für Ladezeiten & Fehler. Das Tool steht nie im Weg. Absolute Höchstgeschwindigkeit war hier keine Option, sondern das fundamentale Design-Prinzip.",
+    "card3_title": "Komplexität, unsichtbar gemacht.",
+    "card3_text": "Gebaut für den pausenlosen Einsatz aus ganz Deutschland. Das Frontend ist spielerisch leicht, das Backend eine absolute Festung. Volle Rechtesteuerung, strenge Compliance und maximale Ausfallsicherheit."
+  },
+  "Legal": {
+    "imprint_title": "Impressum",
+    "imprint_content": "Buff Germany UG\nEulitzstr. 1\n09112 Chemnitz\n\nVertreten durch:\nJohn Doe\n\nKontakt:\nE-Mail: legal@buff.test\nTelefon: +49 123 456 789\n\nHaftungsausschluss:\nDie Inhalte dieser Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen.",
+    "privacy_title": "Datenschutzerklärung",
+    "privacy_content": "1. Datenschutz auf einen Blick\nWir nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung.\n\n2. Datenerfassung auf unserer Website\nWir speichern nur ein zwingend erforderliches Cookie, um Ihre Spracheinstellung zu sichern. Ohne Ihre Zustimmung laufen keine Drittanbieter-Tracker.\n\n3. Ihre Rechte\nSie haben jederzeit das Recht, unentgeltlich Auskunft über Herkunft, Empfänger und Zweck Ihrer gespeicherten personenbezogenen Daten zu erhalten.",
+    "terms_title": "Allgemeine Geschäftsbedingungen",
+    "terms_content": "1. Geltungsbereich\nDiese AGB gelten für alle Interaktionen mit Buff.\n\n2. Erbrachte Leistungen\nWir liefern technisches Rückgrat, kreativen Durchschlag und strategische Klarheit.\n\n3. Haftung\nWir bauen Hochleistungsprodukte. Wenn etwas kaputt geht, reparieren wir es.\n\n4. Schlussbestimmungen\nAkzeptiere keinen Durchschnitt mehr."
+  },
+  "Brand": {
+    "title": "Branding & Assets",
+    "description": "Lade offizielle Buff-Assets und Logos herunter und entdecke unsere Visual Identity. Kein Bullshit, purer Minimalismus.",
+    "download_btn": "Brandkit Herunterladen (.zip)",
+    "colors_title": "Design System",
+    "typography_title": "Typografie"
+  },
+  "Footer": {
+    "title": "Wir sind Buff.",
+    "description": "Wir liefern das technische Fundament, die kreative Durchschlagskraft und die strategische Klarheit, die deiner Marke derzeit fehlt.",
+    "no_bullshit": "Ohne Bullshit.",
+    "nav_title": "Navigation",
+    "nav_products": "Produkte",
+    "nav_services": "Dienstleistungen",
+    "nav_about": "Über Uns",
+    "nav_brandkit": "Brandkit & Assets",
+    "nav_start_project": "Projekt Starten",
+    "legal_title": "Rechtliches",
+    "legal_imprint": "Impressum",
+    "legal_privacy": "Datenschutz",
+    "legal_terms": "AGB",
+    "language_title": "Sprache",
+    "bitfog_tooltip": "Besuche unsere Schwester-Brand bitfog.",
+    "copyright": "© 2026 Buff. No bullshit reserved."
+  },
+  "Loading": {
+    "step1": "Rohe Tech initialisiert...",
+    "step2": "Durchschnitt ignoriert...",
+    "step3": "Konkurrenz schwitzt...",
+    "step4": "Bereit."
+  }
+}
