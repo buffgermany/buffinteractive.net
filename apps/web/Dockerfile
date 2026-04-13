@@ -10,7 +10,7 @@ COPY packages/client-sdk/package.json ./packages/client-sdk/
 COPY apps/web/package.json ./apps/web/
 COPY apps/api/package.json ./apps/api/
 
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # ---- Builder ----
 FROM oven/bun:1 AS builder

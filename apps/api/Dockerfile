@@ -10,7 +10,7 @@ COPY packages/client-sdk/package.json ./packages/client-sdk/
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
 
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Copy source
 COPY packages/shared/ ./packages/shared/
