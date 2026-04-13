@@ -27,6 +27,9 @@ RUN bun build src/index.ts --compile --outfile /app/dist/api
 FROM debian:bookworm-slim AS runner
 WORKDIR /app
 
+# Install wget for health checks
+RUN apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/*
+
 # Copy the compiled binary
 COPY --from=base /app/dist/api ./api
 
