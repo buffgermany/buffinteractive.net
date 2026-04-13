@@ -21,11 +21,18 @@ ENV TURBO_TELEMETRY_DISABLED 1
 
 COPY --from=deps /app /app
 
-COPY . .
+# Copy source code
+COPY packages/shared/ ./packages/shared/
+COPY packages/db/ ./packages/db/
+COPY packages/client-sdk/ ./packages/client-sdk/
+COPY apps/web/ ./apps/web/
+COPY tsconfig.base.json ./
 
-# Build Next.js with standalone output
+# Build Next.js
+# We call 'next build' directly because the 'build' script in package.json 
+# tries to load a local .env file which doesn't exist in the container.
 WORKDIR /app/apps/web
-RUN bun run build
+RUN ../../node_modules/.bin/next build
 
 # ---- Production runner ----
 FROM node:22-alpine AS runner
