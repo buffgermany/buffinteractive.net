@@ -2,14 +2,14 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Server, Zap, Users, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Server, Zap, Users, CheckCircle2, LucideIcon } from "lucide-react";
 import { GlowCard } from "@/components/premium/effects";
 import { Button, Badge, Skeleton } from "@/components/ui/primitives";
 import { WigglyUnderline } from "@/components/premium/organic-ui";
 import { formatCurrency } from "@/lib/utils";
 import type { Product } from "@platform/shared";
 
-const PRODUCT_ICONS: Record<string, React.ElementType> = {
+const PRODUCT_ICONS: Record<string, LucideIcon> = {
   saas: Zap,
   self_hosted: Server,
   human_service: Users,

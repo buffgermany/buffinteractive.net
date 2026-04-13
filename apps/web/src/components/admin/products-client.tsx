@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Plus, Pencil, Trash2, X, Server, Zap, Users, Eye, EyeOff
+  Plus, Pencil, Trash2, X, Server, Zap, Users, Eye, EyeOff, LucideIcon
 } from "lucide-react";
 import {
   Button, Input, Label, Textarea, Badge,
@@ -175,7 +175,7 @@ export function AdminProductsClient({ initial }: { initial: Product[] }) {
     }
   }
 
-  const Icon: Record<string, React.ElementType> = { saas: Zap, self_hosted: Server, human_service: Users };
+  const Icon: Record<string, LucideIcon> = { saas: Zap, self_hosted: Server, human_service: Users };
 
   return (
     <div className="space-y-6 p-6">
