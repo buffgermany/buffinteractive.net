@@ -2,6 +2,7 @@ version: "3.9"
 
 # ============================================================
 # Platform Cloud-Optimized Docker Compose
+# Designed for Coolify "Zero-Config" Deployment
 # ============================================================
 
 networks:
@@ -20,10 +21,13 @@ services:
     restart: always
     networks:
       - platform
-    # Exposing ports internally for the Coolify proxy
+    # COOLIFY AUTO-CONFIG LABELS
+    labels:
+      - "coolify.managed=true"
+      # Automatically route api.buffinteractive.net to this service
+      - "coolify.traefik.frontend.rule=Host(`api.buffinteractive.net`)"
     expose:
       - "3001"
-    # Port mapping kept for direct access if needed (optional)
     ports:
       - "3001:3001"
     environment:
@@ -52,14 +56,19 @@ services:
     restart: always
     networks:
       - platform
+    # COOLIFY AUTO-CONFIG LABELS
+    labels:
+      - "coolify.managed=true"
+      # Automatically route buffinteractive.net to this service
+      - "coolify.traefik.frontend.rule=Host(`buffinteractive.net`)"
     expose:
       - "3000"
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      # SSR fallback to internal network; override in Coolify for Client-side
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://api:3001}
+      - NEXT_PUBLIC_API_URL=https://api.buffinteractive.net
+      - BETTER_AUTH_URL=https://buffinteractive.net
     depends_on:
       api:
         condition: service_healthy
