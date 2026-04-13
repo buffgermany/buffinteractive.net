@@ -43,7 +43,7 @@ export default function AuthPage() {
     handleSubmit,
     reset,
     formState: { errors, isValid },
-  } = useForm({
+  } = useForm<SignupFormValues>({
     resolver: zodResolver(authMode === 'login' ? loginSchema : signupSchema),
     mode: "onChange",
     defaultValues: {
@@ -51,7 +51,7 @@ export default function AuthPage() {
         password: "",
         name: "",
         company: "",
-    }
+    } as SignupFormValues
   });
 
   // Reset states when switching modes
