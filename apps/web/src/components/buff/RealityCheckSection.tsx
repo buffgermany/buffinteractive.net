@@ -31,16 +31,16 @@ const REVEAL_END = 0.4;
  * scroll, the content is already partially faded and translated, so the
  * transition feels like one continuous, intentional motion.
  */
-const CONTENT_FADE_INPUT = [0, 0.08, 0.56, 0.70] as const;
-const CONTENT_FADE_OUTPUT = [0, 1, 1, 0] as const;
+const CONTENT_FADE_INPUT = [0, 0.08, 0.56, 0.70] as number[];
+const CONTENT_FADE_OUTPUT = [0, 1, 1, 0] as number[];
 
 /**
  * Exit drift: the content rises inside the sticky viewport before the CSS
  * sticky releases (~0.667). This pre-motion means the physical unlock is
  * invisible — the eye perceives one smooth upward scroll, not a snap.
  */
-const CONTENT_EXIT_INPUT = [0.52, 0.70] as const;
-const CONTENT_EXIT_OUTPUT = [0, -120] as const;
+const CONTENT_EXIT_INPUT = [0.52, 0.70] as number[];
+const CONTENT_EXIT_OUTPUT = [0, -120] as number[];
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

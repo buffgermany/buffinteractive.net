@@ -27,7 +27,7 @@ const itemVariants = {
       damping: 30,
     },
   },
-};
+} as const;
 
 export function GrowthParadigm() {
   return (

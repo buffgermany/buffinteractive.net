@@ -25,7 +25,7 @@ const ArchitectureGrid = () => (
            </div>
            {Array.from({length: 15}).map((_, i) => (
              <div key={i} className="flex gap-3 whitespace-nowrap opacity-60">
-               <span className="text-white/20">[{new Date().toISOString().split('T')[1].substring(0, 11)}]</span>
+               <span className="text-white/20">[{new Date().toISOString().split('T')[1]?.substring(0, 11) ?? ""}]</span>
                <span className="text-white/30">{['INFO', 'WARN', 'SYS '][i % 3]}</span>
                <span className={i % 4 === 0 ? "text-[#CCFF00]/80" : ""}>
                  {['Node synchronized via primary relay', 'Rebalancing shards across regions', 'Packet loss detected on edge node', 'Route optimized (latency: 12ms)', 'Allocating memory buffer [256MB]', 'Cache hit (ratio: 0.98)'][i % 6]}

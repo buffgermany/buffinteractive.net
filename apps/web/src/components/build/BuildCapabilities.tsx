@@ -123,7 +123,7 @@ const ModernizationVisual = () => (
 );
 
 export const BuildCapabilities = () => {
-  const [activeTab, setActiveTab] = useState(capabilities[0].id);
+  const [activeTab, setActiveTab] = useState(capabilities[0]?.id ?? "frontend");
 
   return (
     <section className="relative w-full bg-[#050505]">

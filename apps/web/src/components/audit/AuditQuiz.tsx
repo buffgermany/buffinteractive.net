@@ -210,20 +210,20 @@ export const AuditQuiz = () => {
     QUESTIONS.filter(q => !q.condition || q.condition(data))
   , [data]);
 
-  const currentQuestion = availableQuestions[currentStepIndex];
+  const currentQuestion = availableQuestions[currentStepIndex] as any;
 
   const handleSelect = (option: Option) => {
     if (selectedOptionId) return;
     
-    setSelectedOptionId(option.id);
-    setFeedback(option.feedback);
+    setSelectedOptionId(option["id"]);
+    setFeedback(option["feedback"]);
 
     setData((prev) => ({
       ...prev,
-      engineeringPoints: prev.engineeringPoints + option.points.eng,
-      growthPoints: prev.growthPoints + option.points.growth,
-      scale: currentQuestion.id === "scale" ? option.id : prev.scale,
-      history: [...prev.history, currentQuestion.id],
+      engineeringPoints: prev["engineeringPoints"] + option["points"]["eng"],
+      growthPoints: prev["growthPoints"] + option["points"]["growth"],
+      scale: currentQuestion["id"] === "scale" ? option["id"] : prev["scale"],
+      history: [...prev["history"], currentQuestion["id"]],
     }));
 
     // High-Fidelity Transition Delay (Analysis simulation)
@@ -270,7 +270,7 @@ export const AuditQuiz = () => {
 
       <AnimatePresence mode="wait">
         <motion.div
-          key={currentQuestion.id}
+          key={currentQuestion["id"]}
           initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           exit={{ opacity: 0, y: -30, filter: "blur(10px)" }}
@@ -303,9 +303,9 @@ export const AuditQuiz = () => {
               show: { transition: { staggerChildren: 0.1 } }
             }}
           >
-            {currentQuestion.options.map((option) => (
+            {currentQuestion["options"].map((option: any) => (
               <motion.div
-                key={option.id}
+                key={option["id"]}
                 variants={{
                   hidden: { opacity: 0, y: 20 },
                   show: { opacity: 1, y: 0 }
@@ -313,8 +313,8 @@ export const AuditQuiz = () => {
               >
                 <OptionCard 
                   option={option}
-                  isSelected={selectedOptionId === option.id}
-                  isDimmed={!!selectedOptionId && selectedOptionId !== option.id}
+                  isSelected={selectedOptionId === option["id"]}
+                  isDimmed={!!selectedOptionId && selectedOptionId !== option["id"]}
                   onSelect={() => handleSelect(option)}
                 />
               </motion.div>

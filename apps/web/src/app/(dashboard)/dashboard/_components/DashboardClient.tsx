@@ -123,10 +123,10 @@ const PRODUCT_TYPE_LABEL: Record<string, string> = {
 // ============================================================
 
 function LicenseRow({ license, index }: { license: License; index: number }) {
-  const statusCfg = STATUS_CONFIG[license.status] ?? STATUS_CONFIG["expired"];
-  const StatusIcon = statusCfg.icon;
-  const ProductIcon = license.product.type === "self_hosted" ? Server : license.product.type === "human_service" ? Users : Zap;
-  const isExpired = license.status === "expired" || license.status === "revoked";
+  const statusCfg = (STATUS_CONFIG[license.status] ?? STATUS_CONFIG["expired"])!;
+  const StatusIcon = statusCfg["icon"];
+  const ProductIcon = license["product"]["type"] === "self_hosted" ? Server : license["product"]["type"] === "human_service" ? Users : Zap;
+  const isExpired = license["status"] === "expired" || license["status"] === "revoked";
 
   return (
     <motion.div
@@ -150,17 +150,17 @@ function LicenseRow({ license, index }: { license: License; index: number }) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <p className="text-lg font-bold text-white truncate">{license.product.name}</p>
+            <p className="text-lg font-bold text-white truncate">{license["product"]["name"]}</p>
             <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground bg-white/5 px-2 py-0.5 rounded-md">
-                {PRODUCT_TYPE_LABEL[license.product.type] ?? license.product.type}
+                {PRODUCT_TYPE_LABEL[license["product"]["type"]] ?? license["product"]["type"]}
             </span>
           </div>
           <p className="text-xs font-mono text-muted-foreground truncate opacity-70 group-hover:opacity-100 transition-opacity">{license.licenseKey}</p>
         </div>
 
-        <div className={cn("hidden lg:flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all", statusCfg.color, statusCfg.bgColor, statusCfg.borderColor)}>
+        <div className={cn("hidden lg:flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all", statusCfg["color"], statusCfg["bgColor"], statusCfg["borderColor"])}>
           <StatusIcon size={12} strokeWidth={3} />
-          {statusCfg.label}
+          {statusCfg["label"]}
         </div>
 
         <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
@@ -174,7 +174,7 @@ function LicenseRow({ license, index }: { license: License; index: number }) {
 // ============================================================
 
 function OrderRow({ order, index }: { order: Order; index: number }) {
-  const statusCfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG["pending"];
+  const statusCfg = (STATUS_CONFIG[order.status] ?? STATUS_CONFIG["pending"])!;
   const formattedAmount = new Intl.NumberFormat("en", {
     style: "currency",
     currency: order.currency?.toUpperCase() ?? "EUR",
@@ -198,8 +198,8 @@ function OrderRow({ order, index }: { order: Order; index: number }) {
         </div>
         <div className="flex flex-col items-end text-right">
             <span className="text-[10px] text-muted-foreground mb-1">{formattedDate}</span>
-            <div className={cn("text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded border leading-none", statusCfg.color, statusCfg.borderColor, statusCfg.bgColor)}>
-                {statusCfg.label}
+            <div className={cn("text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded border leading-none", statusCfg["color"], statusCfg["borderColor"], statusCfg["bgColor"])}>
+                {statusCfg["label"]}
             </div>
         </div>
     </motion.div>
@@ -210,7 +210,11 @@ function OrderRow({ order, index }: { order: Order; index: number }) {
 // Hero Section
 // ============================================================
 
-function DashboardHero({ firstName }: { firstName: string }) {
+interface DashboardHeroProps {
+  firstName: string;
+}
+
+function DashboardHero({ firstName }: DashboardHeroProps) {
     return (
         <section className="relative py-12 md:py-24 flex flex-col items-center text-center">
             <motion.div
@@ -237,7 +241,7 @@ function DashboardHero({ firstName }: { firstName: string }) {
 export function DashboardClient({ userName, licenses, orders }: DashboardClientProps) {
   const activeLicenses = useMemo(() => licenses.filter((l) => l.status === "active").length, [licenses]);
   const uniqueProducts = useMemo(() => new Set(licenses.map((l) => l.productId)).size, [licenses]);
-  const firstName = userName.split(" ")[0];
+  const firstName = userName.split(" ")[0] ?? "User";
 
   return (
     <div className="mx-auto w-full max-w-7xl px-6 lg:px-10 pb-32">
