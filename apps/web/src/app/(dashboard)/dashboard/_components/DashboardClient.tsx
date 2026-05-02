@@ -123,7 +123,7 @@ const PRODUCT_TYPE_LABEL: Record<string, string> = {
 // ============================================================
 
 function LicenseRow({ license, index }: { license: License; index: number }) {
-  const statusCfg = STATUS_CONFIG[license.status] ?? STATUS_CONFIG.expired;
+  const statusCfg = STATUS_CONFIG[license.status] ?? STATUS_CONFIG["expired"];
   const StatusIcon = statusCfg.icon;
   const ProductIcon = license.product.type === "self_hosted" ? Server : license.product.type === "human_service" ? Users : Zap;
   const isExpired = license.status === "expired" || license.status === "revoked";
@@ -174,7 +174,7 @@ function LicenseRow({ license, index }: { license: License; index: number }) {
 // ============================================================
 
 function OrderRow({ order, index }: { order: Order; index: number }) {
-  const statusCfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
+  const statusCfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG["pending"];
   const formattedAmount = new Intl.NumberFormat("en", {
     style: "currency",
     currency: order.currency?.toUpperCase() ?? "EUR",
