@@ -8,6 +8,13 @@
       "when": 1774816674866,
       "tag": "0000_dazzling_thanos",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776097589445,
+      "tag": "0001_sticky_jamie_braddock",
+      "breakpoints": true
     }
   ]
 }

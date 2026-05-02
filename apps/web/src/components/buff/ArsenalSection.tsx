@@ -144,7 +144,8 @@ export function ArsenalSection() {
   }, []);
 
   return (
-    <section className="relative min-h-screen py-24 px-6 flex flex-col items-center justify-center overflow-hidden bg-[#0A0A0A]">
+    <section id="products" className="relative min-h-screen py-24 px-6 flex flex-col items-center justify-center overflow-hidden bg-[#0A0A0A]">
+      <div id="services" className="absolute top-0 left-0 w-0 h-0" />
       
       {/* Premium Background Cross-fade Layers */}
       <div className="absolute inset-0 z-0">

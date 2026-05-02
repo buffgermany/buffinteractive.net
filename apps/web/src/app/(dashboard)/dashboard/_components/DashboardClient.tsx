@@ -1,9 +1,10 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
-import { Key, ShoppingBag, Zap, Server, Users, ArrowUpRight, Clock, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
+import { useEffect, useRef, useState, useMemo } from "react";
+import { Key, ShoppingBag, Zap, Server, Users, ArrowUpRight, Clock, CheckCircle2, AlertCircle, XCircle, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 // ============================================================
 // Types
@@ -41,7 +42,7 @@ interface DashboardClientProps {
 // Count-Up Animation Hook
 // ============================================================
 
-function useCountUp(target: number, duration = 1200) {
+function useCountUp(target: number, duration = 1500) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
@@ -74,23 +75,25 @@ function StatBlock({ label, value, icon: Icon, index }: { label: string; value: 
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30, delay: index * 0.08 }}
-      className="group flex flex-col gap-2 py-8 border-b border-white/5 md:border-b-0 md:border-r last:border-r-0 px-8 first:pl-0 last:pr-0 relative overflow-hidden"
+      transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.2 + index * 0.1 }}
+      className="group flex flex-col gap-3 py-10 px-8 relative overflow-hidden glass rounded-3xl border-white/5 hover:border-primary/20 transition-all duration-500"
     >
-      {/* Subtle hover glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(204,255,0,0.05)_0,transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
       
-      <div className="flex items-center gap-3">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#CCFF00]/10 border border-[#CCFF00]/15">
-          <Icon className="h-3.5 w-3.5 text-[#CCFF00]" />
+      <div className="flex items-center justify-between relative z-10">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary group-hover:bg-primary group-hover:text-background transition-all duration-500">
+          <Icon size={20} strokeWidth={2.5} />
         </div>
-        <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#A0A0B0]">{label}</span>
+        <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-muted-foreground group-hover:text-primary/70 transition-colors uppercase">{label}</span>
       </div>
-      <span ref={ref} className="font-heading font-black text-7xl lg:text-8xl leading-none tracking-tighter text-white tabular-nums" style={{ WebkitFontSmoothing: "antialiased" }}>
-        {count}
-      </span>
+      
+      <div className="mt-4 relative z-10">
+        <span ref={ref} className="font-heading font-bold text-6xl lg:text-7xl leading-none tracking-tighter text-white tabular-nums">
+          {count}
+        </span>
+      </div>
     </motion.div>
   );
 }
@@ -99,20 +102,20 @@ function StatBlock({ label, value, icon: Icon, index }: { label: string; value: 
 // Status Config
 // ============================================================
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
-  active: { label: "Active", color: "text-[#CCFF00]", icon: CheckCircle2 },
-  suspended: { label: "Suspended", color: "text-amber-400", icon: AlertCircle },
-  expired: { label: "Expired", color: "text-[#A0A0B0]", icon: Clock },
-  revoked: { label: "Revoked", color: "text-red-400", icon: XCircle },
-  paid: { label: "Paid", color: "text-[#CCFF00]", icon: CheckCircle2 },
-  pending: { label: "Pending", color: "text-amber-400", icon: Clock },
-  refunded: { label: "Refunded", color: "text-[#A0A0B0]", icon: XCircle },
+const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any; bgColor: string; borderColor: string }> = {
+  active: { label: "Active", color: "text-primary", icon: CheckCircle2, bgColor: "bg-primary/10", borderColor: "border-primary/20" },
+  suspended: { label: "Suspended", color: "text-amber-400", icon: AlertCircle, bgColor: "bg-amber-400/10", borderColor: "border-amber-400/20" },
+  expired: { label: "Expired", color: "text-muted-foreground", icon: Clock, bgColor: "bg-muted-foreground/10", borderColor: "border-muted-foreground/20" },
+  revoked: { label: "Revoked", color: "text-red-400", icon: XCircle, bgColor: "bg-red-400/10", borderColor: "border-red-400/20" },
+  paid: { label: "Paid", color: "text-primary", icon: CheckCircle2, bgColor: "bg-primary/10", borderColor: "border-primary/20" },
+  pending: { label: "Pending", color: "text-amber-400", icon: Clock, bgColor: "bg-amber-400/10", borderColor: "border-amber-400/20" },
+  refunded: { label: "Refunded", color: "text-muted-foreground", icon: XCircle, bgColor: "bg-muted-foreground/10", borderColor: "border-muted-foreground/20" },
 };
 
 const PRODUCT_TYPE_LABEL: Record<string, string> = {
-  self_hosted: "Self-Hosted",
-  human_service: "Human Service",
-  saas: "SaaS",
+  self_hosted: "Infrastructure",
+  human_service: "Strategic Service",
+  saas: "Digital Arsenal",
 };
 
 // ============================================================
@@ -120,103 +123,111 @@ const PRODUCT_TYPE_LABEL: Record<string, string> = {
 // ============================================================
 
 function LicenseRow({ license, index }: { license: License; index: number }) {
-  const statusCfg = STATUS_CONFIG[license.status] ?? { label: license.status, color: "text-[#A0A0B0]", icon: Clock };
+  const statusCfg = STATUS_CONFIG[license.status] ?? STATUS_CONFIG.expired;
   const StatusIcon = statusCfg.icon;
   const ProductIcon = license.product.type === "self_hosted" ? Server : license.product.type === "human_service" ? Users : Zap;
-  const isActive = license.status === "active";
+  const isExpired = license.status === "expired" || license.status === "revoked";
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -16 }}
+      initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.3 + index * 0.06 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.4 + index * 0.05 }}
     >
       <Link
         href={`/dashboard/licenses/${license.id}`}
-        className={`group relative flex items-center gap-6 py-5 px-6 transition-all duration-300 hover:bg-white/[0.03] ${isActive ? "border-l-2 border-[#CCFF00]" : "border-l-2 border-transparent"}`}
+        className={cn(
+            "group relative flex items-center gap-6 py-6 px-8 transition-all duration-300 hover:bg-white/[0.04] border-l-2",
+            isExpired ? "border-transparent opacity-60 grayscale" : "border-primary/40 hover:border-primary"
+        )}
       >
-        {/* Type tag */}
-        <span className="hidden lg:block w-28 shrink-0 text-[9px] font-mono uppercase tracking-[0.2em] text-[#A0A0B0]">
-          {PRODUCT_TYPE_LABEL[license.product.type] ?? license.product.type}
-        </span>
-
-        {/* Product icon */}
-        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors duration-300 ${isActive ? "bg-[#CCFF00]/10 border-[#CCFF00]/20 group-hover:bg-[#CCFF00]/15" : "bg-white/5 border-white/5 group-hover:bg-white/10"}`}>
-          <ProductIcon className={`h-4 w-4 ${isActive ? "text-[#CCFF00]" : "text-[#A0A0B0]"}`} />
+        <div className={cn(
+            "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border transition-all duration-500",
+            !isExpired ? "bg-primary/5 border-primary/10 group-hover:bg-primary group-hover:text-background group-hover:border-primary" : "bg-white/5 border-white/5"
+        )}>
+          <ProductIcon size={22} strokeWidth={2.5} className={cn(!isExpired && "group-hover:text-background")} />
         </div>
 
-        {/* Product name + key */}
-        <div className="flex-1 overflow-hidden">
-          <p className="text-base font-bold text-white truncate group-hover:text-white/90 transition-colors">{license.product.name}</p>
-          <p className="text-[11px] font-mono text-[#A0A0B0] truncate mt-0.5">{license.licenseKey}</p>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <p className="text-lg font-bold text-white truncate">{license.product.name}</p>
+            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground bg-white/5 px-2 py-0.5 rounded-md">
+                {PRODUCT_TYPE_LABEL[license.product.type] ?? license.product.type}
+            </span>
+          </div>
+          <p className="text-xs font-mono text-muted-foreground truncate opacity-70 group-hover:opacity-100 transition-opacity">{license.licenseKey}</p>
         </div>
 
-        {/* Status */}
-        <div className={`hidden sm:flex items-center gap-1.5 ${statusCfg.color}`}>
-          <StatusIcon className="h-3.5 w-3.5" />
-          <span className="text-[10px] font-mono uppercase tracking-widest">{statusCfg.label}</span>
+        <div className={cn("hidden lg:flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all", statusCfg.color, statusCfg.bgColor, statusCfg.borderColor)}>
+          <StatusIcon size={12} strokeWidth={3} />
+          {statusCfg.label}
         </div>
 
-        {/* Arrow */}
-        <ArrowUpRight className="h-4 w-4 text-[#A0A0B0] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
+        <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
       </Link>
     </motion.div>
   );
 }
 
 // ============================================================
-// Order Timeline Item
+// Order Row
 // ============================================================
 
-function OrderTimelineItem({ order, index, isLast }: { order: Order; index: number; isLast: boolean }) {
-  const statusCfg = STATUS_CONFIG[order.status] ?? { label: order.status, color: "text-[#A0A0B0]", icon: Clock };
-  const StatusIcon = statusCfg.icon;
-  const opacity = Math.max(0.35, 1 - index * 0.15);
-  const isFirst = index === 0;
-
+function OrderRow({ order, index }: { order: Order; index: number }) {
+  const statusCfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
   const formattedAmount = new Intl.NumberFormat("en", {
     style: "currency",
     currency: order.currency?.toUpperCase() ?? "EUR",
-    minimumFractionDigits: 2,
   }).format(order.amountCents / 100);
 
   const formattedDate = new Date(order.createdAt).toLocaleDateString("en", {
-    month: "short",
+    month: "long",
     day: "numeric",
-    year: "numeric",
   });
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: opacity, y: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.4 + index * 0.07 }}
-      className="relative flex gap-4 pb-6 last:pb-0"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5 + index * 0.05 }}
+      className="flex items-center justify-between py-4 group"
     >
-      {/* Timeline line */}
-      {!isLast && (
-        <div className="absolute left-[7px] top-6 w-px h-full bg-white/5" />
-      )}
-
-      {/* Dot */}
-      <div className={`relative mt-1 h-3.5 w-3.5 shrink-0 rounded-full border-2 ${isFirst ? "border-[#CCFF00] bg-[#CCFF00]" : "border-white/20 bg-[#0A0A0A]"}`} />
-
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <StatusIcon className={`h-3 w-3 shrink-0 ${statusCfg.color}`} />
-            <span className={`text-[9px] font-mono uppercase tracking-widest ${statusCfg.color}`}>{statusCfg.label}</span>
-          </div>
-          <span className={`font-heading font-black text-base tracking-tight ${isFirst ? "text-white" : "text-white/70"}`}>
-            {formattedAmount}
-          </span>
+        <div className="flex flex-col">
+            <span className="text-sm font-bold text-white">{formattedAmount}</span>
+            <span className="text-[10px] font-mono text-muted-foreground">{order.externalOrderId}</span>
         </div>
-        <p className="text-[10px] font-mono text-[#A0A0B0] mt-1 truncate">{order.externalOrderId}</p>
-        <p className="text-[10px] text-[#A0A0B0] mt-0.5">{formattedDate}</p>
-      </div>
+        <div className="flex flex-col items-end text-right">
+            <span className="text-[10px] text-muted-foreground mb-1">{formattedDate}</span>
+            <div className={cn("text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded border leading-none", statusCfg.color, statusCfg.borderColor, statusCfg.bgColor)}>
+                {statusCfg.label}
+            </div>
+        </div>
     </motion.div>
   );
+}
+
+// ============================================================
+// Hero Section
+// ============================================================
+
+function DashboardHero({ firstName }: { firstName: string }) {
+    return (
+        <section className="relative py-12 md:py-24 flex flex-col items-center text-center">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                className="relative z-10"
+            >
+                <h1 className="font-heading font-bold text-4xl md:text-6xl tracking-tighter text-white leading-tight mb-6">
+                    Moin, <span className="text-primary">{firstName}</span>.
+                </h1>
+                <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed opacity-80">
+                    Your digital arsenal is active. Manage licenses, track orders, and scale your deployment.
+                </p>
+            </motion.div>
+        </section>
+    );
 }
 
 // ============================================================
@@ -224,104 +235,108 @@ function OrderTimelineItem({ order, index, isLast }: { order: Order; index: numb
 // ============================================================
 
 export function DashboardClient({ userName, licenses, orders }: DashboardClientProps) {
-  const activeLicenses = licenses.filter((l) => l.status === "active").length;
-  const uniqueProducts = new Set(licenses.map((l) => l.productId)).size;
+  const activeLicenses = useMemo(() => licenses.filter((l) => l.status === "active").length, [licenses]);
+  const uniqueProducts = useMemo(() => new Set(licenses.map((l) => l.productId)).size, [licenses]);
   const firstName = userName.split(" ")[0];
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-6 lg:px-10 py-10 space-y-16">
-      {/* ── Greeting ──────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.05 }}
-      >
-        <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#A0A0B0] mb-2">Command Center</p>
-        <h1 className="font-heading font-black text-5xl sm:text-6xl tracking-tighter text-white leading-none">
-          {firstName}.
-        </h1>
-      </motion.div>
+    <div className="mx-auto w-full max-w-7xl px-6 lg:px-10 pb-32">
+      
+      <DashboardHero firstName={firstName} />
 
-      {/* ── KPI Bar ────────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.15 }}
-        className="border-t border-white/5"
-      >
-        <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/5">
-          <StatBlock label="Active Licenses" value={activeLicenses} icon={Key} index={0} />
-          <StatBlock label="Total Orders" value={orders.length} icon={ShoppingBag} index={1} />
-          <StatBlock label="Products owned" value={uniqueProducts} icon={Zap} index={2} />
+      {/* ── Stat Grid ────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+        <StatBlock label="Active Licenses" value={activeLicenses} icon={Key} index={0} />
+        <StatBlock label="Order History" value={orders.length} icon={ShoppingBag} index={1} />
+        <StatBlock label="Products in Arsenal" value={uniqueProducts} icon={Zap} index={2} />
+      </div>
+
+      {/* ── Premium Bento Content ────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+        {/* Licenses Panel (Largest) */}
+        <div className="lg:col-span-8 flex flex-col">
+            <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                    <h2 className="text-3xl font-heading font-bold tracking-tight">Your Arsenal</h2>
+                    <span className="text-[10px] font-mono text-muted-foreground bg-white/5 px-2 py-1 rounded border border-white/5">{licenses.length} Total</span>
+                </div>
+                {licenses.length > 0 && (
+                    <Link href="/dashboard/licenses" className="text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 group">
+                        View All <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                )}
+            </div>
+
+            {licenses.length === 0 ? (
+                <div className="flex-1 glass rounded-[2.5rem] border-white/5 p-12 flex flex-col items-center justify-center text-center">
+                    <div className="mb-6 h-20 w-20 flex items-center justify-center rounded-3xl bg-white/5 border border-white/10 opacity-20">
+                        <Key size={40} />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3 uppercase tracking-tight">The arsenal is empty</h3>
+                    <p className="text-muted-foreground max-w-sm mb-8">
+                        You haven't acquired any digital licenses yet. Unlock infrastructure and strategic services.
+                    </p>
+                    <Link href="/#products">
+                        <button className="interactive-pill bg-primary text-background px-10 py-3 font-bold uppercase text-sm hover:scale-105 transition-transform shadow-[0_0_30px_rgba(204,255,0,0.2)]">
+                            Browse Products
+                        </button>
+                    </Link>
+                </div>
+            ) : (
+                <div className="glass rounded-[2rem] border-white/5 overflow-hidden divide-y divide-white/[0.04]">
+                    {licenses.slice(0, 6).map((license, i) => (
+                        <LicenseRow key={license.id} license={license} index={i} />
+                    ))}
+                    {licenses.length > 6 && (
+                        <Link href="/dashboard/licenses" className="block py-6 text-center text-xs font-bold text-muted-foreground hover:text-white transition-colors bg-white/5 hover:bg-white/10">
+                            + {licenses.length - 6} more licenses. View full arsenal.
+                        </Link>
+                    )}
+                </div>
+            )}
         </div>
-        <div className="border-t border-white/5" />
-      </motion.div>
 
-      {/* ── Main Grid ──────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
-
-        {/* License List — 2/3 */}
-        <div className="lg:col-span-2 lg:border-r border-white/5">
-          {/* Section Header */}
-          <div className="flex items-center justify-between pb-6 lg:pr-10">
+        {/* Sidebar Panel (Orders & Status) */}
+        <div className="lg:col-span-4 space-y-10">
+            {/* Orders Section */}
             <div>
-              <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#A0A0B0]">Your Licenses</p>
-              <p className="text-xs text-[#A0A0B0] mt-1">{licenses.length} total · {activeLicenses} active</p>
+                <h3 className="text-xl font-heading font-bold mb-8 flex items-center justify-between">
+                    Recent Orders
+                    <Link href="/dashboard/orders" className="text-[9px] font-mono uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors">History</Link>
+                </h3>
+                <div className="glass rounded-[2rem] border-white/5 p-8 divide-y divide-white/[0.04]">
+                    {orders.length === 0 ? (
+                        <p className="text-xs text-muted-foreground py-4 text-center italic">No orders detected.</p>
+                    ) : (
+                        orders.slice(0, 5).map((order, i) => (
+                            <OrderRow key={order.id} order={order} index={i} />
+                        ))
+                    )}
+                </div>
             </div>
-          </div>
 
-          {licenses.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="flex flex-col items-start gap-4 py-16 pl-6 border-l-2 border-dashed border-white/10"
+            {/* Quick Support Card */}
+            <motion.div 
+                whileHover={{ scale: 1.02 }}
+                className="glass rounded-[2rem] border-primary/20 p-8 bg-gradient-to-br from-primary/10 to-transparent relative group overflow-hidden cursor-pointer"
             >
-              <Key className="h-8 w-8 text-[#A0A0B0]/30" />
-              <p className="text-xl font-bold text-white">No licenses yet</p>
-              <p className="text-sm text-[#A0A0B0] max-w-xs leading-relaxed">Purchase a product to get your first license. All your keys will live here.</p>
-              <Link href="/#products">
-                <motion.button
-                  whileHover={{ x: 4 }}
-                  className="flex items-center gap-2 text-sm font-bold text-[#CCFF00] hover:underline"
-                >
-                  Browse products <ArrowUpRight className="h-4 w-4" />
-                </motion.button>
-              </Link>
+                <div className="absolute top-2 right-2 p-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                    <ArrowUpRight size={20} />
+                </div>
+                <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary text-background mb-4 transition-transform group-hover:rotate-12">
+                    <Zap size={20} />
+                </div>
+                <h4 className="text-lg font-bold mb-2">Need strategic support?</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-6">
+                    Our engineering team is ready to scale your infrastructure or fix bottlenecks.
+                </p>
+                <Link href="/#contact" className="text-xs font-bold uppercase tracking-widest text-primary hover:underline">
+                    Initialize Comms
+                </Link>
             </motion.div>
-          ) : (
-            <div className="divide-y divide-white/[0.04]">
-              {licenses.map((license, i) => (
-                <LicenseRow key={license.id} license={license} index={i} />
-              ))}
-            </div>
-          )}
         </div>
 
-        {/* Order Timeline — 1/3 */}
-        <div className="lg:pl-10 pt-8 lg:pt-0">
-          <div className="pb-6">
-            <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-[#A0A0B0]">Recent Activity</p>
-            <p className="text-xs text-[#A0A0B0] mt-1">{orders.length} orders</p>
-          </div>
-
-          {orders.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.35 }}
-              className="pl-4 border-l border-dashed border-white/10 py-8"
-            >
-              <p className="text-sm text-[#A0A0B0]">No activity yet.</p>
-            </motion.div>
-          ) : (
-            <div>
-              {orders.map((order, i) => (
-                <OrderTimelineItem key={order.id} order={order} index={i} isLast={i === orders.length - 1} />
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
@@ -334,38 +349,21 @@ export function DashboardClient({ userName, licenses, orders }: DashboardClientP
 export function DashboardSkeleton() {
   return (
     <div className="mx-auto w-full max-w-7xl px-6 lg:px-10 py-10 space-y-16 animate-pulse">
-      <div className="space-y-3">
-        <div className="h-3 w-24 bg-white/5 rounded" />
-        <div className="h-16 w-48 bg-white/10 rounded" />
+      <div className="space-y-4 pt-12">
+        <div className="h-3 w-32 bg-white/5 rounded" />
+        <div className="h-20 w-96 bg-white/10 rounded-2xl" />
+        <div className="h-4 w-64 bg-white/5 rounded" />
       </div>
-      <div className="border-t border-white/5">
-        <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/5">
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="flex-1 py-8 px-8">
-              <div className="h-3 w-28 bg-white/5 rounded mb-4" />
-              <div className="h-16 w-20 bg-white/10 rounded" />
-            </div>
+            <div key={i} className="h-48 glass rounded-3xl border-transparent bg-white/5" />
           ))}
-        </div>
-        <div className="border-t border-white/5" />
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
-        <div className="lg:col-span-2 lg:border-r border-white/5 space-y-px">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="h-20 bg-white/[0.02] border-l-2 border-transparent" />
-          ))}
-        </div>
-        <div className="lg:pl-10 pt-8 space-y-6">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="flex gap-4">
-              <div className="h-3.5 w-3.5 rounded-full bg-white/10 shrink-0 mt-1" />
-              <div className="flex-1 space-y-2">
-                <div className="h-3 w-24 bg-white/5 rounded" />
-                <div className="h-2 w-full bg-white/5 rounded" />
-              </div>
-            </div>
-          ))}
-        </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div className="lg:col-span-8 h-96 glass rounded-[2rem] border-transparent bg-white/5" />
+        <div className="lg:col-span-4 h-96 glass rounded-[2rem] border-transparent bg-white/5" />
       </div>
     </div>
   );

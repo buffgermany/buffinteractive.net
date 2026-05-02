@@ -1,0 +1,87 @@
+"use client";
+
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+
+export const BuildDiagnosis = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  const y = useTransform(scrollYProgress, [0, 0.2], [40, 0]);
+  
+  const nodes = Array.from({ length: 12 }).map((_, i) => ({
+    id: i,
+    initialX: Math.random() * 200 - 100,
+    initialY: Math.random() * 200 - 100,
+    targetX: (i - 5.5) * 30,
+    targetY: 0,
+  }));
+
+  return (
+    <section 
+      ref={containerRef} 
+      className="py-32 px-6 overflow-hidden relative"
+      style={{
+        maskImage: `linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)`,
+        WebkitMaskImage: `linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)`
+      }}
+    >
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-20 items-center relative z-10">
+        <motion.div
+          style={{ opacity, y }}
+          className="flex flex-col gap-8"
+        >
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-[#F8F8F8] tracking-tight leading-tight">
+            Your code shouldn't dictate your business logic.
+          </h2>
+          
+          <div className="flex flex-col gap-6 text-[#A0A0B0] text-lg md:text-xl leading-relaxed font-sans">
+            <p>
+              Right now, your operations adapt to fit the limitations of your software. 
+              Plugins conflict, APIs fail under load, and your dev team spends 80% 
+              of their time fixing bugs instead of shipping features.
+            </p>
+            <p className="text-white font-medium">
+              That’s not a tech stack. That’s a digital bottleneck. 
+              You need engineering that bends to your vision, not the other way around.
+            </p>
+          </div>
+        </motion.div>
+
+        <div className="relative h-[400px] flex items-center justify-center">
+          <motion.div style={{ opacity }} className="relative w-full h-full flex items-center justify-center">
+            {nodes.map((node) => {
+              const x = useTransform(scrollYProgress, [0.1, 0.5], [node.initialX, node.targetX]);
+              const y = useTransform(scrollYProgress, [0.1, 0.5], [node.initialY, node.targetY]);
+              const color = useTransform(
+                scrollYProgress, 
+                [0.1, 0.5], 
+                ["rgba(255, 255, 255, 0.2)", "#00F0FF"]
+              );
+
+              return (
+                <motion.div
+                  key={node.id}
+                  style={{ x, y, backgroundColor: color }}
+                  className="absolute w-3 h-3 rounded-full blur-[1px] shadow-[0_0_10px_rgba(0,240,255,0.3)]"
+                />
+              );
+            })}
+            
+            <motion.div
+              style={{
+                scaleX: useTransform(scrollYProgress, [0.4, 0.6], [0, 1]),
+                opacity: useTransform(scrollYProgress, [0.4, 0.5], [0, 0.5]),
+              }}
+              className="absolute h-[1px] w-[360px] bg-[#00F0FF] shadow-[0_0_15px_rgba(0,240,255,0.5)]"
+            />
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};

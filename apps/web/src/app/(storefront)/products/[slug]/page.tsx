@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
 import { db, schema, eq } from "@platform/db";
 import type { Metadata } from "next";
-import { SiteNav } from "@/components/layout/nav";
 import { ProductDetailClient } from "@/components/storefront/product-detail-client";
-import { Footer } from "@/components/storefront/hero";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -43,12 +41,8 @@ export default async function ProductPage({ params }: PageProps) {
   if (!product) notFound();
 
   return (
-    <>
-      <SiteNav />
-      <main className="min-h-screen pt-24">
+      <main className="min-h-screen pt-48">
         <ProductDetailClient product={product} />
       </main>
-      <Footer />
-    </>
   );
 }

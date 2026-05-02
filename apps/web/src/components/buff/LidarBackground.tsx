@@ -1,206 +1,309 @@
 "use client";
 
 import { useMemo, useRef, useEffect } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { motion } from "framer-motion";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+const PARTICLE_COUNT_DESKTOP = 10000;
+const PARTICLE_COUNT_MOBILE = 5000;
+
+const INTERACTION_RADIUS = 3.2;
+const INTERACTION_RADIUS_SQ = INTERACTION_RADIUS * INTERACTION_RADIUS;
+const REPULSION_STRENGTH = 1.3;
+const SPRING_FACTOR = 0.07;
+const SMOOTH_LERP = 0.12;
+const ROT_SPEED = 0.04;
+
+// ---------------------------------------------------------------------------
+// Pre-allocated scratch objects — zero GC pressure per frame
+// ---------------------------------------------------------------------------
+const _plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+const _mouseWorld = new THREE.Vector3();
+const _ndcPointer = new THREE.Vector2();
+
+// ---------------------------------------------------------------------------
+// Utility
+// ---------------------------------------------------------------------------
+function isMobileDevice(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+}
+
+// ---------------------------------------------------------------------------
+// Cloud component
+//
+// Architecture:
+//   <group ref={groupRef}>       ← cinematic rotation lives here
+//     <points ref={pointsRef}>   ← ALWAYS at identity (no rotation)
+//
+// Because <points> has no transform of its own, its local space IS world
+// space. The plane intersection (_mouseWorld) is therefore the exact cursor
+// position in particle-local coordinates — always, regardless of how much
+// the parent group has rotated. No worldToLocal needed, no drift.
+// ---------------------------------------------------------------------------
 function LidarCloud({ scrollProgress }: { scrollProgress: any }) {
+  const { camera, raycaster } = useThree();
+
+  const groupRef  = useRef<THREE.Group>(null);
   const pointsRef = useRef<THREE.Points>(null);
   const materialRef = useRef<THREE.PointsMaterial>(null);
-  
-  // Create a soft, glowing spherical texture for the particles
+
+  const isMobile = useMemo(() => isMobileDevice(), []);
+  const particleCount = isMobile ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT_DESKTOP;
+
+  // ---- Glow sprite texture (created once) --------------------------------
   const particleTexture = useMemo(() => {
     if (typeof document === "undefined") return null;
-    const canvas = document.createElement('canvas');
-    canvas.width = 64;
-    canvas.height = 64;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-      gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.8)');
-      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 64, 64);
-    }
+    const size = 64;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d")!;
+    const gradient = ctx.createRadialGradient(
+      size / 2, size / 2, 0,
+      size / 2, size / 2, size / 2
+    );
+    gradient.addColorStop(0,    "rgba(255,255,255,1)");
+    gradient.addColorStop(0.35, "rgba(255,255,255,0.75)");
+    gradient.addColorStop(1,    "rgba(255,255,255,0)");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
     const tex = new THREE.CanvasTexture(canvas);
+    tex.needsUpdate = true;
     return tex;
   }, []);
 
-  const particleCount = 12000;
-  
+  // ---- Particle positions -------------------------------------------------
   const { originalPositions, currentPositions } = useMemo(() => {
     const orig = new Float32Array(particleCount * 3);
     const curr = new Float32Array(particleCount * 3);
+
     for (let i = 0; i < particleCount; i++) {
-        let x, y, z;
-        
-        const type = Math.random();
-        if (type < 0.5) {
-           // Base terrain
-           x = (Math.random() - 0.5) * 50;
-           z = (Math.random() - 0.5) * 30;
-           y = Math.sin(x * 0.2) * 2 + Math.cos(z * 0.2) * 2 - 6;
-        } else if (type < 0.8) {
-           // Floating data rings
-           const angle = Math.random() * Math.PI * 2;
-           const radius = 8 + (Math.random() - 0.5) * 2;
-           x = Math.cos(angle) * radius;
-           z = Math.sin(angle) * radius;
-           y = (Math.random() - 0.5) * 4 + 3;
-        } else {
-           // Ambient atmospheric noise
-           x = (Math.random() - 0.5) * 50;
-           y = (Math.random() - 0.5) * 30;
-           z = (Math.random() - 0.5) * 30;
-        }
+      const i3   = i * 3;
+      const roll = Math.random();
+      let x: number, y: number, z: number;
 
-        // Add lidar-like jitter
-        x += (Math.random() - 0.5) * 0.4;
-        y += (Math.random() - 0.5) * 0.4;
-        z += (Math.random() - 0.5) * 0.4;
-        
-        orig[i * 3] = x;
-        orig[i * 3 + 1] = y;
-        orig[i * 3 + 2] = z;
+      if (roll < 0.5) {
+        // Terrain
+        x = (Math.random() - 0.5) * 50;
+        z = (Math.random() - 0.5) * 30;
+        y = Math.sin(x * 0.2) * 2 + Math.cos(z * 0.2) * 2 - 6;
+      } else if (roll < 0.8) {
+        // Floating data rings
+        const angle  = Math.random() * Math.PI * 2;
+        const radius = 8 + (Math.random() - 0.5) * 2;
+        x = Math.cos(angle) * radius;
+        z = Math.sin(angle) * radius;
+        y = (Math.random() - 0.5) * 4 + 3;
+      } else {
+        // Atmospheric scatter
+        x = (Math.random() - 0.5) * 50;
+        y = (Math.random() - 0.5) * 30;
+        z = (Math.random() - 0.5) * 30;
+      }
 
-        curr[i * 3] = x;
-        curr[i * 3 + 1] = y;
-        curr[i * 3 + 2] = z;
+      x += (Math.random() - 0.5) * 0.4;
+      y += (Math.random() - 0.5) * 0.4;
+      z += (Math.random() - 0.5) * 0.4;
+
+      orig[i3] = curr[i3] = x;
+      orig[i3 + 1] = curr[i3 + 1] = y;
+      orig[i3 + 2] = curr[i3 + 2] = z;
     }
     return { originalPositions: orig, currentPositions: curr };
-  }, []);
+  }, [particleCount]);
 
-  const gyroRef = useRef({ x: 0, y: 0, hasGyro: false });
+  // ---- Gyroscope (mobile) ------------------------------------------------
+  const gyroRef = useRef({ x: 0, y: 0, active: false });
 
-  // Capture device tilt on mobile for hardware-accelerated interaction
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
-    const handleOrientation = (event: DeviceOrientationEvent) => {
-      if (event.gamma === null || event.beta === null) return;
-      
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      if (e.gamma === null || e.beta === null) return;
       const maxTilt = 45;
-      // Gamma is left-to-right rotation in degrees (-90 to 90)
-      const normalizedX = Math.max(-1, Math.min(1, event.gamma / maxTilt));
-      
-      // Beta is front-to-back tilt in degrees (-180 to 180). 
-      // Subtract 45 to assume standard phone holding angle.
-      const normalizedY = Math.max(-1, Math.min(1, (event.beta - 45) / maxTilt));
-      
-      gyroRef.current.x = normalizedX;
-      gyroRef.current.y = -normalizedY; 
-      gyroRef.current.hasGyro = true;
+      gyroRef.current.x = Math.max(-1, Math.min(1,  e.gamma / maxTilt));
+      gyroRef.current.y = Math.max(-1, Math.min(1, -(e.beta - 45) / maxTilt));
+      gyroRef.current.active = true;
     };
-    
-    // Add event listener for Android/compatible browsers natively
-    window.addEventListener('deviceorientation', handleOrientation);
-    return () => window.removeEventListener('deviceorientation', handleOrientation);
+
+    const requestGyro = async () => {
+      const DOE = DeviceOrientationEvent as any;
+      if (typeof DOE.requestPermission === "function") {
+        try {
+          const perm = await DOE.requestPermission();
+          if (perm === "granted") window.addEventListener("deviceorientation", handleOrientation);
+        } catch { /* iOS denied — fall through to pointer */ }
+      } else {
+        window.addEventListener("deviceorientation", handleOrientation);
+      }
+    };
+
+    if (isMobileDevice()) requestGyro();
+    return () => window.removeEventListener("deviceorientation", handleOrientation);
   }, []);
 
-  // Soft interpolation target for smooth mouse/gyro transition
-  const smoothPointer = useRef({ x: 0, y: 0 });
+  // ---- Touch NDC tracking (mobile) ----------------------------------------
+  const touchNDCRef = useRef({ x: 0, y: 0, active: false });
 
+  useEffect(() => {
+    if (typeof window === "undefined" || !isMobileDevice()) return;
+
+    const onTouch = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (!t) return;
+      touchNDCRef.current.x =   (t.clientX / window.innerWidth)  * 2 - 1;
+      touchNDCRef.current.y = -((t.clientY / window.innerHeight) * 2 - 1);
+      touchNDCRef.current.active = true;
+    };
+    const onTouchEnd = () => { touchNDCRef.current.active = false; };
+
+    window.addEventListener("touchmove",  onTouch,    { passive: true });
+    window.addEventListener("touchend",   onTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener("touchmove",  onTouch);
+      window.removeEventListener("touchend",   onTouchEnd);
+    };
+  }, []);
+
+  // ---- Smoothed NDC pointer -----------------------------------------------
+  const smoothNDC = useRef({ x: 0, y: 0 });
+
+  // ---- Render loop --------------------------------------------------------
   useFrame((state, delta) => {
-    if (!pointsRef.current) return;
-    
-    // Slow cinematic rotation
-    pointsRef.current.rotation.y += delta * 0.05;
-    pointsRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.1) * 0.1;
+    const group = groupRef.current;
+    const mesh  = pointsRef.current;
+    if (!group || !mesh) return;
 
-    const geom = pointsRef.current.geometry;
-    const posAttribute = geom.getAttribute('position') as THREE.BufferAttribute;
-    const positions = posAttribute.array as Float32Array;
-    
-    // Mix static mouse with active gyro data
-    const targetX = gyroRef.current.hasGyro ? gyroRef.current.x : state.pointer.x;
-    const targetY = gyroRef.current.hasGyro ? gyroRef.current.y : state.pointer.y;
-    
-    // Lerp towards target for organic feel
-    smoothPointer.current.x = THREE.MathUtils.lerp(smoothPointer.current.x, targetX, 0.15);
-    smoothPointer.current.y = THREE.MathUtils.lerp(smoothPointer.current.y, targetY, 0.15);
+    // 1. Cinematic rotation on the GROUP (not the points mesh)
+    group.rotation.y += delta * ROT_SPEED;
+    group.rotation.x  = Math.sin(state.clock.elapsedTime * 0.1) * 0.08;
 
-    // Map pointer (-1 to 1) accurately to the 3D plane at Z=0
-    const mouseX = smoothPointer.current.x * (state.viewport.width / 2);
-    const mouseY = smoothPointer.current.y * (state.viewport.height / 2);
-    
-    const mouseWorld = new THREE.Vector3(mouseX, mouseY, 0);
-    // Convert to local space to match rotated points
-    pointsRef.current.updateMatrixWorld();
-    mouseWorld.applyMatrix4(pointsRef.current.matrixWorld.clone().invert());
+    // 2. Resolve raw NDC from whichever input source is active
+    let rawX: number, rawY: number;
+    if (gyroRef.current.active) {
+      rawX = gyroRef.current.x * 0.8 + (touchNDCRef.current.active ? touchNDCRef.current.x * 0.2 : 0);
+      rawY = gyroRef.current.y * 0.8 + (touchNDCRef.current.active ? touchNDCRef.current.y * 0.2 : 0);
+    } else if (touchNDCRef.current.active) {
+      rawX = touchNDCRef.current.x;
+      rawY = touchNDCRef.current.y;
+    } else {
+      rawX = state.pointer.x;
+      rawY = state.pointer.y;
+    }
+
+    // 3. Smooth lerp for organic lag
+    smoothNDC.current.x = THREE.MathUtils.lerp(smoothNDC.current.x, rawX, SMOOTH_LERP);
+    smoothNDC.current.y = THREE.MathUtils.lerp(smoothNDC.current.y, rawY, SMOOTH_LERP);
+
+    // 4. Unproject NDC → world-space point on the z=0 plane.
+    //    Because <points> has NO rotation of its own, its local space IS
+    //    world space. _mouseWorld.x / .y are directly usable as particle
+    //    reference coordinates — no worldToLocal required, ever.
+    _ndcPointer.set(smoothNDC.current.x, smoothNDC.current.y);
+    raycaster.setFromCamera(_ndcPointer, camera);
+    const hit = raycaster.ray.intersectPlane(_plane, _mouseWorld);
+
+    const mx = _mouseWorld.x;
+    const my = _mouseWorld.y;
+
+    // 5. Per-particle physics
+    const posAttr = mesh.geometry.getAttribute("position") as THREE.BufferAttribute;
+    const pos = posAttr.array as Float32Array;
 
     for (let i = 0; i < particleCount; i++) {
-        const i3 = i * 3;
-        
-        const ox = originalPositions[i3] as number;
-        const oy = originalPositions[i3 + 1] as number;
-        const oz = originalPositions[i3 + 2] as number;
-        
-        let cx = positions[i3] as number;
-        let cy = positions[i3 + 1] as number;
-        let cz = positions[i3 + 2] as number;
-        
-        // Mouse repulsion - completely accurately mapped
-        const dx = cx - mouseWorld.x;
-        const dy = cy - mouseWorld.y; 
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        
-        if (dist < 2.0) {
-            const force = (2.0 - dist) / 2.0;
-            cx += (dx / dist) * force * 0.8;
-            cy += (dy / dist) * force * 0.8;
-            cz += force * 0.8;
+      const i3 = i * 3;
+
+      const ox = originalPositions[i3]!;
+      const oy = originalPositions[i3 + 1]!;
+      const oz = originalPositions[i3 + 2]!;
+
+      let cx = pos[i3]!;
+      let cy = pos[i3 + 1]!;
+      let cz = pos[i3 + 2]!;
+
+      // Screen-space (XY-only) distance check.
+      // Every particle at any Z depth within the cursor radius reacts.
+      if (hit) {
+        const dx      = cx - mx;
+        const dy      = cy - my;
+        const distSq2D = dx * dx + dy * dy;
+
+        if (distSq2D < INTERACTION_RADIUS_SQ && distSq2D > 0.0001) {
+          const dist2D = Math.sqrt(distSq2D);
+          const force  = ((INTERACTION_RADIUS - dist2D) / INTERACTION_RADIUS) * REPULSION_STRENGTH;
+          cx += (dx / dist2D) * force;
+          cy += (dy / dist2D) * force;
+          // Pop Z toward camera — creates a satisfying depth-parting effect
+          cz += force * 0.6;
         }
-        
-        // Spring back to original shape
-        cx += (ox - cx) * 0.08;
-        cy += (oy - cy) * 0.08;
-        cz += (oz - cz) * 0.08;
-        
-        positions[i3] = cx;
-        positions[i3 + 1] = cy;
-        positions[i3 + 2] = cz;
+      }
+
+      // Spring back to rest
+      cx += (ox - cx) * SPRING_FACTOR;
+      cy += (oy - cy) * SPRING_FACTOR;
+      cz += (oz - cz) * SPRING_FACTOR;
+
+      pos[i3]     = cx;
+      pos[i3 + 1] = cy;
+      pos[i3 + 2] = cz;
     }
-    
-    posAttribute.needsUpdate = true;
-    
-    // Dynamic Opacity based on Scroll Progress (Fade out transition)
+
+    posAttr.needsUpdate = true;
+
+    // 6. Scroll-based fade
     if (materialRef.current && scrollProgress) {
-        const p = scrollProgress.get();
-        // Base opacity is 0.8. We fade to 0 slightly before the section ends
-        materialRef.current.opacity = Math.max(0, 0.8 * (1 - p * 1.5));
+      const p: number = scrollProgress.get();
+      materialRef.current.opacity = Math.max(0, 0.82 * (1 - p * 1.5));
     }
   });
 
   return (
-    <points
-      ref={pointsRef as any}
-      frustumCulled={false}
-    >
-      <bufferGeometry>
-         <bufferAttribute attach="attributes-position" args={[currentPositions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        ref={materialRef}
-        transparent
-        color="#CCFF00"
-        size={0.12} // Increased size slightly to account for the soft feathering of the texture
-        sizeAttenuation={true}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-        opacity={0.8}
-        toneMapped={false}
-        map={particleTexture}
-        alphaTest={0.01}
-      />
-    </points>
+    <group ref={groupRef}>
+      <points ref={pointsRef as any} frustumCulled={false}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[currentPositions, 3]} />
+        </bufferGeometry>
+        <pointsMaterial
+          ref={materialRef}
+          transparent
+          color="#CCFF00"
+          size={isMobile ? 0.16 : 0.12}
+          sizeAttenuation
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          opacity={0.82}
+          toneMapped={false}
+          map={particleTexture}
+          alphaTest={0.01}
+        />
+      </points>
+    </group>
   );
 }
 
+// ---------------------------------------------------------------------------
+// Exported wrapper
+// ---------------------------------------------------------------------------
 export default function LidarBackground({ scrollProgress }: { scrollProgress: any }) {
   return (
-    <Canvas camera={{ position: [0, 0, 16], fov: 60 }} gl={{ alpha: true, antialias: false }}>
-      <LidarCloud scrollProgress={scrollProgress} />
-    </Canvas>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.2, ease: "easeOut" }}
+      className="w-full h-full"
+    >
+      <Canvas
+        camera={{ position: [0, 0, 16], fov: 60 }}
+        gl={{ alpha: true, antialias: false, powerPreference: "high-performance" }}
+        dpr={[1, 1.5]}
+      >
+        <LidarCloud scrollProgress={scrollProgress} />
+      </Canvas>
+    </motion.div>
   );
 }

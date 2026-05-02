@@ -5,73 +5,7 @@ import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } fr
 import { Zap, LayoutGrid, Lock } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-function BentoCard({ children, className = "" }: { children: React.ReactNode, className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  
-  const mouseXSpring = useSpring(x, { stiffness: 400, damping: 90 });
-  const mouseYSpring = useSpring(y, { stiffness: 400, damping: 90 });
-
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["4deg", "-4deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-4deg", "4deg"]);
-
-  // Glow position
-  const glowX = useMotionValue(0);
-  const glowY = useMotionValue(0);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    
-    const width = rect.width;
-    const height = rect.height;
-    
-    const clientX = e.clientX - rect.left;
-    const clientY = e.clientY - rect.top;
-    
-    const xPct = clientX / width - 0.5;
-    const yPct = clientY / height - 0.5;
-    
-    x.set(xPct);
-    y.set(yPct);
-
-    glowX.set(clientX);
-    glowY.set(clientY);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX,
-        rotateY,
-        transformStyle: "preserve-3d",
-      }}
-      className={`relative group rounded-3xl bg-[#2C2C2C]/20 backdrop-blur-xl border border-white/5 overflow-hidden will-change-transform ${className}`}
-    >
-      <motion.div
-        className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-        style={{
-          background: useMotionTemplate`radial-gradient(400px circle at ${glowX}px ${glowY}px, rgba(204,255,0,0.15), transparent 80%)`,
-        }}
-      />
-      <div 
-        className="relative z-10 w-full h-full p-8 md:p-12 flex flex-col justify-between"
-        style={{ transform: "translateZ(40px)" }} // pop out content slightly for 3D effect
-      >
-        {children}
-      </div>
-    </motion.div>
-  );
-}
+import { BentoCard } from "./BentoCard";
 
 export function AntiPortfolioSection() {
   const t = useTranslations('EnterpriseBento');
@@ -94,7 +28,9 @@ export function AntiPortfolioSection() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
             <h2 className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-bold font-heading text-[#F8F8F8] tracking-tight leading-tight">
-              {t('section_headline')}
+              {t.rich('section_headline', {
+                sup1: (chunks) => <sup className="text-[0.6em] ml-0.5 text-muted-foreground/50">{chunks}</sup>
+              })}
             </h2>
           </motion.div>
         </div>
@@ -127,7 +63,9 @@ export function AntiPortfolioSection() {
                   />
                   <div>
                     <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-[#F8F8F8] tracking-tight leading-tight max-w-4xl">
-                      {t('card1_headline')}
+                      {t.rich('card1_headline', {
+                        sup2: (chunks) => <sup className="text-[0.6em] ml-0.5 text-muted-foreground/50">{chunks}</sup>
+                      })}
                     </h2>
                   </div>
                 </div>

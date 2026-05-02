@@ -49,11 +49,9 @@ export function Footer() {
             
             <div className="flex flex-col gap-3">
                 <h5 className="font-bold text-sm uppercase tracking-widest text-foreground-muted mb-4">{t('nav_title')}</h5>
-                <Link href="#products" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_products')}</Link>
-                <Link href="#services" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_services')}</Link>
-                <Link href="#about" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_about')}</Link>
-                <Link href="/brand" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_brandkit')}</Link>
-                <Link href="#contact" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_start_project')}</Link>
+                <Link href="/#services" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_services')}</Link>
+                <Link href="/#about" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_about')}</Link>
+                <Link href="/#contact" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_start_project')}</Link>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -70,7 +68,7 @@ export function Footer() {
                            {/* Important: we want the dropdown menu to open UPWARDS generally in a footer, or just downwards if there's space. Let's make it open downwards since we have space below, or upwards since it's the footer edge. The absolute bottom is not directly underneath, but to be safe, opening UPWARDS is usually better in a footer. */}
                            <button 
                                onClick={() => setIsLangOpen(!isLangOpen)}
-                               className="text-sm text-white hover:text-[#CCFF00] transition-colors flex items-center justify-between group w-full text-left py-1 outline-none"
+                               className="text-sm text-white hover:text-primary transition-colors flex items-center justify-between group w-full text-left py-1 outline-none"
                            >
                                <div className="flex items-center gap-2.5">
                                  <img src={currentLanguage?.flagUrl || 'https://flagcdn.com/gb.svg'} alt={currentLanguage?.label || 'English'} className="w-5 h-[15px] object-cover rounded-[2px]" />
@@ -95,14 +93,14 @@ export function Footer() {
                                                 className={`flex items-center justify-between p-3 rounded-xl border transition-all group outline-none ${
                                                     isActive 
                                                     ? 'border-transparent hover:bg-white/5' 
-                                                    : 'border-white/5 bg-white/5 hover:border-[#CCFF00]/50 hover:bg-[#CCFF00]/10'
+                                                    : 'border-white/5 bg-white/5 hover:border-primary/50 hover:bg-primary/10'
                                                 }`}
                                             >
                                                 <div className={`flex items-center gap-3 transition-opacity ${isActive ? 'opacity-60 group-hover:opacity-100' : ''}`}>
                                                     <div className={`w-6 h-[16px] shrink-0 rounded-[2px] overflow-hidden border border-white/10 transition-all ${isActive ? 'grayscale group-hover:grayscale-0' : ''}`}>
                                                         <img src={lang.flagUrl} alt={lang.label} className="w-full h-full object-cover" />
                                                     </div>
-                                                    <span className={`text-sm transition-colors tracking-tight ${isActive ? 'text-white font-medium' : 'text-white font-bold group-hover:text-[#CCFF00]'}`}>
+                                                    <span className={`text-sm transition-colors tracking-tight ${isActive ? 'text-white font-medium' : 'text-white font-bold group-hover:text-primary'}`}>
                                                         {isActive ? lang.activeText : lang.actionText}
                                                     </span>
                                                 </div>

@@ -6,9 +6,7 @@ import { RealityCheckSection } from "@/components/buff/RealityCheckSection";
 import { ArsenalSection } from "@/components/buff/ArsenalSection";
 import { AntiPortfolioSection } from "@/components/buff/AntiPortfolioSection";
 import { MadLibsFooter } from "@/components/buff/MadLibsFooter";
-
-import { Header } from "@/components/buff/Header";
-import { Footer } from "@/components/buff/Footer";
+import { FootnotesSection } from "@/components/buff/FootnotesSection";
 
 export const metadata: Metadata = {
   title: "Buff — Provocative Tech & Marketing",
@@ -18,16 +16,13 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <>
-      <Header />
       <main className="min-h-screen bg-transparent text-foreground font-sans">
         <HeroSection />
         <RealityCheckSection />
         <ArsenalSection />
         <AntiPortfolioSection />
         <MadLibsFooter />
+        <FootnotesSection />
       </main>
-      <Footer />
-    </>
   );
 }

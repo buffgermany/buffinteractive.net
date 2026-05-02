@@ -5,8 +5,25 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 
-// Next.js dynamisches Importieren trennt den Code fürs Backend und lädt ThreeJS erst client-side.
-const LidarBackground = dynamic(() => import('./LidarBackground'), { ssr: false });
+// High-fidelity placeholder that mimics the 3D scene's vibe during load
+function LidarPlaceholder() {
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      {/* Primary lime glow - positioned to align with the typical 3D cluster focus */}
+      <div className="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[80%] h-[60%] bg-[radial-gradient(ellipse,rgba(204,255,0,0.15)_0%,transparent_70%)] animate-pulse duration-[4000ms]" />
+      
+      {/* Atmospheric secondary glows */}
+      <div className="absolute bottom-[10%] right-[10%] w-[40%] h-[40%] bg-[radial-gradient(circle,rgba(204,255,0,0.05)_0%,transparent_60%)]" />
+      <div className="absolute top-[20%] left-[10%] w-[30%] h-[30%] bg-[radial-gradient(circle,rgba(204,255,0,0.03)_0%,transparent_60%)]" />
+    </div>
+  );
+}
+
+// Dynamic import with SSR disabled and a high-fidelity placeholder
+const LidarBackground = dynamic(() => import('./LidarBackground'), { 
+  ssr: false,
+  loading: () => <LidarPlaceholder />
+});
 
 function Magnetic({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -39,7 +56,6 @@ function Magnetic({ children }: { children: React.ReactNode }) {
 
 export function HeroSection() {
   const t = useTranslations('Hero');
-  const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -49,43 +65,27 @@ export function HeroSection() {
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 0.8], [1, 0.95]);
 
-  const [loadBackground, setLoadBackground] = useState(false);
-
-  useEffect(() => {
-    // Delay loading the 3D scene until text has primarily animated rendering
-    // This dramatically improves the Time To Interactive for initial paint.
-    const timer = setTimeout(() => {
-      if ('requestIdleCallback' in window) {
-        window.requestIdleCallback(() => setLoadBackground(true));
-      } else {
-        setLoadBackground(true);
-      }
-    }, 600); // 600ms corresponds closely to text animation duration (0.8s but starts earlier)
-
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <section 
       ref={containerRef}
       className="relative min-h-[120vh] flex items-center justify-center overflow-hidden px-6 lg:px-12 pt-24 pb-12"
-      style={{
-        maskImage: `linear-gradient(to bottom, black 80%, transparent)`,
-        WebkitMaskImage: `linear-gradient(to bottom, black 80%, transparent)`
-      }}
     >
-      {/* Absolute Full-Screen Lidar Background */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-auto cursor-crosshair">
-        <div className="absolute -inset-[5%] w-[110%] h-[110%] blur-[1px]">
-          {loadBackground && <LidarBackground scrollProgress={scrollYProgress} />}
+      {/* Absolute Full-Screen Background Layer */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-auto">
+        <div className="absolute -inset-[5%] w-[110%] h-[110%]">
+          <LidarBackground scrollProgress={scrollYProgress} />
         </div>
         {/* Base dark overlay */}
         <div className="absolute inset-0 bg-background/40 pointer-events-none" />
-        {/* Centered intense shadow to pop the text */}
+        
+        {/* Centered intense gradient to pop the text (Replacing expensive blur filter) */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-screen md:w-[800px] h-[500px] bg-background/90 blur-[100px] rounded-[100%]" />
+          <div className="w-full max-w-[1000px] aspect-square bg-[radial-gradient(circle,hsl(var(--background)/0.9)_0%,transparent_70%)] opacity-100" />
         </div>
       </div>
+
+      {/* Bottom fade transition (Replacing expensive mask-image) */}
+      <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
 
       <motion.div 
         style={{ opacity, scale }}
@@ -125,3 +125,4 @@ export function HeroSection() {
     </section>
   );
 }
+

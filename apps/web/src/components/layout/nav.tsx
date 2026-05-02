@@ -253,7 +253,7 @@ export function DashboardTopRail({ currentPath }: { currentPath: string }) {
             <span className="text-xs font-medium text-white leading-none">{session?.user.name}</span>
             <span className="text-[10px] text-[#A0A0B0] font-mono">{session?.user.email}</span>
           </div>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/20 text-[11px] font-black text-[#CCFF00]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#CCFF00]/10 border border-[#CCFF00]/20 text-[11px] font-bold text-[#CCFF00]">
             {initials}
           </div>
           <button

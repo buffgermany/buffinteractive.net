@@ -7,6 +7,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { LanguagePopup } from "@/components/buff/LanguagePopup";
 import { LoadingScreen } from "@/components/buff/LoadingScreen";
+import Script from "next/script";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -63,6 +64,11 @@ export default async function RootLayout({
             <LanguagePopup />
             <LoadingScreen />
           </ThemeProvider>
+          <Script
+            src="https://analytics.buffinteractive.net/api/script.js"
+            data-site-id="74c5bb7ba5a7"
+            strategy="afterInteractive"
+          />
         </NextIntlClientProvider>
       </body>
     </html>

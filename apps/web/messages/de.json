@@ -10,7 +10,6 @@
     "highlightPhrase": "sprengen jetzt eure Infrastruktur"
   },
   "Header": {
-    "nav_products": "Products",
     "nav_services": "Services",
     "nav_about": "About Us",
     "nav_login": "Login",
@@ -47,7 +46,30 @@
   },
   "Contact": {
     "title": "Sparen wir uns den Smalltalk.",
-    "subtext": "Sagt uns, was nicht funktioniert oder was ihr erreichen wollt. Wir sind dabei, wenn es ehrgeizig ist. Wenn es langweilig ist, lassen wir es."
+    "subtext": "Sagt uns, was nicht funktioniert oder was ihr erreichen wollt. Wir sind dabei, wenn es ehrgeizig ist. Wenn es langweilig ist, lassen wir es.",
+    "hi": "Hi Buff. Ich bin",
+    "from": "von",
+    "honestly": ". Ganz ehrlich, aktuell bremst uns unser",
+    "holding_back": "einfach aus. Wir brauchen jemanden, der",
+    "reach_out": "kann. Meldet euch bei mir unter",
+    "lets_go": ". Packen wir es an.",
+    "placeholder_name": "Dein Name",
+    "placeholder_company": "Unternehmen",
+    "placeholder_email": "E-Mail-Adresse",
+    "submit_btn": "Abschicken.",
+    "submit_btn_pending": "Sende...",
+    "success_title": "Wir melden uns.",
+    "success_retry": "Noch eine Anfrage senden?",
+    "error_title": "Das Nichts hat gewonnen (diesmal).",
+    "error_text": "Ein technischer Fehler hätte fast dein Projekt verschlungen. Das sollten wir nicht zulassen. Lass nicht einen kleinen Fehler das Ende sein.",
+    "error_retry": "Nochmal versuchen.",
+    "select_problem_tech": "Tech-Stack",
+    "select_problem_marketing": "Marketing",
+    "select_problem_chaos": "Agentur-Chaos",
+    "select_problem_infra": "Infrastruktur",
+    "select_action_build": "alles neu aufbauen",
+    "select_action_scale": "aggressiv skalieren",
+    "select_action_fix": "das Chaos bereinigen"
   },
   "Arsenal": {
     "build_title": "Der Motor",
@@ -58,9 +80,9 @@
     "growth_tab_label": "The Growth"
   },
   "EnterpriseBento": {
-    "section_headline": "Gebaut für Europas größten Konzern.",
+    "section_headline": "Gebaut für Europas wertvollsten Konzern.<sup1>1</sup1>",
     "nda_hint": "Weitere verschwiegene Marktführer unter NDA",
-    "card1_headline": "Wir skalieren die Vertriebssteuerung der Deutschen Telekom bundesweit.",
+    "card1_headline": "Wir skalieren die Vertriebssteuerung der Deutschen Telekom bundesweit.<sup2>2</sup2>",
     "card2_title": "Null Sekunden Bedenkzeit.",
     "card2_text": "Eingesetzt live im Kundengespräch. Das bedeutet: Null Toleranz für Ladezeiten & Fehler. Das Tool steht nie im Weg. Absolute Höchstgeschwindigkeit war hier keine Option, sondern das fundamentale Design-Prinzip.",
     "card3_title": "Komplexität, unsichtbar gemacht.",
@@ -68,28 +90,20 @@
   },
   "Legal": {
     "imprint_title": "Impressum",
-    "imprint_content": "Buff Germany UG\nEulitzstr. 1\n09112 Chemnitz\n\nVertreten durch:\nJohn Doe\n\nKontakt:\nE-Mail: legal@buff.test\nTelefon: +49 123 456 789\n\nHaftungsausschluss:\nDie Inhalte dieser Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen.",
+    "imprint_content": "Buff Germany UG\nEulitzstr. 1\n09112 Chemnitz\n\nVertreten durch:\nFelix Kinze\n\nKontakt:\nE-Mail: service@buffinteractive.net\n\nHaftungsausschluss:\nDie Inhalte dieser Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen.",
     "privacy_title": "Datenschutzerklärung",
     "privacy_content": "1. Datenschutz auf einen Blick\nWir nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung.\n\n2. Datenerfassung auf unserer Website\nWir speichern nur ein zwingend erforderliches Cookie, um Ihre Spracheinstellung zu sichern. Ohne Ihre Zustimmung laufen keine Drittanbieter-Tracker.\n\n3. Ihre Rechte\nSie haben jederzeit das Recht, unentgeltlich Auskunft über Herkunft, Empfänger und Zweck Ihrer gespeicherten personenbezogenen Daten zu erhalten.",
     "terms_title": "Allgemeine Geschäftsbedingungen",
     "terms_content": "1. Geltungsbereich\nDiese AGB gelten für alle Interaktionen mit Buff.\n\n2. Erbrachte Leistungen\nWir liefern technisches Rückgrat, kreativen Durchschlag und strategische Klarheit.\n\n3. Haftung\nWir bauen Hochleistungsprodukte. Wenn etwas kaputt geht, reparieren wir es.\n\n4. Schlussbestimmungen\nAkzeptiere keinen Durchschnitt mehr."
   },
-  "Brand": {
-    "title": "Branding & Assets",
-    "description": "Lade offizielle Buff-Assets und Logos herunter und entdecke unsere Visual Identity. Kein Bullshit, purer Minimalismus.",
-    "download_btn": "Brandkit Herunterladen (.zip)",
-    "colors_title": "Design System",
-    "typography_title": "Typografie"
-  },
   "Footer": {
     "title": "Wir sind Buff.",
-    "description": "Wir liefern das technische Fundament, die kreative Durchschlagskraft und die strategische Klarheit, die deiner Marke derzeit fehlt.",
+    "description": "Wir liefern das technische Fundament, die kreative Durchschlagskraft und die strategic Klarheit, die deiner Marke derzeit fehlt.",
     "no_bullshit": "Ohne Bullshit.",
     "nav_title": "Navigation",
     "nav_products": "Produkte",
     "nav_services": "Dienstleistungen",
     "nav_about": "Über Uns",
-    "nav_brandkit": "Brandkit & Assets",
     "nav_start_project": "Projekt Starten",
     "legal_title": "Rechtliches",
     "legal_imprint": "Impressum",
@@ -99,10 +113,38 @@
     "bitfog_tooltip": "Besuche unsere Schwester-Brand bitfog.",
     "copyright": "© 2026 Buff. No bullshit reserved."
   },
+  "Growth": {
+    "hero_title_part1": "Du finanzierst",
+    "hero_title_accent": "Mark Zuckerbergs",
+    "hero_title_part2": "nächste Yacht.",
+    "hero_description": "Dein Werbebudget versickert gerade im Nichts. Wir bauen Funnels, die jeden Klick in Profit verwandeln. Kein Raten, nur Mathe.",
+    "cta_primary": "Unsere Strategie prüfen",
+    "cta_secondary": "Oder sieh wie wir skalieren",
+    "receipt_header": "Meta Ads",
+    "receipt_subheader": "OFFIZIELLE RECHNUNG // VERLUST-TELEMETRIE",
+    "receipt_footer": "Verbrenne Kapital...",
+    "receipt_type": "Typ: CPC // Dist: Global"
+  },
   "Loading": {
     "step1": "Rohe Tech initialisiert...",
     "step2": "Durchschnitt ignoriert...",
     "step3": "Konkurrenz schwitzt...",
     "step4": "Bereit."
+  },
+  "Footnotes": {
+    "note1": "Basierend auf dem 'Brand Finance Global 500' Bericht 2026, der die Deutsche Telekom als wertvollste Marke in Europa einstuft.",
+    "note2": "Bezieht sich auf die Entwicklung und den bundesweiten Rollout eines multifunktionalen Beratungstools für die Mitarbeiter der Deutschen Telekom Service GmbH."
+  },
+  "GrowthArsenal": {
+    "title": "Das Arsenal",
+    "card1_label": "[STRATEGIE]",
+    "card1_title": "Blindes Skalieren ist Selbstmord.",
+    "card1_text": "Wir zerlegen eure aktuellen Funnels, analysieren eure Unit Economics und bauen einen maßgeschneiderten Growth-Blueprint. Kein Raten. Nur Mathematik und Marktpsychologie.",
+    "card1_label_traffic": "[TRAFFIC & AKQUISE]",
+    "card1_title_traffic": "Wir kaufen keine Klicks. Wir kaufen Kunden.",
+    "card1_text_traffic": "Plattformübergreifend Media buying, das darauf ausgelegt ist, eure Nische zu dominieren. Wir verwandeln Werbeplattformen von einem Glücksspiel in eine berechenbare Umsatzmaschine.",
+    "card1_label_creative": "[KREATIVE UMSETZUNG]",
+    "card1_title_creative": "Schnell, aggressiv und präzise.",
+    "card1_text_creative": "Ad-Copy, die konvertiert, und Funnels, die nicht lecken. Wir übernehmen die gesamte kreative Umsetzung. Schnell, aggressiv und perfekt auf die technische Infrastruktur abgestimmt."
   }
 }

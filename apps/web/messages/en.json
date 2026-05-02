@@ -10,7 +10,6 @@
     "highlightPhrase": "You’ve hit a wall."
   },
   "Header": {
-    "nav_products": "Products",
     "nav_services": "Services",
     "nav_about": "About Us",
     "nav_login": "Login",
@@ -47,7 +46,30 @@
   },
   "Contact": {
     "title": "Let's cut the small talk.",
-    "subtext": "Tell us what's broken or what you want to conquer. If it's ambitious, we're in. If it's boring, we'll pass."
+    "subtext": "Tell us what's broken or what you want to conquer. If it's ambitious, we're in. If it's boring, we'll pass.",
+    "hi": "Hi Buff. I am",
+    "from": "from",
+    "honestly": ". Honestly, right now our",
+    "holding_back": "is holding us back. We need someone who can",
+    "reach_out": ". Reach out to me at",
+    "lets_go": ". Let's go.",
+    "placeholder_name": "Your Name",
+    "placeholder_company": "Company",
+    "placeholder_email": "Email address",
+    "submit_btn": "Send it.",
+    "submit_btn_pending": "Sending...",
+    "success_title": "We'll get in touch.",
+    "success_retry": "Send another one?",
+    "error_title": "The void won (this time).",
+    "error_text": "A technical glitch almost let your project slip away. We shouldn't let that happen. Don't let a minor error be the end of this.",
+    "error_retry": "Let's try that again.",
+    "select_problem_tech": "Tech-Stack",
+    "select_problem_marketing": "Marketing",
+    "select_problem_chaos": "Agency-Chaos",
+    "select_problem_infra": "Infrastructure",
+    "select_action_build": "build it from scratch",
+    "select_action_scale": "scale it aggressively",
+    "select_action_fix": "fix the mess"
   },
   "Arsenal": {
     "build_title": "Raw Tech",
@@ -58,9 +80,9 @@
     "growth_tab_label": "The Growth"
   },
   "EnterpriseBento": {
-    "section_headline": "Built for Europe's largest corporation.",
+    "section_headline": "Built for Europe's most valuable brand.<sup1>1</sup1>",
     "nda_hint": "Further undisclosed market leaders under NDA",
-    "card1_headline": "Scaling sales operations for T-Mobile on a national level.",
+    "card1_headline": "Scaling sales operations for T-Mobile on a national level.<sup2>2</sup2>",
     "card2_title": "Zero-second latency.",
     "card2_text": "Built for real-time customer interactions. This means zero tolerance for lag or errors. The tool never gets in the way. High-speed performance wasn't a feature—it was the core design principle.",
     "card3_title": "Complexity, made invisible.",
@@ -68,18 +90,11 @@
   },
   "Legal": {
     "imprint_title": "Imprint",
-    "imprint_content": "Buff Digital Agency\nAcid Lime Street 42\n10115 Berlin\n\nRepresented by:\nJohn Doe\n\nContact:\nEmail: legal@buff.test\nPhone: +49 123 456 789\n\nDisclaimer:\nThe contents of these pages were created with great care. However, we cannot guarantee the accuracy, completeness, and timeliness of the content.",
+    "imprint_content": "Buff Germany UG\nEulitzstr. 1\n09112 Chemnitz\n\nRepresented by:\nFelix Kinze\n\nContact:\nEmail: service@buffinteractive.net\n\nDisclaimer:\nThe contents of these pages were created with great care. However, we cannot guarantee the accuracy, completeness, and timeliness of the content.",
     "privacy_title": "Privacy Policy",
     "privacy_content": "1. Data Protection at a Glance\nWe take the protection of your personal data very seriously. We treat your personal data confidentially and in accordance with the statutory data protection regulations and this privacy policy.\n\n2. Data Collection on Our Website\nWe only store a strictly necessary cookie to save your language preference. No third-party trackers are running without your consent.\n\n3. Your Rights\nYou have the right to receive information about the origin, recipient, and purpose of your stored personal data at any time free of charge.",
     "terms_title": "Terms of Service",
     "terms_content": "1. Scope of Application\nThese Terms of Service apply to all interactions with Buff.\n\n2. Services Provided\nWe provide technical backbone, creative punch, and strategic clarity.\n\n3. Liability\nWe build high-performance products. If it breaks, we fix it.\n\n4. Final Provisions\nStop accepting average stuff."
-  },
-  "Brand": {
-    "title": "Branding & Assets",
-    "description": "Download official Buff assets, logos, and check out our visual identity guidelines. No bullshit, just pure aesthetics.",
-    "download_btn": "Download Brandkit (.zip)",
-    "colors_title": "Design System",
-    "typography_title": "Typography"
   },
   "Footer": {
     "title": "We are Buff.",
@@ -89,7 +104,6 @@
     "nav_products": "Products",
     "nav_services": "Services",
     "nav_about": "About Us",
-    "nav_brandkit": "Brandkit & Assets",
     "nav_start_project": "Start Project",
     "legal_title": "Legal",
     "legal_imprint": "Imprint",
@@ -99,10 +113,38 @@
     "bitfog_tooltip": "Visit our sister brand bitfog.",
     "copyright": "© 2026 Buff. No bullshit reserved."
   },
+  "Growth": {
+    "hero_title_part1": "Stop funding",
+    "hero_title_accent": "Mark Zuckerberg's",
+    "hero_title_part2": "next yacht.",
+    "hero_description": "Your ad budget is currently going down the drain. We build funnels that turn every click into profit. No guessing, just math.",
+    "cta_primary": "Audit our strategy",
+    "cta_secondary": "Or see how we scale",
+    "receipt_header": "Meta Ads",
+    "receipt_subheader": "OFFICIAL INVOICE // LOSS TELEMETRY",
+    "receipt_footer": "Burning Capital...",
+    "receipt_type": "Type: CPC // Dist: Global"
+  },
   "Loading": {
     "step1": "Initializing raw tech...",
     "step2": "Bypassing average...",
     "step3": "Making competitors nervous...",
     "step4": "Ready."
+  },
+  "Footnotes": {
+    "note1": "Based on the 2026 'Brand Finance Global 500' report, which ranks Deutsche Telekom as the most valuable brand in Europe.",
+    "note2": "Refers to the development and nationwide rollout of a multifunctional consulting tool for employees of Deutsche Telekom Service GmbH."
+  },
+  "GrowthArsenal": {
+    "title": "The Arsenal",
+    "card1_label": "[STRATEGY]",
+    "card1_title": "Blind scaling is suicide.",
+    "card1_text": "We tear down your current funnels, analyze your unit economics, and build a customized growth blueprint. No guessing. Just math and market psychology.",
+    "card1_label_traffic": "[TRAFFIC & ACQUISITION]",
+    "card1_title_traffic": "We don't buy clicks. We buy customers.",
+    "card1_text_traffic": "Cross-platform media buying engineered to dominate your niche. We turn ad platforms from a gamble into a predictable revenue engine.",
+    "card1_label_creative": "[CREATIVE EXECUTION]",
+    "card1_title_creative": "Fast, aggressive, and aligned.",
+    "card1_text_creative": "Ad copy that converts and funnels that don't leak. We handle the entire creative fulfillment. Perfectly aligned with the technical infrastructure."
   }
 }

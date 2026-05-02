@@ -10,7 +10,6 @@
     "highlightPhrase": "Es parálisis."
   },
   "Header": {
-    "nav_products": "Productos",
     "nav_services": "Servicios",
     "nav_about": "Sobre Nosotros",
     "nav_login": "Iniciar sesión",
@@ -46,7 +45,31 @@
     "signup_disabled_description": "Los registros están desactivados temporalmente. Por favor, contáctenos para obtener acceso."
   },
   "Contact": {
-    "title": "Dejémonos de charlas."
+    "title": "Dejémonos de charlas.",
+    "subtext": "Cuéntanos qué está roto o qué quieres conquistar. Si es ambicioso, cuenta con nosotros. Si es aburrido, pasamos.",
+    "hi": "Hola Buff. Soy",
+    "from": "de",
+    "honestly": ". Sinceramente, ahora mismo nuestro",
+    "holding_back": "nos está frenando. Necesitamos a alguien que pueda",
+    "reach_out": ". Contacta conmigo en",
+    "lets_go": ". Hagámoslo.",
+    "placeholder_name": "Tu nombre",
+    "placeholder_company": "Empresa",
+    "placeholder_email": "Correo electrónico",
+    "submit_btn": "Enviar.",
+    "submit_btn_pending": "Enviando...",
+    "success_title": "Transmisión recibida.",
+    "success_retry": "¿Enviar otra?",
+    "error_title": "El vacío ganó (esta vez).",
+    "error_text": "Un fallo técnico casi hace que tu proyecto se escape. No deberíamos permitirlo. No dejes que un pequeño error sea el final.",
+    "error_retry": "Intentar de nuevo.",
+    "select_problem_tech": "Tech-Stack",
+    "select_problem_marketing": "Marketing",
+    "select_problem_chaos": "Caos de agencia",
+    "select_problem_infra": "Infraestructura",
+    "select_action_build": "construirlo de cero",
+    "select_action_scale": "escalarlo agresivamente",
+    "select_action_fix": "arreglar el desastre"
   },
   "Arsenal": {
     "build_title": "Tecnología pura.",
@@ -55,9 +78,9 @@
     "growth_tab_label": "The Growth"
   },
   "EnterpriseBento": {
-    "section_headline": "Construido para la mayor corporación de Europa.",
+    "section_headline": "Construido para la mayor corporación de Europa.<sup1>1</sup1>",
     "nda_hint": "Otros líderes del mercado no revelados bajo NDA",
-    "card1_headline": "Escalamos la gestión de ventas de T-Mobile en toda Alemania.",
+    "card1_headline": "Escalamos la gestión de ventas de T-Mobile en toda Alemania.<sup2>2</sup2>",
     "card2_title": "Tiempo de respuesta: Cero.",
     "card2_text": "Implementado en tiempo real durante la atención al cliente. Cero tolerancia a esperas o errores. La herramienta fluye sin interrupciones. La máxima velocidad no fue una opción, sino el principio fundamental de su diseño.",
     "card3_title": "Complejidad invisible.",
@@ -65,18 +88,11 @@
   },
   "Legal": {
     "imprint_title": "Aviso Legal",
-    "imprint_content": "Buff Digital Agency\nAcid Lime Street 42\n10115 Berlín\n\nRepresentado por:\nJohn Doe\n\nContacto:\nEmail: legal@buff.test\nTeléfono: +49 123 456 789\n\nDescargo de responsabilidad:\nEl contenido de estas páginas ha sido creado con gran cuidado. Sin embargo, no podemos garantizar la exactitud, exhaustividad o actualidad del contenido.",
+    "imprint_content": "Buff Germany UG\nEulitzstr. 1\n09112 Chemnitz\n\nRepresentado por:\nFelix Kinze\n\nContacto:\nEmail: service@buffinteractive.net\n\nDescargo de responsabilidad:\nEl contenido de estas páginas ha sido creado con gran cuidado. Sin embargo, no podemos garantizar la exactitud, exhaustividad o actualidad del contenido.",
     "privacy_title": "Política de Privacidad",
     "privacy_content": "1. Protección de Datos en un Vistazo\nNos tomamos muy en serio la protección de sus datos personales. Tratamos sus datos de forma confidencial y de acuerdo con las normativas legales de protección de datos.\n\n2. Recopilación de Datos en Nuestro Sitio Web\nSolo almacenamos una cookie estrictamente necesaria para guardar sus preferencias de idioma. No se ejecutan rastreadores de terceros sin su consentimiento.\n\n3. Sus Derechos\nUsted tiene derecho a recibir información sobre el origen, destinatario y propósito de sus datos personales almacenados en cualquier momento de forma gratuita.",
     "terms_title": "Términos de Servicio",
     "terms_content": "1. Ámbito de Aplicación\nEstos Términos de Servicio se aplican a todas las interacciones con Buff.\n\n2. Servicios Proporcionados\nProporcionamos infraestructura técnica, impacto creativo y claridad estratégica.\n\n3. Responsabilidad\nConstruimos productos de alto rendimiento. Si se rompe, lo arreglamos.\n\n4. Disposiciones Finales\nDeja de aceptar cosas promedio."
-  },
-  "Brand": {
-    "title": "Branding & Assets",
-    "description": "Descarga los recursos oficiales de Buff, logotipos y descubre nuestra identidad visual. Sin tonterías, pura estética.",
-    "download_btn": "Descargar Brandkit (.zip)",
-    "colors_title": "Sistema de Diseño",
-    "typography_title": "Tipografía"
   },
   "Footer": {
     "title": "Somos Buff.",
@@ -86,7 +102,6 @@
     "nav_products": "Productos",
     "nav_services": "Servicios",
     "nav_about": "Sobre Nosotros",
-    "nav_brandkit": "Brandkit y Recursos",
     "nav_start_project": "Iniciar Proyecto",
     "legal_title": "Legal",
     "legal_imprint": "Aviso Legal",
@@ -96,10 +111,38 @@
     "bitfog_tooltip": "Visita nuestra marca hermana bitfog.",
     "copyright": "© 2026 Buff. Reservados sin tonterías."
   },
+  "Growth": {
+    "hero_title_part1": "Deja de financiar",
+    "hero_title_accent": "el próximo yate",
+    "hero_title_part2": "de Mark Zuckerberg.",
+    "hero_description": "Tu presupuesto publicitario se está perdiendo en el vacío. Construimos embudos que convierten cada clic en beneficio. Sin adivinanzas, solo matemáticas.",
+    "cta_primary": "Audita nuestra estrategia",
+    "cta_secondary": "O mira cómo escalamos",
+    "receipt_header": "Meta Ads",
+    "receipt_subheader": "FACTURA OFICIAL // TELEMETRÍA DE PÉRDIDA",
+    "receipt_footer": "Quemando capital...",
+    "receipt_type": "Tipo: CPC // Dist: Global"
+  },
   "Loading": {
     "step1": "Inicializando tecnología pura...",
     "step2": "Evitando el promedio...",
     "step3": "Poniendo nerviosa a la competencia...",
     "step4": "Listo."
+  },
+  "Footnotes": {
+    "note1": "Basado en el informe 'Brand Finance Global 500' de 2026, que sitúa a Deutsche Telekom como la marca más valiosa de Europa.",
+    "note2": "Se refiere al desarrollo y despliegue nacional de una herramienta de consultoría multifuncional para los empleados de Deutsche Telekom Service GmbH."
+  },
+  "GrowthArsenal": {
+    "title": "El Arsenal",
+    "card1_label": "[ESTRATEGIA]",
+    "card1_title": "Escalar a ciegas es un suicidio.",
+    "card1_text": "Desglosamos tus embudos actuales, analizamos tu economía unitaria y construimos un plan de crecimiento personalizado. Sin adivinanzas. Solo matemáticas y psicología de mercado.",
+    "card2_label": "[TRÁFICO Y ADQUISICIÓN]",
+    "card2_title": "No compramos clics. Compramos clientes.",
+    "card2_text": "Compra de medios cross-platform diseñada para dominar tu nicho. Convertimos las plataformas publicitarias de una apuesta en un motor de ingresos predecible.",
+    "card3_label": "[EJECUCIÓN CREATIVA]",
+    "card3_title": "Rápido, agresivo y alineado.",
+    "card3_text": "Copia de anuncios que convierte y embudos que no gotean. Nos encargamos de toda la ejecución creativa. Perfectamente alineados con la infraestructura técnica."
   }
 }

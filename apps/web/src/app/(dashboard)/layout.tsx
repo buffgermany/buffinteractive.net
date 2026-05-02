@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { DashboardTopRail } from "@/components/layout/nav";
+import { DashboardHeader } from "@/components/buff/DashboardHeader";
 import { headers as nextHeaders } from "next/headers";
 
 
@@ -38,12 +38,10 @@ export default async function DashboardLayout({
       />
 
       {/* Top navigation rail */}
-      <div className="relative z-10">
-        <DashboardTopRail currentPath={pathname} />
-      </div>
+      <DashboardHeader currentPath={pathname} />
 
       {/* Page content */}
-      <main className="relative z-10 flex-1 overflow-y-auto">
+      <main className="relative z-10 flex-1 overflow-y-auto pt-24 md:pt-32 pb-20">
         {children}
       </main>
     </div>

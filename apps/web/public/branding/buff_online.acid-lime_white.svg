@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1400 170" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(0.600716,0,0,0.600716,37.69593,31.858131)">
+        <g transform="matrix(222.99883,0,0,222.99883,476.771499,170)">
+            <path d="M0.742,-0L0.742,-0.51L0.982,-0.46L0.982,-0L0.742,-0ZM0.982,-0.69L1.213,-0.69L1.213,-0.53L1.082,-0.53C1.055,-0.531 1.035,-0.529 1.02,-0.526C1.006,-0.523 0.996,-0.516 0.991,-0.506C0.985,-0.496 0.982,-0.481 0.982,-0.46L0.742,-0.51C0.742,-0.55 0.749,-0.583 0.765,-0.61C0.78,-0.637 0.804,-0.657 0.84,-0.67C0.874,-0.683 0.922,-0.69 0.982,-0.69ZM0.183,-0L0.183,-0.51L0.423,-0.46L0.423,-0L0.183,-0ZM0.423,-0.69L0.654,-0.69L0.654,-0.53L0.523,-0.53C0.496,-0.531 0.476,-0.529 0.462,-0.526C0.447,-0.523 0.437,-0.516 0.431,-0.506C0.426,-0.496 0.423,-0.481 0.423,-0.46L0.183,-0.51C0.183,-0.55 0.191,-0.583 0.206,-0.61C0.221,-0.637 0.246,-0.657 0.281,-0.67C0.316,-0.683 0.363,-0.69 0.423,-0.69ZM0.02,-0.46L1.213,-0.46L1.213,-0.31L0.02,-0.31L0.02,-0.46Z" style="fill:rgb(204,255,0);fill-rule:nonzero;"/>
+        </g>
+        <g transform="matrix(222.99883,0,0,222.99883,476.771499,170)">
+        </g>
+        <g transform="matrix(222.99883,0,0,222.99883,614.250278,170)">
+        </g>
+        <g transform="matrix(222.99883,0,0,222.99883,751.729057,170)">
+        </g>
+        <text x="0px" y="170px" style="font-family:'Syne-ExtraBold', 'Syne';font-weight:800;font-size:222.999px;fill:rgb(204,255,0);">Bu</text>
+    </g>
+    <g transform="matrix(0.628166,0,0,0.628166,529.29893,27.379954)">
+        <g transform="matrix(222.99883,0,0,222.99883,786.516874,170)">
+        </g>
+        <text x="0px" y="170px" style="font-family:'Syne-Bold', 'Syne';font-weight:700;font-size:222.999px;fill:white;">Online</text>
+    </g>
+</svg>

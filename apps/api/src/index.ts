@@ -6,6 +6,7 @@ import { lemonSqueezyWebhook } from "./routes/webhooks/lemon-squeezy.js";
 import { stripeWebhook } from "./routes/webhooks/stripe.js";
 import { licenseConnect } from "./routes/license/connect.js";
 import { adminLicenseRoutes } from "./routes/admin/licenses.js";
+import { leadsRoutes } from "./routes/leads.js";
 
 // ============================================================
 // API Engine — ElysiaJS on Bun
@@ -61,6 +62,9 @@ const app = new Elysia()
 
   // ---- Admin Routes ----
   .use(adminLicenseRoutes)
+
+  // ---- Public / Contact Routes ----
+  .use(leadsRoutes)
 
   // ---- Global error handler ----
   .onError(({ code, error, set }) => {
