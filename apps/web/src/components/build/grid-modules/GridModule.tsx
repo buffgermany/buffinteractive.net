@@ -8,7 +8,7 @@ interface GridModuleProps {
   children: React.ReactNode;
   className?: string;
   title?: string;
-  icon?: React.ElementType;
+  icon?: React.ComponentType<{ className?: string }>;
 }
 
 export const GridModule = ({ children, className, title, icon: Icon }: GridModuleProps) => {
