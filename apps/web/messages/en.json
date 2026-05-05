@@ -3,13 +3,14 @@
     "title_part1": "Make your",
     "title_part2": "competitors nervous",
     "description": "Safe choices don't win markets. We engineer the tech that runs your business and the marketing that scales it to give your brand an unfair, undeniable advantage.",
-    "cta": "Prove us wrong."
+    "cta_primary": "Our Arsenal"
   },
   "RealityCheck": {
     "text": "You’ve hit a wall. The tactics that got you here are now breaking your infrastructure. Your code is crumbling under the traffic, or your marketing is failing to bring it in.",
     "highlightPhrase": "You’ve hit a wall."
   },
   "Header": {
+    "nav_home": "Home",
     "nav_services": "Services",
     "nav_about": "About Us",
     "nav_login": "Login",
@@ -18,7 +19,9 @@
     "mobile_products": "Products",
     "mobile_services": "Services",
     "mobile_about": "About Us",
-    "mobile_contact": "Contact"
+    "mobile_contact": "Contact",
+    "mobile_services_headline": "Services",
+    "mobile_menu_headline": "Menu"
   },
   "Auth": {
     "login_title": "Welcome back.",
@@ -77,7 +80,8 @@
     "build_description": "Custom Software, High-Performance Hosting, and SaaS infrastructures that don't crash when traffic spikes.",
     "growth_description": "A great product is useless if nobody uses it. We engineer the attention your brand deserves. From cut-throat performance marketing to seamless fulfillment—we make sure the market pays attention. And pays you.",
     "build_tab_label": "The Build",
-    "growth_tab_label": "The Growth"
+    "growth_tab_label": "The Growth",
+    "cta_button": "Dive deeper"
   },
   "EnterpriseBento": {
     "section_headline": "Built for Europe's most valuable brand.<sup1>1</sup1>",
@@ -90,7 +94,7 @@
   },
   "Legal": {
     "imprint_title": "Imprint",
-    "imprint_content": "Buff Germany UG\nEulitzstr. 1\n09112 Chemnitz\n\nRepresented by:\nFelix Kinze\n\nContact:\nEmail: service@buffinteractive.net\n\nDisclaimer:\nThe contents of these pages were created with great care. However, we cannot guarantee the accuracy, completeness, and timeliness of the content.",
+    "imprint_content": "Buff Germany UG (haftungsbeschränkt) i. L.\nEulitzstr. 1\n09112 Chemnitz\n\nRepresented by:\nFelix Kinze\n\nContact:\nEmail: service@buffinteractive.net\n\nDisclaimer:\nThe contents of these pages were created with great care. However, we cannot guarantee the accuracy, completeness, and timeliness of the content.",
     "privacy_title": "Privacy Policy",
     "privacy_content": "1. Data Protection at a Glance\nWe take the protection of your personal data very seriously. We treat your personal data confidentially and in accordance with the statutory data protection regulations and this privacy policy.\n\n2. Data Collection on Our Website\nWe only store a strictly necessary cookie to save your language preference. No third-party trackers are running without your consent.\n\n3. Your Rights\nYou have the right to receive information about the origin, recipient, and purpose of your stored personal data at any time free of charge.",
     "terms_title": "Terms of Service",
@@ -123,7 +127,10 @@
     "receipt_header": "Meta Ads",
     "receipt_subheader": "OFFICIAL INVOICE // LOSS TELEMETRY",
     "receipt_footer": "Burning Capital...",
-    "receipt_type": "Type: CPC // Dist: Global"
+    "receipt_type": "Type: CPC // Dist: Global",
+    "diagnosis_headline": "The problem isn't your product. It's your <sup1>translation.</sup1>",
+    "diagnosis_accent": "Blind scaling is suicide.",
+    "diagnosis_subtext": "No guessing. Just mathematical prediction."
   },
   "Loading": {
     "step1": "Initializing raw tech...",
@@ -140,11 +147,94 @@
     "card1_label": "[STRATEGY]",
     "card1_title": "Blind scaling is suicide.",
     "card1_text": "We tear down your current funnels, analyze your unit economics, and build a customized growth blueprint. No guessing. Just math and market psychology.",
-    "card1_label_traffic": "[TRAFFIC & ACQUISITION]",
-    "card1_title_traffic": "We don't buy clicks. We buy customers.",
-    "card1_text_traffic": "Cross-platform media buying engineered to dominate your niche. We turn ad platforms from a gamble into a predictable revenue engine.",
-    "card1_label_creative": "[CREATIVE EXECUTION]",
-    "card1_title_creative": "Fast, aggressive, and aligned.",
-    "card1_text_creative": "Ad copy that converts and funnels that don't leak. We handle the entire creative fulfillment. Perfectly aligned with the technical infrastructure."
+    "card2_label": "[TRAFFIC & ACQUISITION]",
+    "card2_title": "We don't buy clicks. We buy customers.",
+    "card2_text": "Cross-platform media buying engineered to dominate your niche. We turn ad platforms from a gamble into a predictable revenue engine.",
+    "card3_label": "[CREATIVE EXECUTION]",
+    "card3_title": "Fast, aggressive, and aligned.",
+    "card3_text": "Ad copy that converts and funnels that don't leak. We handle the entire creative fulfillment. Perfectly aligned with the technical infrastructure."
+  },
+  "GrowthParadigm": {
+    "title": "How we ",
+    "title_accent": "operate.",
+    "subtext": "We've optimized every layer of the growth engine to prioritize what actually moves the needle.",
+    "legacy_title": "Market Noise",
+    "legacy_1_title": "The \"Awareness\" Trap",
+    "legacy_1_text": "Optimizing for impressions, reach, and likes. These metrics look great in a boardroom PDF, but they don't solve your customer acquisition cost (CAC).",
+    "legacy_2_title": "Creative Inertia",
+    "legacy_2_text": "Taking 4–6 weeks to launch a \"perfect\" campaign. By the time it goes live, you’ve already burned a month of budget while the market has evolved.",
+    "legacy_3_title": "Rear-View Reporting",
+    "legacy_3_text": "Monthly summaries explaining why performance was average. It’s information you can’t act on, delivered long after the damage is done.",
+    "buff_title": "Revenue ",
+    "buff_title_accent": "Engineering",
+    "buff_1_title": "Unit Economic Mastery",
+    "buff_1_text": "We ignore vanity metrics and obsess over your margins. We bridge the gap between media spend and bank balance, ensuring every $1 spent returns profit.",
+    "buff_2_title": "Aggressive Velocity",
+    "buff_2_text": "24-hour test-to-deploy cycles. We find the winning creative and profitable funnels while your competitors are still debating guidelines in meetings.",
+    "buff_3_title": "Live Performance Telemetry",
+    "buff_3_text": "Zero PDFs. We provide live dashboards that track the ground truth of your business. Real-time clarity into your growth engine, accessible anywhere.",
+    "footer_text": "The result? A predictable, technical advantage over your market."
+  },
+  "GrowthGate": {
+    "title": "Can you handle the scale?",
+    "subtext": "Aggressive marketing only works if your backend and fulfillment can survive a massive spike in demand. If your operations are ready for a ruthless scale-up, pitch us your current bottleneck.",
+    "success_title": "Growth Sequence Initiated",
+    "success_text": "Our architecture team will analyze your bottleneck and contact you within 24 hours.",
+    "form_name": "Name",
+    "form_company": "Company",
+    "form_mrr": "Current Baseline (MRR)",
+    "form_mrr_placeholder": "Select Current Revenue",
+    "form_mrr_option1": "Under $50,000 / month",
+    "form_mrr_option2": "$50,000 - $250,000 / month",
+    "form_mrr_option3": "$250,000 - $1,000,000 / month",
+    "form_mrr_option4": "Over $1,000,000 / month",
+    "form_bottleneck": "The Bottleneck",
+    "form_bottleneck_placeholder": "Describe the friction keeping you from the next tier...",
+    "form_submit": "Initiate Growth",
+    "form_submit_pending": "Analyzing..."
+  },
+  "Build": {
+    "hero_title_part1": "Fragile code is a",
+    "hero_title_accent": "liability.",
+    "hero_description": "Most agencies build MVPs that collapse under pressure. We engineer enterprise-grade custom software, bulletproof SaaS infrastructures, and high-performance managed hosting. We build systems that don't crash when it actually matters.",
+    "cta": "Audit your tech stack",
+    "diagnosis_headline": "Bad software forces you to <sup1>compromise your business.</sup1>",
+    "diagnosis_phase2_part1": "We engineer systems that ",
+    "diagnosis_phase2_accent": "never compromise.",
+    "diagnosis_phase2_part2": "Zero apologies. Zero downtime.",
+    "cap_frontend_title": "Custom Software & Legacy Rework",
+    "cap_frontend_text": "Your off-the-shelf tools are a bottleneck. We rip out failing legacy code and architect custom software that actually does what you need it to do. Brutally fast, perfectly aligned, and built to scale without compromises.",
+    "cap_saas_title": "Unbreakable SaaS Architecture",
+    "cap_saas_text": "A traffic spike shouldn't mean a server outage. We engineer highly resilient SaaS applications that handle massive concurrency without flinching. Built for scale, optimized for absolute zero-latency execution.",
+    "cap_infra_title": "Elite Managed Hosting",
+    "cap_infra_text": "We don't trust cheap infrastructure. We collaborate directly with top-tier hosters to provide high-performance, strictly managed environments. Total security, maximum uptime, zero excuses.",
+    "std_header_part1": "Execution without ",
+    "std_header_accent": "apologies.",
+    "std_1_title": "Absolute Performance.",
+    "std_1_text": "Latency kills conversions. We write clean, aggressive code optimized for the fastest possible execution. No bloated frameworks, no lazy workarounds. Just raw speed.",
+    "std_2_title": "Radical Ownership.",
+    "std_2_text": "We build custom solutions on open standards. You own the IP. You own the codebase. We stay as your execution partner because you want us to, not because you're trapped.",
+    "std_3_title": "Engineered for Scale.",
+    "std_3_text": "We despise temporary tech trends. We architect systems designed to scale from 100 to 100,000 concurrent users effortlessly. Do it right the first time, or don't do it at all.",
+    "cta_header": "Stop tolerating mediocrity.",
+    "cta_subtext": "Bring us your failing legacy system, your scaling bottlenecks, or your vision for a market-dominating SaaS. We will dismantle the problem and engineer the exact solution. No excuses.",
+    "form_name": "Name",
+    "form_role": "Role",
+    "form_challenge": "The Technical Challenge",
+    "form_challenge_placeholder": "Describe your current bottleneck or vision...",
+    "form_submit": "Request Audit"
+  },
+  "MegaMenu": {
+    "products_headline": "Our Platforms",
+    "vault_title": "Vault",
+    "vault_text": "Secure infrastructure.",
+    "velocity_title": "Velocity",
+    "velocity_text": "Edge deployment.",
+    "build_title": "Engineering",
+    "build_text": "Stop patching. Start engineering. Custom, scalable infrastructure designed for raw performance.",
+    "growth_title": "Growth Ops",
+    "growth_text": "Ruthless, mathematical approach to capturing market share and eliminating CAC bleed.",
+    "audit_title": "Analyze Needs",
+    "audit_text": "Not sure? Get a personalized recommendation within seconds."
   }
 }

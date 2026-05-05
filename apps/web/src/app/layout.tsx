@@ -7,6 +7,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { LanguagePopup } from "@/components/buff/LanguagePopup";
 import { LoadingScreen } from "@/components/buff/LoadingScreen";
+import { Prefetcher } from "@/components/buff/Prefetcher";
 import Script from "next/script";
 
 const inter = Inter({
@@ -63,6 +64,7 @@ export default async function RootLayout({
             <Toaster />
             <LanguagePopup />
             <LoadingScreen />
+            <Prefetcher />
           </ThemeProvider>
           <Script
             src="https://analytics.buffinteractive.net/api/script.js"

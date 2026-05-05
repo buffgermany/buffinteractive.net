@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Check, X, ArrowDownRight, Zap } from "lucide-react";
 import { BentoCard } from "@/components/buff/BentoCard";
 import { WigglyUnderline } from "@/components/premium/organic-ui";
+import { useTranslations } from "next-intl";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -17,10 +18,11 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 30, filter: "blur(10px)" },
   visible: {
     opacity: 1,
     y: 0,
+    filter: "blur(0px)",
     transition: {
       type: "spring",
       stiffness: 300,
@@ -30,6 +32,7 @@ const itemVariants = {
 } as const;
 
 export function GrowthParadigm() {
+  const t = useTranslations('GrowthParadigm');
   return (
     <section id="paradigm" className="relative z-10 w-full py-24 md:py-32 px-6 overflow-hidden bg-[#050505]">
       {/* Visual Transition: Connecting Line from Arsenal */}
@@ -41,22 +44,23 @@ export function GrowthParadigm() {
       <div className="max-w-6xl mx-auto flex flex-col gap-12 relative z-10">
         <div className="flex flex-col items-center text-center gap-4">
           <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true }}
+            transition={{ type: "spring", stiffness: 200, damping: 25 }}
             className="text-4xl md:text-6xl font-heading font-bold text-white tracking-tighter leading-none"
           >
-            How we <WigglyUnderline>operate.</WigglyUnderline>
+            {t('title')} <WigglyUnderline>{t('title_accent')}</WigglyUnderline>
           </motion.h2>
           
           <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.1 }}
             className="max-w-2xl text-[#A0A0B0] text-lg md:text-xl"
           >
-            We've optimized every layer of the growth engine to prioritize what actually moves the needle.
+            {t('subtext')}
           </motion.p>
         </div>
         
@@ -72,37 +76,37 @@ export function GrowthParadigm() {
             <BentoCard className="h-full grayscale opacity-50 hover:opacity-100 transition-all duration-700">
               <div className="flex flex-col h-full">
                 <div className="mb-10">
-                  <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-[#8A8A96] font-heading uppercase leading-none">Market Noise</h3>
+                  <h3 className="text-3xl md:text-4xl font-bold tracking-tight text-[#8A8A96] font-heading uppercase leading-none">{t('legacy_title')}</h3>
                 </div>
                 
                 <div className="space-y-12">
                   <div className="group">
                     <div className="flex items-center gap-3 mb-3">
                       <X className="w-5 h-5 text-red-500/40 shrink-0" />
-                      <h4 className="text-lg font-bold text-white opacity-60">The "Awareness" Trap</h4>
+                      <h4 className="text-lg font-bold text-white opacity-60">{t('legacy_1_title')}</h4>
                     </div>
                     <p className="text-[#A0A0B0] font-sans leading-relaxed">
-                      Optimizing for impressions, reach, and likes. These metrics look great in a boardroom PDF, but they don't solve your customer acquisition cost (CAC).
+                      {t('legacy_1_text')}
                     </p>
                   </div>
 
                   <div className="group">
                     <div className="flex items-center gap-3 mb-3">
                       <X className="w-5 h-5 text-red-500/40 shrink-0" />
-                      <h4 className="text-lg font-bold text-white opacity-60">Creative Inertia</h4>
+                      <h4 className="text-lg font-bold text-white opacity-60">{t('legacy_2_title')}</h4>
                     </div>
                     <p className="text-[#A0A0B0] font-sans leading-relaxed">
-                      Taking 4–6 weeks to launch a "perfect" campaign. By the time it goes live, you’ve already burned a month of budget while the market has evolved.
+                      {t('legacy_2_text')}
                     </p>
                   </div>
 
                   <div className="group">
                     <div className="flex items-center gap-3 mb-3">
                       <X className="w-5 h-5 text-red-500/40 shrink-0" />
-                      <h4 className="text-lg font-bold text-white opacity-60">Rear-View Reporting</h4>
+                      <h4 className="text-lg font-bold text-white opacity-60">{t('legacy_3_title')}</h4>
                     </div>
                     <p className="text-[#A0A0B0] font-sans leading-relaxed">
-                      Monthly summaries explaining why performance was average. It’s information you can’t act on, delivered long after the damage is done.
+                      {t('legacy_3_text')}
                     </p>
                   </div>
                 </div>
@@ -112,47 +116,47 @@ export function GrowthParadigm() {
 
           {/* Buff Growth Column */}
           <motion.div variants={itemVariants} className="h-full">
-            <BentoCard className="h-full border-primary/20 shadow-[0_0_80px_-20px_rgba(204,255,0,0.1)]">
+            <BentoCard className="h-full border-primary/20 shadow-[0_0_80px_-20px_rgba(204,255,0,0.15)]">
               <div className="flex flex-col h-full">
                 <div className="mb-10">
-                  <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-white font-heading uppercase leading-none">Revenue <span className="text-[#CCFF00]">Engineering</span></h3>
+                  <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-white font-heading uppercase leading-none">{t('buff_title')} <span className="text-[#CCFF00]">{t('buff_title_accent')}</span></h3>
                 </div>
                 
                 <div className="space-y-12">
                   <div className="group">
                     <div className="flex items-center gap-3 mb-3">
                       <Check className="w-6 h-6 text-[#CCFF00] shrink-0" strokeWidth={2.5} />
-                      <h4 className="text-xl font-bold text-white">Unit Economic Mastery</h4>
+                      <h4 className="text-xl font-bold text-white">{t('buff_1_title')}</h4>
                     </div>
                     <p className="text-[#A0A0B0] font-sans text-lg leading-relaxed">
-                      We ignore vanity metrics and obsess over your margins. We bridge the gap between media spend and bank balance, ensuring every $1 spent returns profit, not just attention.
+                      {t('buff_1_text')}
                     </p>
                   </div>
 
                   <div className="group">
                     <div className="flex items-center gap-3 mb-3">
                       <Check className="w-6 h-6 text-[#CCFF00] shrink-0" strokeWidth={2.5} />
-                      <h4 className="text-xl font-bold text-white">Aggressive Velocity</h4>
+                      <h4 className="text-xl font-bold text-white">{t('buff_2_title')}</h4>
                     </div>
                     <p className="text-[#A0A0B0] font-sans text-lg leading-relaxed">
-                      24-hour test-to-deploy cycles. We find the winning creative and profitable funnels while your competitors are still debating their brand guidelines in meetings.
+                      {t('buff_2_text')}
                     </p>
                   </div>
 
                   <div className="group">
                     <div className="flex items-center gap-3 mb-3">
                       <Check className="w-6 h-6 text-[#CCFF00] shrink-0" strokeWidth={2.5} />
-                      <h4 className="text-xl font-bold text-white">Live Performance Telemetry</h4>
+                      <h4 className="text-xl font-bold text-white">{t('buff_3_title')}</h4>
                     </div>
                     <p className="text-[#A0A0B0] font-sans text-lg leading-relaxed">
-                      Zero PDFs. We provide live dashboards that track the ground truth of your business. Real-time clarity into your growth engine, accessible anywhere, anytime.
+                      {t('buff_3_text')}
                     </p>
                   </div>
                 </div>
 
                 <div className="mt-auto pt-12">
                    <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10 flex items-center justify-between gap-6">
-                      <p className="text-sm font-medium text-white/70">The result? A predictable, technical advantage over your market.</p>
+                      <p className="text-sm font-medium text-white/70">{t('footer_text')}</p>
                       <Zap className="w-6 h-6 text-[#CCFF00]" />
                    </div>
                 </div>

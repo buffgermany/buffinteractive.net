@@ -8,7 +8,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
       initial={{ opacity: 0, filter: "blur(20px)", scale: 0.98, y: 10 }}
       animate={{ opacity: 1, filter: "blur(0px)", scale: 1, y: 0 }}
       transition={{ 
-        duration: 0.4, 
+        duration: 0.7, 
         ease: [0.22, 1, 0.36, 1],
       }}
       className="w-full h-full origin-top"

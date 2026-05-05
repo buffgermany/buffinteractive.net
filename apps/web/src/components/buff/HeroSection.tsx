@@ -4,6 +4,8 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 
 // High-fidelity placeholder that mimics the 3D scene's vibe during load
 function LidarPlaceholder() {
@@ -92,33 +94,38 @@ export function HeroSection() {
         className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center pointer-events-none"
       >
         <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="heading-massive text-foreground mb-8 text-balance max-w-4xl drop-shadow-2xl"
+          initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ type: "spring", stiffness: 200, damping: 25 }}
+          className="heading-massive text-foreground mb-8 text-balance max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto drop-shadow-2xl"
         >
           {t('title_part1')} <span className="text-accent">{t('title_part2')}</span>.
         </motion.h1>
         
         <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.2 }}
           className="text-lg md:text-2xl text-white max-w-2xl mx-auto mb-10 leading-relaxed drop-shadow-md"
         >
           {t('description')}
         </motion.p>
         
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          className="pointer-events-auto"
+          initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.4 }}
+          className="pointer-events-auto flex flex-col sm:flex-row items-center gap-6"
         >
           <Magnetic>
-            <button className="interactive-pill bg-[#CCFF00] text-background px-8 py-4 text-lg font-bold hover:shadow-[0_0_40px_rgba(204,255,0,0.5)] active:scale-95 transition-all">
-              {t('cta')}
-            </button>
+            <Link 
+              href="#services" 
+              prefetch={true}
+              className="group interactive-pill bg-[#CCFF00] text-background px-10 py-4 text-lg font-bold hover:shadow-[0_0_40px_rgba(204,255,0,0.5)] active:scale-95 transition-all flex items-center gap-2"
+            >
+              <span>{t('cta_primary')}</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </Magnetic>
         </motion.div>
       </motion.div>

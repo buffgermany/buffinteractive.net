@@ -49,16 +49,16 @@ export function Footer() {
             
             <div className="flex flex-col gap-3">
                 <h5 className="font-bold text-sm uppercase tracking-widest text-foreground-muted mb-4">{t('nav_title')}</h5>
-                <Link href="/#services" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_services')}</Link>
-                <Link href="/#about" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_about')}</Link>
-                <Link href="/#contact" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_start_project')}</Link>
+                <Link href="/#services" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_services')}</Link>
+                <Link href="/#about" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_about')}</Link>
+                <Link href="/#contact" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_start_project')}</Link>
             </div>
 
             <div className="flex flex-col gap-3">
                 <h5 className="font-bold text-sm uppercase tracking-widest text-foreground-muted mb-4">{t('legal_title')}</h5>
-                <Link href="/imprint" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_imprint')}</Link>
-                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_privacy')}</Link>
-                <Link href="/terms" className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_terms')}</Link>
+                <Link href="/imprint" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_imprint')}</Link>
+                <Link href="/privacy" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_privacy')}</Link>
+                <Link href="/terms" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_terms')}</Link>
                 
                 <div className="mt-4 pt-4 border-t border-white/5 relative">
                     <div className="flex flex-col gap-2 relative">
@@ -117,7 +117,7 @@ export function Footer() {
 
         {/* Easter Egg */}
         <div className="absolute right-6 bottom-[18vw] md:bottom-[12vw] z-20 group">
-            <Link href="#bitfog-entry" className="flex items-center gap-2 font-mono text-[10px] text-muted-foreground/30 hover:text-[#00F0FF] transition-all duration-300">
+            <Link href="#bitfog-entry" prefetch={true} className="flex items-center gap-2 font-mono text-[10px] text-muted-foreground/30 hover:text-[#00F0FF] transition-all duration-300">
                 <Terminal size={12} />
                 <span>&gt; ping bitfog</span>
             </Link>

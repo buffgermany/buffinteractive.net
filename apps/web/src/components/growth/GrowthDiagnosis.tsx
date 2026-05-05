@@ -2,8 +2,10 @@
 
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 
 export const GrowthDiagnosis = () => {
+  const t = useTranslations('Growth');
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -35,9 +37,9 @@ export const GrowthDiagnosis = () => {
             style={{ opacity: opacity1, y: y1, scale: scale1 }}
             className="absolute text-center flex items-center justify-center w-full"
           >
-            <h2 className="text-4xl md:text-6xl lg:text-8xl font-medium font-heading leading-[1.1] tracking-tight text-white/50 text-balance max-w-5xl">
-              The problem isn't your product. It's your <span className="text-white font-bold drop-shadow-xl">translation.</span>
-            </h2>
+            <h2 className="text-4xl md:text-6xl lg:text-8xl font-medium font-heading leading-[1.1] tracking-tight text-white/50 text-balance max-w-5xl"
+                dangerouslySetInnerHTML={{ __html: t.raw('diagnosis_headline') }}
+            />
           </motion.div>
 
           {/* Phase 2 */}
@@ -51,9 +53,9 @@ export const GrowthDiagnosis = () => {
                 style={{ letterSpacing: tracking2 }}
                 className="font-bold text-[#CCFF00] drop-shadow-[0_0_40px_rgba(204,255,0,0.5)] inline-block mt-4 md:mt-0"
               >
-                Blind scaling is suicide.
+                {t('diagnosis_accent')}
               </motion.span><br className="hidden md:block" />
-              <span className="text-3xl md:text-5xl lg:text-6xl font-medium font-heading leading-[1.2] text-white text-balance max-w-6xl">No guessing. Just prediction.</span>
+              <span className="text-3xl md:text-5xl lg:text-6xl font-medium font-heading leading-[1.2] text-white text-balance max-w-6xl">{t('diagnosis_subtext')}</span>
             </p>
           </motion.div>
 

@@ -124,36 +124,36 @@ function ReceiptVisual() {
          {/* Left Column: Copy & Actions */}
          <div className="flex-1 flex flex-col items-start text-left min-w-0 pr-0 lg:pr-8">
            <motion.h1 
-             initial={{ opacity: 0, x: -30 }}
-             animate={{ opacity: 1, x: 0 }}
-             transition={{ duration: 0.8, ease: "easeOut" }}
-             className="text-[clamp(2.5rem,8vw,5.5rem)] leading-[0.95] tracking-tighter font-bold text-white mb-8 max-w-[12rem] xs:max-w-none sm:max-w-[15ch] lg:max-w-[12ch] xl:max-w-[14ch]"
+             initial={{ opacity: 0, x: -30, filter: "blur(10px)" }}
+             animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+             transition={{ type: "spring", stiffness: 200, damping: 25 }}
+             className="font-heading font-bold text-[clamp(2.5rem,6vw,5.5rem)] tracking-tighter leading-[0.95] text-foreground mb-8 text-balance w-full"
            >
              {t('hero_title_part1')}{' '}
-             <span className="text-[#CCFF00]">{t('hero_title_accent')}</span>{' '}
+             <span className="text-primary">{t('hero_title_accent')}</span>{' '}
              {t('hero_title_part2')}
            </motion.h1>
 
            <motion.p 
-             initial={{ opacity: 0, x: -20 }}
-             animate={{ opacity: 1, x: 0 }}
-             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-             className="max-w-xl text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed pt-2 mb-10 px-2 sm:px-0"
+             initial={{ opacity: 0, x: -20, filter: "blur(10px)" }}
+             animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+             transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.1 }}
+             className="w-full max-w-2xl text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed pt-2 mb-10 px-2 sm:px-0 text-balance"
            >
              {t('hero_description')}
            </motion.p>
 
            <motion.div 
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+             initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+             transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.2 }}
              className="flex flex-col sm:flex-row items-center gap-4 md:gap-6 pt-4 md:pt-6 w-full sm:w-auto px-2 sm:px-0"
            >
-             <Link href="#contact" className="group flex items-center justify-center gap-3 rounded-full font-bold transition-all duration-300 bg-[#CCFF00] text-[#0A0A0A] px-8 py-4 text-base hover:shadow-[0_0_40px_-5px_rgba(204,255,0,0.6)] w-full sm:w-auto active:scale-95">
+             <Link href="#contact" className="group interactive-pill flex items-center justify-center gap-3 bg-primary text-primary-foreground px-8 py-4 text-base hover:shadow-[0_0_40px_-5px_hsl(var(--primary)/0.6)] w-full sm:w-auto active:scale-95">
                {t('cta_primary')}
                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
              </Link>
-             <Link href="#architecture" className="text-muted-foreground font-medium hover:text-white transition-all duration-300 px-6 py-4 text-sm md:text-base">
+             <Link href="#architecture" className="text-muted-foreground font-medium hover:text-foreground transition-all duration-300 px-6 py-4 text-sm md:text-base">
                {t('cta_secondary')}
              </Link>
            </motion.div>
@@ -161,9 +161,9 @@ function ReceiptVisual() {
 
         {/* Right Column: Visualizer */}
         <motion.div 
-           initial={{ opacity: 0, scale: 0.95 }}
-           animate={{ opacity: 1, scale: 1 }}
-           transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+           initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+           animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+           transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.1 }}
            className="w-full lg:w-[450px] xl:w-[500px] shrink-0 scale-90 sm:scale-95 md:scale-100"
         >
           <ReceiptVisual />

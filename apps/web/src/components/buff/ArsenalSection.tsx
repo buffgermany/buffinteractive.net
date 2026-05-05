@@ -4,6 +4,9 @@ import { useState, useMemo, memo } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Cpu, TrendingUp } from "lucide-react";
+import Link from "next/link";
+
+const MotionLink = motion(Link);
 
 export type TechLogo = {
   name: string;
@@ -311,10 +314,10 @@ export function ArsenalSection() {
             {activeTab === "build" && (
               <motion.div
                 key="build-content"
-                initial={{ opacity: 0, scale: 0.98, y: 15 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.98, y: -15 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0, scale: 0.98, y: 15, filter: "blur(10px)" }}
+                animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, scale: 0.98, y: -15, filter: "blur(10px)" }}
+                transition={{ type: "spring", stiffness: 200, damping: 25 }}
                 className="flex flex-col items-center text-center w-full max-w-3xl absolute"
               >
                 <div className="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none">
@@ -330,16 +333,18 @@ export function ArsenalSection() {
                 
                 {/* Call to Action */}
                 <div className="flex justify-center relative z-10 w-full mt-4">
-                  <motion.button 
+                  <MotionLink 
+                    href="/build"
+                    prefetch={true}
                     whileHover="hover"
                     whileTap={{ scale: 0.95 }}
                     className="px-8 py-3.5 rounded-full border-2 border-[#00F0FF] bg-[#00F0FF]/5 text-[#00F0FF] font-heading font-bold text-base tracking-tight transition-all duration-300 hover:bg-[#00F0FF] hover:text-[#0A0A0A] hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] flex items-center gap-2 group"
                   >
-                    <span>Dive deeper</span>
+                    <span>{t('cta_button')}</span>
                     <motion.div variants={{ hover: { x: 5 } }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
                       <ArrowRight size={18} strokeWidth={3} />
                     </motion.div>
-                  </motion.button>
+                  </MotionLink>
                 </div>
               </motion.div>
             )}
@@ -347,10 +352,10 @@ export function ArsenalSection() {
             {activeTab === "growth" && (
               <motion.div
                 key="growth-content"
-                initial={{ opacity: 0, scale: 0.98, y: 15 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.98, y: -15 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0, scale: 0.98, y: 15, filter: "blur(10px)" }}
+                animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, scale: 0.98, y: -15, filter: "blur(10px)" }}
+                transition={{ type: "spring", stiffness: 200, damping: 25 }}
                 className="flex flex-col items-center text-center w-full max-w-3xl absolute"
               >
                 <div className="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none">
@@ -366,16 +371,18 @@ export function ArsenalSection() {
 
                 {/* Call to Action */}
                 <div className="flex justify-center relative z-10 w-full mt-4">
-                  <motion.button 
+                  <MotionLink 
+                    href="/growth"
+                    prefetch={true}
                     whileHover="hover"
                     whileTap={{ scale: 0.95 }}
                     className="px-8 py-3.5 rounded-full border-2 border-[#CCFF00] bg-[#CCFF00]/5 text-[#CCFF00] font-heading font-bold text-base tracking-tight transition-all duration-300 hover:bg-[#CCFF00] hover:text-[#0A0A0A] hover:shadow-[0_0_30px_rgba(204,255,0,0.4)] flex items-center gap-2 group"
                   >
-                    <span>Dive deeper</span>
+                    <span>{t('cta_button')}</span>
                     <motion.div variants={{ hover: { x: 5 } }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
                       <ArrowRight size={18} strokeWidth={3} />
                     </motion.div>
-                  </motion.button>
+                  </MotionLink>
                 </div>
               </motion.div>
             )}

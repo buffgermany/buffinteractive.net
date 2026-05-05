@@ -22,10 +22,10 @@ export function AntiPortfolioSection() {
         {/* Section Header */}
         <div className="mb-12 md:mb-16 w-full">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }} 
-            whileInView={{ opacity: 1, y: 0 }} 
+            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }} 
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} 
             viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ type: "spring", stiffness: 200, damping: 25 }}
           >
             <h2 className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-bold font-heading text-[#F8F8F8] tracking-tight leading-tight">
               {t.rich('section_headline', {
@@ -39,10 +39,10 @@ export function AntiPortfolioSection() {
           
           {/* Card 1: The Authority — Full width top */}
           <motion.div 
-            initial={{ opacity: 0, y: 30 }} 
-            whileInView={{ opacity: 1, y: 0 }} 
+            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }} 
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} 
             viewport={{ once: true, margin: "-100px" }} 
-            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ type: "spring", stiffness: 200, damping: 25 }}
             className="w-full"
           >
             <BentoCard className="w-full min-h-[320px] md:min-h-[380px]">
@@ -79,10 +79,10 @@ export function AntiPortfolioSection() {
             {/* Card 2 */}
             <motion.div 
               className="flex"
-              initial={{ opacity: 0, y: 30 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
+              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }} 
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} 
               viewport={{ once: true, margin: "-100px" }} 
-              transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+              transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.15 }}
             >
               <BentoCard className="w-full">
                 <div>
@@ -98,10 +98,10 @@ export function AntiPortfolioSection() {
             {/* Card 3 */}
             <motion.div 
               className="flex"
-              initial={{ opacity: 0, y: 30 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
+              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }} 
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} 
               viewport={{ once: true, margin: "-100px" }} 
-              transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+              transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.3 }}
             >
               <BentoCard className="w-full">
                 <div>
@@ -119,10 +119,10 @@ export function AntiPortfolioSection() {
 
         {/* NDA Footer Hint */}
         <motion.div
-           initial={{ opacity: 0, y: 20 }} 
-           whileInView={{ opacity: 1, y: 0 }} 
+           initial={{ opacity: 0, y: 30, filter: "blur(10px)" }} 
+           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} 
            viewport={{ once: true, margin: "-50px" }} 
-           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
+           transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.4 }}
            className="mt-16 sm:mt-20 flex flex-col sm:flex-row items-center justify-center gap-3 text-center"
         >
           <Lock className="w-4 h-4 text-[#A0A0B0]" />
