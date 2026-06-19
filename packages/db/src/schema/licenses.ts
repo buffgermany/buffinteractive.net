@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, pgEnum, index } from "drizzle-orm/pg-core";
 import { createId } from "@paralleldrive/cuid2";
 import { users } from "./users";
 import { products } from "./products";
@@ -57,7 +57,13 @@ export const licenses = pgTable("licenses", {
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (table) => [
+  index("licenses_order_id_idx").on(table.orderId),
+  index("licenses_user_id_idx").on(table.userId),
+  index("licenses_product_id_idx").on(table.productId),
+  index("licenses_status_idx").on(table.status),
+  index("licenses_created_at_idx").on(table.createdAt),
+]);
 
 // ============================================================
 // Inferred Types

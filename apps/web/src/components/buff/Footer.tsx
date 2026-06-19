@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useTransition } from "react";
 import Link from "next/link";
-import { Terminal, ChevronUp } from "lucide-react";
+import { Terminal, ChevronUp, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocale, useTranslations } from 'next-intl';
@@ -19,6 +19,8 @@ export function Footer() {
   const currentLocale = useLocale();
   const { setLocale } = useLanguageStore();
   const [isLangOpen, setIsLangOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [switchingTo, setSwitchingTo] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentLanguage = LOCALES.find(l => l.code === currentLocale) || LOCALES[0];
@@ -32,6 +34,25 @@ export function Footer() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Handle automatic closing after transition finishes
+  useEffect(() => {
+    if (!isPending && switchingTo) {
+      const timer = setTimeout(() => {
+        setIsLangOpen(false);
+        setSwitchingTo(null);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [isPending, switchingTo]);
+
+  const handleLocaleChange = (code: string) => {
+    setSwitchingTo(code);
+    startTransition(() => {
+      setLocale(code);
+      router.refresh();
+    });
+  };
 
   return (
     <footer className="relative bg-[#0A0A0A] border-t border-white/5 pt-24 overflow-hidden">
@@ -67,12 +88,15 @@ export function Footer() {
                         <div className="relative" ref={dropdownRef}>
                            {/* Important: we want the dropdown menu to open UPWARDS generally in a footer, or just downwards if there's space. Let's make it open downwards since we have space below, or upwards since it's the footer edge. The absolute bottom is not directly underneath, but to be safe, opening UPWARDS is usually better in a footer. */}
                            <button 
-                               onClick={() => setIsLangOpen(!isLangOpen)}
-                               className="text-sm text-white hover:text-primary transition-colors flex items-center justify-between group w-full text-left py-1 outline-none"
+                               onClick={() => !isPending && setIsLangOpen(!isLangOpen)}
+                               disabled={isPending}
+                               className="text-sm text-white hover:text-primary transition-colors flex items-center justify-between group w-full text-left py-1 outline-none disabled:opacity-70 disabled:cursor-wait"
                            >
                                <div className="flex items-center gap-2.5">
-                                 <img src={currentLanguage?.flagUrl || 'https://flagcdn.com/gb.svg'} alt={currentLanguage?.label || 'English'} className="w-5 h-[15px] object-cover rounded-[2px]" />
-                                 <strong className="font-bold">{currentLanguage?.label || 'English'}</strong>
+                                 <div className="w-5 h-[15px] shrink-0 rounded-[2px] overflow-hidden border border-white/10 flex items-center justify-center bg-white/5">
+                                    <img src={currentLanguage?.flagUrl || 'https://flagcdn.com/gb.svg'} alt={currentLanguage?.label || 'English'} className="w-full h-full object-cover" />
+                                 </div>
+                                 <strong className="font-bold">{isPending ? 'Loading...' : (currentLanguage?.label || 'English')}</strong>
                                </div>
                                <ChevronUp size={14} className={`transition-transform duration-300 ml-2 ${isLangOpen ? 'rotate-180' : ''}`} />
                            </button>
@@ -82,27 +106,29 @@ export function Footer() {
                                <div className="absolute bottom-full left-0 mb-3 w-[280px] bg-[#0A0A0A]/95 border border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur-2xl z-50 flex flex-col gap-2 p-3 origin-bottom-left animate-in fade-in slide-in-from-bottom-2 duration-200">
                                     {LOCALES.map((lang) => {
                                         const isActive = currentLocale === lang.code;
+                                        const isSwitchingToThis = switchingTo === lang.code;
+
                                         return (
                                             <button
                                                 key={lang.code}
-                                                onClick={() => {
-                                                    setLocale(lang.code);
-                                                    setIsLangOpen(false);
-                                                    router.refresh();
-                                                }}
-                                                className={`flex items-center justify-between p-3 rounded-xl border transition-all group outline-none ${
+                                                disabled={isPending}
+                                                onClick={() => handleLocaleChange(lang.code)}
+                                                className={`flex items-center justify-between p-3 rounded-xl border transition-all group outline-none disabled:cursor-wait ${
                                                     isActive 
                                                     ? 'border-transparent hover:bg-white/5' 
                                                     : 'border-white/5 bg-white/5 hover:border-primary/50 hover:bg-primary/10'
-                                                }`}
+                                                } ${isSwitchingToThis ? 'border-primary/50 bg-primary/10' : ''}`}
                                             >
-                                                <div className={`flex items-center gap-3 transition-opacity ${isActive ? 'opacity-60 group-hover:opacity-100' : ''}`}>
-                                                    <div className={`w-6 h-[16px] shrink-0 rounded-[2px] overflow-hidden border border-white/10 transition-all ${isActive ? 'grayscale group-hover:grayscale-0' : ''}`}>
+                                                <div className={`flex items-center gap-3 transition-opacity w-full ${isActive ? 'opacity-60 group-hover:opacity-100' : ''}`}>
+                                                    <div className={`w-6 h-[16px] shrink-0 rounded-[2px] overflow-hidden border border-white/10 transition-all flex items-center justify-center bg-white/5 ${isActive ? 'grayscale group-hover:grayscale-0' : ''}`}>
                                                         <img src={lang.flagUrl} alt={lang.label} className="w-full h-full object-cover" />
                                                     </div>
                                                     <span className={`text-sm transition-colors tracking-tight ${isActive ? 'text-white font-medium' : 'text-white font-bold group-hover:text-primary'}`}>
-                                                        {isActive ? lang.activeText : lang.actionText}
+                                                        {isSwitchingToThis ? (isActive ? 'Refreshing...' : 'Switching...') : (isActive ? lang.activeText : lang.actionText)}
                                                     </span>
+                                                    {isSwitchingToThis && (
+                                                        <Loader2 size={14} className="ml-auto text-primary animate-spin" />
+                                                    )}
                                                 </div>
                                             </button>
                                        );

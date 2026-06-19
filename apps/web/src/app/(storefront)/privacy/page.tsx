@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Buff",
+  title: "Privacy Policy",
 };
 
 export default function PrivacyPolicyPage() {

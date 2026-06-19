@@ -5,6 +5,7 @@ import {
   boolean,
   timestamp,
   pgEnum,
+  index,
 } from "drizzle-orm/pg-core";
 import { createId } from "@paralleldrive/cuid2";
 
@@ -54,7 +55,9 @@ export const products = pgTable("products", {
   localImageKey: text("local_image_key"), // Internal disk path for product image
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (table) => [
+  index("products_created_at_idx").on(table.createdAt),
+]);
 
 // ============================================================
 // Inferred Types

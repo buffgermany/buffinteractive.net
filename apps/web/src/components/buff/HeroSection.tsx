@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
@@ -29,7 +29,11 @@ const LidarBackground = dynamic(() => import('./LidarBackground'), {
 
 function Magnetic({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const springX = useSpring(x, { stiffness: 150, damping: 15, mass: 0.1 });
+  const springY = useSpring(y, { stiffness: 150, damping: 15, mass: 0.1 });
 
   const handleMouse = (e: React.MouseEvent) => {
     if (!ref.current) return;
@@ -37,18 +41,21 @@ function Magnetic({ children }: { children: React.ReactNode }) {
     const { height, width, left, top } = ref.current.getBoundingClientRect();
     const middleX = clientX - (left + width / 2);
     const middleY = clientY - (top + height / 2);
-    setPosition({ x: middleX * 0.25, y: middleY * 0.25 });
+    x.set(middleX * 0.25);
+    y.set(middleY * 0.25);
   };
 
-  const reset = () => setPosition({ x: 0, y: 0 });
+  const reset = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
     <motion.div
       ref={ref}
       onMouseMove={handleMouse}
       onMouseLeave={reset}
-      animate={{ x: position.x, y: position.y }}
-      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+      style={{ x: springX, y: springY }}
       className="relative inline-block"
     >
       {children}
@@ -90,13 +97,14 @@ export function HeroSection() {
       <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
 
       <motion.div 
-        style={{ opacity, scale }}
+        style={{ opacity, scale, willChange: "transform, opacity" }}
         className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center pointer-events-none"
       >
         <motion.h1 
           initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ type: "spring", stiffness: 200, damping: 25 }}
+          style={{ willChange: "transform, opacity, filter" }}
           className="heading-massive text-foreground mb-8 text-balance max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto drop-shadow-2xl"
         >
           {t('title_part1')} <span className="text-accent">{t('title_part2')}</span>.
@@ -106,6 +114,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.2 }}
+          style={{ willChange: "transform, opacity, filter" }}
           className="text-lg md:text-2xl text-white max-w-2xl mx-auto mb-10 leading-relaxed drop-shadow-md"
         >
           {t('description')}
@@ -115,6 +124,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.4 }}
+          style={{ willChange: "transform, opacity, filter" }}
           className="pointer-events-auto flex flex-col sm:flex-row items-center gap-6"
         >
           <Magnetic>

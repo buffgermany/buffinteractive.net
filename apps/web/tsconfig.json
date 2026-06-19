@@ -18,24 +18,43 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@platform/api": ["../../apps/api/src/index.ts"],
-      "@platform/api/*": ["../../apps/api/src/*"],
-      "@platform/shared": ["../../packages/shared/src/index.ts"],
-      "@platform/shared/*": ["../../packages/shared/src/*"],
-      "@platform/db": ["../../packages/db/src/index.ts"],
-      "@platform/db/*": ["../../packages/db/src/*"],
-      "@platform/client-sdk": ["../../packages/client-sdk/src/index.ts"],
-      "@platform/client-sdk/*": ["../../packages/client-sdk/src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@platform/api": [
+        "../../apps/api/src/index.ts"
+      ],
+      "@platform/api/*": [
+        "../../apps/api/src/*"
+      ],
+      "@platform/shared": [
+        "../../packages/shared/src/index.ts"
+      ],
+      "@platform/shared/*": [
+        "../../packages/shared/src/*"
+      ],
+      "@platform/db": [
+        "../../packages/db/src/index.ts"
+      ],
+      "@platform/db/*": [
+        "../../packages/db/src/*"
+      ],
+      "@platform/client-sdk": [
+        "../../packages/client-sdk/src/index.ts"
+      ],
+      "@platform/client-sdk/*": [
+        "../../packages/client-sdk/src/*"
+      ]
     },
     "allowJs": true,
     "resolveJsonModule": true
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
+    ".next-dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

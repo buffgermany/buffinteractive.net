@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -14,7 +14,6 @@ const PARTICLE_COUNT_MOBILE = 5000;
 const INTERACTION_RADIUS = 3.2;
 const INTERACTION_RADIUS_SQ = INTERACTION_RADIUS * INTERACTION_RADIUS;
 const REPULSION_STRENGTH = 1.3;
-const SPRING_FACTOR = 0.07;
 const SMOOTH_LERP = 0.12;
 const ROT_SPEED = 0.04;
 
@@ -34,23 +33,81 @@ function isMobileDevice(): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Cloud component
-//
-// Architecture:
-//   <group ref={groupRef}>       ← cinematic rotation lives here
-//     <points ref={pointsRef}>   ← ALWAYS at identity (no rotation)
-//
-// Because <points> has no transform of its own, its local space IS world
-// space. The plane intersection (_mouseWorld) is therefore the exact cursor
-// position in particle-local coordinates — always, regardless of how much
-// the parent group has rotated. No worldToLocal needed, no drift.
+// Shaders
 // ---------------------------------------------------------------------------
-function LidarCloud({ scrollProgress }: { scrollProgress: any }) {
+const vertexShader = `
+  uniform vec3 uMouse; // In world space
+  uniform float uRadius;
+  uniform float uRadiusSq;
+  uniform float uRepulsionStrength;
+  uniform float uSize;
+  uniform float uMouseActive;
+
+  void main() {
+    // 1. Transform local position to world space
+    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+
+    // 2. Transform world coordinates to eye space (view space)
+    vec4 mvPosition = viewMatrix * worldPos;
+    vec4 mvMouse = viewMatrix * vec4(uMouse, 1.0);
+
+    if (uMouseActive > 0.5) {
+      // 3. Project eye position onto the plane at z = mvMouse.z (which is negative)
+      // In eye space, the camera is at (0,0,0) looking down -Z.
+      if (mvPosition.z < -0.0001 && mvMouse.z < -0.0001) {
+        float t = mvMouse.z / mvPosition.z;
+        vec2 projPos = mvPosition.xy * t;
+
+        // 4. Compute distance in projected space (matches screen/pointer space perfectly)
+        float dx = projPos.x - mvMouse.x;
+        float dy = projPos.y - mvMouse.y;
+        float distSq2D = dx * dx + dy * dy;
+
+        if (distSq2D < uRadiusSq && distSq2D > 0.0001) {
+          float dist2D = sqrt(distSq2D);
+          float force = ((uRadius - dist2D) / uRadius) * uRepulsionStrength;
+          
+          // 5. Scale repulsion force by depth factor t so on-screen movement is visually consistent
+          float worldForce = force / t;
+
+          // Displace position away from mouse in eye space
+          mvPosition.x += (dx / dist2D) * worldForce;
+          mvPosition.y += (dy / dist2D) * worldForce;
+          
+          // Pop Z toward camera in eye space (making it less negative / closer to 0)
+          mvPosition.z += force * 0.6;
+        }
+      }
+    }
+
+    // 6. Project eye-space position to clip space
+    gl_Position = projectionMatrix * mvPosition;
+
+    // Size attenuation (simulates perspective scaling)
+    gl_PointSize = uSize * (300.0 / -mvPosition.z);
+  }
+`;
+
+const fragmentShader = `
+  uniform vec3 uColor;
+  uniform float uOpacity;
+  uniform sampler2D uTexture;
+
+  void main() {
+    // Render glow sprite
+    vec4 texColor = texture2D(uTexture, gl_PointCoord);
+    gl_FragColor = vec4(uColor, 1.0) * texColor * uOpacity;
+  }
+`;
+
+// ---------------------------------------------------------------------------
+// Cloud component
+// ---------------------------------------------------------------------------
+function LidarCloud({ scrollProgress, isInView }: { scrollProgress: any; isInView: boolean }) {
   const { camera, raycaster } = useThree();
 
   const groupRef  = useRef<THREE.Group>(null);
   const pointsRef = useRef<THREE.Points>(null);
-  const materialRef = useRef<THREE.PointsMaterial>(null);
 
   const isMobile = useMemo(() => isMobileDevice(), []);
   const particleCount = isMobile ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT_DESKTOP;
@@ -77,10 +134,9 @@ function LidarCloud({ scrollProgress }: { scrollProgress: any }) {
     return tex;
   }, []);
 
-  // ---- Particle positions -------------------------------------------------
-  const { originalPositions, currentPositions } = useMemo(() => {
+  // ---- Particle positions (static, uploaded to GPU once) ------------------
+  const originalPositions = useMemo(() => {
     const orig = new Float32Array(particleCount * 3);
-    const curr = new Float32Array(particleCount * 3);
 
     for (let i = 0; i < particleCount; i++) {
       const i3   = i * 3;
@@ -110,12 +166,25 @@ function LidarCloud({ scrollProgress }: { scrollProgress: any }) {
       y += (Math.random() - 0.5) * 0.4;
       z += (Math.random() - 0.5) * 0.4;
 
-      orig[i3] = curr[i3] = x;
-      orig[i3 + 1] = curr[i3 + 1] = y;
-      orig[i3 + 2] = curr[i3 + 2] = z;
+      orig[i3] = x;
+      orig[i3 + 1] = y;
+      orig[i3 + 2] = z;
     }
-    return { originalPositions: orig, currentPositions: curr };
+    return orig;
   }, [particleCount]);
+
+  // ---- Shader uniforms (defined once, mutated in render loop) ------------
+  const uniforms = useMemo(() => ({
+    uMouse: { value: new THREE.Vector3() },
+    uMouseActive: { value: 0.0 },
+    uRadius: { value: INTERACTION_RADIUS },
+    uRadiusSq: { value: INTERACTION_RADIUS_SQ },
+    uRepulsionStrength: { value: REPULSION_STRENGTH },
+    uSize: { value: isMobile ? 0.16 : 0.12 },
+    uColor: { value: new THREE.Color("#CCFF00") },
+    uOpacity: { value: 0.82 },
+    uTexture: { value: particleTexture }
+  }), [isMobile, particleTexture]);
 
   // ---- Gyroscope (mobile) ------------------------------------------------
   const gyroRef = useRef({ x: 0, y: 0, active: false });
@@ -175,6 +244,8 @@ function LidarCloud({ scrollProgress }: { scrollProgress: any }) {
 
   // ---- Render loop --------------------------------------------------------
   useFrame((state, delta) => {
+    if (!isInView) return;
+
     const group = groupRef.current;
     const mesh  = pointsRef.current;
     if (!group || !mesh) return;
@@ -201,64 +272,29 @@ function LidarCloud({ scrollProgress }: { scrollProgress: any }) {
     smoothNDC.current.y = THREE.MathUtils.lerp(smoothNDC.current.y, rawY, SMOOTH_LERP);
 
     // 4. Unproject NDC → world-space point on the z=0 plane.
-    //    Because <points> has NO rotation of its own, its local space IS
-    //    world space. _mouseWorld.x / .y are directly usable as particle
-    //    reference coordinates — no worldToLocal required, ever.
     _ndcPointer.set(smoothNDC.current.x, smoothNDC.current.y);
     raycaster.setFromCamera(_ndcPointer, camera);
     const hit = raycaster.ray.intersectPlane(_plane, _mouseWorld);
 
-    const mx = _mouseWorld.x;
-    const my = _mouseWorld.y;
-
-    // 5. Per-particle physics
-    const posAttr = mesh.geometry.getAttribute("position") as THREE.BufferAttribute;
-    const pos = posAttr.array as Float32Array;
-
-    for (let i = 0; i < particleCount; i++) {
-      const i3 = i * 3;
-
-      const ox = originalPositions[i3]!;
-      const oy = originalPositions[i3 + 1]!;
-      const oz = originalPositions[i3 + 2]!;
-
-      let cx = pos[i3]!;
-      let cy = pos[i3 + 1]!;
-      let cz = pos[i3 + 2]!;
-
-      // Screen-space (XY-only) distance check.
-      // Every particle at any Z depth within the cursor radius reacts.
-      if (hit) {
-        const dx      = cx - mx;
-        const dy      = cy - my;
-        const distSq2D = dx * dx + dy * dy;
-
-        if (distSq2D < INTERACTION_RADIUS_SQ && distSq2D > 0.0001) {
-          const dist2D = Math.sqrt(distSq2D);
-          const force  = ((INTERACTION_RADIUS - dist2D) / INTERACTION_RADIUS) * REPULSION_STRENGTH;
-          cx += (dx / dist2D) * force;
-          cy += (dy / dist2D) * force;
-          // Pop Z toward camera — creates a satisfying depth-parting effect
-          cz += force * 0.6;
-        }
+    // 5. Update shader uniforms directly
+    const material = mesh.material as THREE.ShaderMaterial;
+    if (material && material.uniforms) {
+      const uniforms = material.uniforms;
+      if (hit && uniforms['uMouse'] && uniforms['uMouseActive']) {
+        uniforms['uMouse'].value.copy(_mouseWorld);
+        uniforms['uMouseActive'].value = 1.0;
+      } else if (uniforms['uMouseActive']) {
+        uniforms['uMouseActive'].value = 0.0;
       }
 
-      // Spring back to rest
-      cx += (ox - cx) * SPRING_FACTOR;
-      cy += (oy - cy) * SPRING_FACTOR;
-      cz += (oz - cz) * SPRING_FACTOR;
-
-      pos[i3]     = cx;
-      pos[i3 + 1] = cy;
-      pos[i3 + 2] = cz;
-    }
-
-    posAttr.needsUpdate = true;
-
-    // 6. Scroll-based fade
-    if (materialRef.current && scrollProgress) {
-      const p: number = scrollProgress.get();
-      materialRef.current.opacity = Math.max(0, 0.82 * (1 - p * 1.5));
+      if (scrollProgress && uniforms['uOpacity']) {
+        const p: number = scrollProgress.get();
+        const opacityVal = Math.max(0, 0.82 * (1 - p * 1.5));
+        uniforms['uOpacity'].value = opacityVal;
+        
+        // Hide mesh completely to skip expensive draw calls when scrolled out/invisible
+        mesh.visible = opacityVal > 0.001;
+      }
     }
   });
 
@@ -266,20 +302,16 @@ function LidarCloud({ scrollProgress }: { scrollProgress: any }) {
     <group ref={groupRef}>
       <points ref={pointsRef as any} frustumCulled={false}>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[currentPositions, 3]} />
+          <bufferAttribute attach="attributes-position" args={[originalPositions, 3]} />
         </bufferGeometry>
-        <pointsMaterial
-          ref={materialRef}
+        <shaderMaterial
           transparent
-          color="#CCFF00"
-          size={isMobile ? 0.16 : 0.12}
-          sizeAttenuation
           depthWrite={false}
           blending={THREE.AdditiveBlending}
-          opacity={0.82}
           toneMapped={false}
-          map={particleTexture}
-          alphaTest={0.01}
+          vertexShader={vertexShader}
+          fragmentShader={fragmentShader}
+          uniforms={uniforms}
         />
       </points>
     </group>
@@ -287,22 +319,35 @@ function LidarCloud({ scrollProgress }: { scrollProgress: any }) {
 }
 
 // ---------------------------------------------------------------------------
+// Stable, static WebGL and Camera configurations to avoid inline object recreation
+// ---------------------------------------------------------------------------
+const CAMERA_CONFIG = { position: [0, 0, 16] as [number, number, number], fov: 60 };
+const GL_CONFIG = { alpha: true, antialias: false, powerPreference: "high-performance" as const };
+const DPR_CONFIG: [number, number] = [1, 1.5];
+
+// ---------------------------------------------------------------------------
 // Exported wrapper
 // ---------------------------------------------------------------------------
 export default function LidarBackground({ scrollProgress }: { scrollProgress: any }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  // Freeze WebGL rendering loop when scrolled completely out of view
+  const isInView = useInView(containerRef, { amount: 0.05 });
+
   return (
     <motion.div 
+      ref={containerRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1.2, ease: "easeOut" }}
       className="w-full h-full"
     >
       <Canvas
-        camera={{ position: [0, 0, 16], fov: 60 }}
-        gl={{ alpha: true, antialias: false, powerPreference: "high-performance" }}
-        dpr={[1, 1.5]}
+        camera={CAMERA_CONFIG}
+        gl={GL_CONFIG}
+        dpr={DPR_CONFIG}
+        frameloop={isInView ? "always" : "demand"}
       >
-        <LidarCloud scrollProgress={scrollProgress} />
+        <LidarCloud scrollProgress={scrollProgress} isInView={isInView} />
       </Canvas>
     </motion.div>
   );

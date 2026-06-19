@@ -9,7 +9,7 @@ import { MadLibsFooter } from "@/components/buff/MadLibsFooter";
 import { FootnotesSection } from "@/components/buff/FootnotesSection";
 
 export const metadata: Metadata = {
-  title: "Buff — Provocative Tech & Marketing",
+  title: "Raw Tech. Ruthless Growth.",
   description:
     "Your digital setup is underperforming. Stop accepting bad code and average marketing. We provide the technical backbone, the creative punch, and the strategic clarity your brand is currently missing.",
 };

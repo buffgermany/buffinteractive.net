@@ -76,7 +76,7 @@ export function BentoCard({
         }}
       />
       <div 
-        className="relative z-10 w-full h-full p-8 md:p-12 flex flex-col justify-between"
+        className="relative z-10 w-full h-full p-6 md:p-8 flex flex-col justify-between"
         style={{ transform: "translateZ(40px)" }}
       >
         {children}

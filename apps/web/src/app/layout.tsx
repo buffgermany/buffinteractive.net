@@ -4,7 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toast";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getLocale } from 'next-intl/server';
 import { LanguagePopup } from "@/components/buff/LanguagePopup";
 import { LoadingScreen } from "@/components/buff/LoadingScreen";
 import { Prefetcher } from "@/components/buff/Prefetcher";
@@ -24,7 +24,7 @@ const syne = Syne({
 
 export const metadata: Metadata = {
   title: {
-    default: "Buff — Provocative Tech & Marketing",
+    default: "Raw Tech. Ruthless Growth.",
     template: "%s | Buff",
   },
   description:
@@ -46,19 +46,20 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
   const messages = await getMessages();
 
   return (
-    <html lang="en" className={`${inter.variable} ${syne.variable}`} suppressHydrationWarning>
+    <html lang={locale} className={`${inter.variable} ${syne.variable}`} suppressHydrationWarning>
       <head />
       <body className="min-h-screen bg-background font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider
-              attribute="class"
-              defaultTheme="dark"
-              enableSystem={false}
-              forcedTheme="dark"
-              disableTransitionOnChange
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+            forcedTheme="dark"
+            disableTransitionOnChange
           >
             {children}
             <Toaster />

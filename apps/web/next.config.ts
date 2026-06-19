@@ -6,6 +6,7 @@ const withNextIntl = createNextIntlPlugin(
 );
 
 const nextConfig: NextConfig = {
+  distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
   output: "standalone",
   typedRoutes: false,
   images: {

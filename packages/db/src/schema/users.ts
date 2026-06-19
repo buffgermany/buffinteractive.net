@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
 
 // ============================================================
 // Better Auth base tables (generated via @better-auth/cli,
@@ -17,7 +17,9 @@ export const users = pgTable("users", {
     .default("user"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (table) => [
+  index("users_created_at_idx").on(table.createdAt),
+]);
 
 export const sessions = pgTable("sessions", {
   id: text("id").primaryKey(),
@@ -30,7 +32,9 @@ export const sessions = pgTable("sessions", {
   userId: text("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-});
+}, (table) => [
+  index("sessions_user_id_idx").on(table.userId),
+]);
 
 export const accounts = pgTable("accounts", {
   id: text("id").primaryKey(),
@@ -48,7 +52,9 @@ export const accounts = pgTable("accounts", {
   password: text("password"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (table) => [
+  index("accounts_user_id_idx").on(table.userId),
+]);
 
 export const verifications = pgTable("verifications", {
   id: text("id").primaryKey(),

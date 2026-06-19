@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Buff",
+  title: "Terms of Service",
 };
 
 export default function TermsPage() {

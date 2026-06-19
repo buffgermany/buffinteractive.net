@@ -1,4 +1,4 @@
-import { pgTable, text, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, timestamp, index } from "drizzle-orm/pg-core";
 import { createId } from "@paralleldrive/cuid2";
 import { products } from "./products";
 
@@ -29,7 +29,9 @@ export const assets = pgTable("assets", {
   label: text("label"),
 
   uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
-});
+}, (table) => [
+  index("assets_product_id_idx").on(table.productId),
+]);
 
 // ============================================================
 // Inferred Types

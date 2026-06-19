@@ -9,9 +9,12 @@ export default async function AdminLicensesPage() {
   let total = 0;
   
   try {
-    licenses = await db.select().from(schema.licenses).orderBy(desc(schema.licenses.createdAt)).limit(50);
-    const [countResult] = await db.select({ count: sql<number>`count(*)` }).from(schema.licenses);
-    total = Number(countResult?.count || 0);
+    const [rows, countResult] = await Promise.all([
+      db.select().from(schema.licenses).orderBy(desc(schema.licenses.createdAt)).limit(50),
+      db.select({ count: sql<number>`count(*)` }).from(schema.licenses),
+    ]);
+    licenses = rows;
+    total = Number(countResult[0]?.count || 0);
   } catch {
     // DB not connected
   }

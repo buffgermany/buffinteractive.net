@@ -4,7 +4,7 @@ interface LanguageState {
   locale: string;
   setLocale: (locale: string) => void;
   hasDismissedLanguagePopup: boolean;
-  dismissLanguagePopup: () => void;
+  dismissLanguagePopup: (currentLocale?: string) => void;
 }
 
 // Function to safely read initial values
@@ -37,10 +37,18 @@ export const useLanguageStore = create<LanguageState>((set) => ({
     set({ locale: newLocale, hasDismissedLanguagePopup: true });
   },
 
-  dismissLanguagePopup: () => {
+  dismissLanguagePopup: (currentLocale) => {
     if (typeof window !== 'undefined') {
         localStorage.setItem('buff_lang_preference', 'true');
     }
-    set({ hasDismissedLanguagePopup: true });
+    if (currentLocale && typeof document !== 'undefined') {
+        const date = new Date();
+        date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000));
+        document.cookie = `buff_locale=${currentLocale};expires=${date.toUTCString()};path=/`;
+    }
+    set((state) => ({ 
+      hasDismissedLanguagePopup: true,
+      locale: currentLocale || state.locale 
+    }));
   }
 }));

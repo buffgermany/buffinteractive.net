@@ -6,10 +6,13 @@ import * as schema from "./schema/index";
 // Database Client
 // ============================================================
 
-let _db: ReturnType<typeof drizzle> | null = null;
+const globalForDb = globalThis as unknown as {
+  _db: ReturnType<typeof drizzle> | undefined;
+  _client: ReturnType<typeof postgres> | undefined;
+};
 
 function getDb() {
-  if (_db) return _db;
+  if (globalForDb._db) return globalForDb._db;
   const url = process.env["DATABASE_URL"];
   if (!url) {
     console.warn(
@@ -19,17 +22,21 @@ function getDb() {
     // Return a dummy that will throw on any query — allows import without crashing
     return null as unknown as ReturnType<typeof drizzle>;
   }
-  const client = postgres(url, {
-    max: 10,
-    idle_timeout: 30,
-    connect_timeout: 10,
-    prepare: false,
-  });
-  _db = drizzle(client, {
+  
+  if (!globalForDb._client) {
+    globalForDb._client = postgres(url, {
+      max: 10,
+      idle_timeout: 30,
+      connect_timeout: 10,
+      prepare: false,
+    });
+  }
+  
+  globalForDb._db = drizzle(globalForDb._client, {
     schema,
     logger: process.env["NODE_ENV"] === "development",
   });
-  return _db;
+  return globalForDb._db;
 }
 
 type DbInstance = ReturnType<typeof drizzle<typeof schema>>;

@@ -10,7 +10,7 @@ import { AntiPortfolioSection } from "@/components/buff/AntiPortfolioSection";
 import { FootnotesSection } from "@/components/buff/FootnotesSection";
 
 export const metadata: Metadata = {
-  title: "The Build | Enterprise Engineering by Buff",
+  title: "The Build | Enterprise Engineering",
   description: "Stop renting workarounds. Own your infrastructure. We engineer custom, enterprise-grade platforms and high-performance web apps.",
 };
 

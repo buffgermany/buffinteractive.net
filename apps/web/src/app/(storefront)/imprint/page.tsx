@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
 
 export const metadata: Metadata = {
-  title: "Imprint — Buff",
+  title: "Imprint",
 };
 
 export default function ImprintPage() {

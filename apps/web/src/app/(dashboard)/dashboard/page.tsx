@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import { DashboardClient, DashboardSkeleton } from "./_components/DashboardClient";
 
 export const metadata: Metadata = {
-  title: "Command Center — Buff",
+  title: "Command Center",
   description: "Your licenses, orders and assets in one place.",
 };
 
