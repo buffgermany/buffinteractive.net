@@ -473,7 +473,7 @@ export function GrowthParadigm() {
                       name="Growth"
                       price={billingInterval === 'monthly' ? "89 €" : "84,55 €"}
                       period="/ Monat"
-                      setupFee={billingInterval === 'monthly' ? "zzgl. 329,99 € Einmalgebühr" : "zzgl. 329,99 € Einmalgebühr (bei jährlicher Zahlung)"}
+                      setupFee={billingInterval === 'monthly' ? "zzgl. 369,99 € Einmalgebühr" : "zzgl. 369,99 € Einmalgebühr (bei jährlicher Zahlung)"}
                       desc="Für Betriebe, die online professionell Kunden & Patienten gewinnen wollen."
                       features={tier2Features}
                       specialFeature="Alles von Essential"
