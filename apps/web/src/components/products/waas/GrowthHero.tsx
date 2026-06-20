@@ -3,7 +3,38 @@
 import { motion, useAnimationFrame } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, TrendingDown, Receipt } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useMemo } from 'react';
+
+function GrowthCurvesBackground() {
+  const curves = useMemo(() => {
+    return Array.from({ length: 6 }).map((_, i) => {
+      const offset = i * 20;
+      return `M -100 ${300 + offset} Q 200 ${100 + offset} 400 ${400 + offset} T 1000 ${200 + offset} T 1600 ${350 + offset}`;
+    });
+  }, []);
+
+  return (
+    <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none opacity-[0.14] flex items-center justify-center">
+      <svg className="w-full h-full min-h-[500px]" viewBox="0 0 1200 800" preserveAspectRatio="none">
+        {curves.map((d, i) => (
+          <motion.path
+            key={i}
+            d={d}
+            fill="none"
+            stroke="#CCFF00"
+            strokeWidth="1.5"
+            animate={{ y: [15, -15, 15] }}
+            transition={{
+              duration: 8 + i,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
+      </svg>
+    </div>
+  );
+}
 
 function AdSpendCounter() {
   const startVal = 2450.00;
@@ -138,16 +169,33 @@ function ReceiptVisual() {
 
 export function GrowthHero() {
   return (
-    <section className="relative min-h-[85vh] md:min-h-[92vh] flex items-center pt-24 md:pt-32 pb-20 md:pb-24 px-4 sm:px-6 z-10 w-full max-w-7xl mx-auto">
-      <div className="flex flex-col lg:flex-row items-start justify-between gap-12 lg:gap-16 w-full relative z-10 lg:pt-8">
+    <section className="relative min-h-[85vh] md:min-h-[92vh] flex items-center pt-24 md:pt-32 pb-20 md:pb-24 px-4 sm:px-6 z-10 w-full overflow-hidden bg-background">
+      
+      {/* Absolute Full-Screen Background Layer */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <GrowthCurvesBackground />
+        
+        {/* Base dark overlay */}
+        <div className="absolute inset-0 bg-background/30 pointer-events-none" />
+        
+        {/* Centered intense gradient to pop the text */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-full max-w-[1000px] aspect-square bg-[radial-gradient(circle,hsl(var(--background)/0.8)_0%,transparent_75%)] opacity-100" />
+        </div>
+      </div>
+
+      {/* Bottom fade transition */}
+      <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
+
+      <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 lg:gap-16 w-full max-w-7xl mx-auto relative z-10 lg:pt-8">
 
         {/* Left Column: Copy & Actions */}
-        <div className="flex-1 flex flex-col items-start text-left min-w-0 pr-0 lg:pr-8">
+        <div className="flex-1 flex flex-col items-center text-center lg:items-start lg:text-left min-w-0 pr-0 lg:pr-8">
           <motion.h1
             initial={{ opacity: 0, x: -30, filter: "blur(10px)" }}
             animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
             transition={{ type: "spring", stiffness: 200, damping: 25 }}
-            className="font-heading font-bold text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-[3.5rem] 2xl:text-[3.75rem] tracking-tighter leading-[1.1] text-foreground mb-6 text-balance w-full max-w-xl lg:max-w-[38rem] xl:max-w-[42rem]"
+            className="font-heading font-bold text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-[3.5rem] 2xl:text-[3.75rem] tracking-tighter leading-[1.1] text-foreground mb-6 text-balance w-full max-w-xl lg:max-w-[38rem] xl:max-w-[42rem] mx-auto lg:mx-0"
           >
             Deine <span className="text-primary font-extrabold">Website auf{' '}
               Autopilot.</span>{' '}
@@ -158,7 +206,7 @@ export function GrowthHero() {
             initial={{ opacity: 0, x: -20, filter: "blur(10px)" }}
             animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
             transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.1 }}
-            className="w-full max-w-xl lg:max-w-[32rem] xl:max-w-[36rem] text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed pt-2 mb-10 px-2 sm:px-0 text-balance"
+            className="w-full max-w-xl lg:max-w-[32rem] xl:max-w-[36rem] text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed pt-2 mb-10 px-2 sm:px-0 text-balance mx-auto lg:mx-0"
           >
             Keine teuren Einmalzahlungen, kein technisches Kauderwelsch. Wir bauen, hosten und pflegen deine Traum-Website zum fairen monatlichen Festpreis. Damit du dich voll auf dein Geschäft konzentrieren kannst.
           </motion.p>
@@ -167,7 +215,7 @@ export function GrowthHero() {
             initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.2 }}
-            className="flex flex-col sm:flex-row items-center gap-4 md:gap-6 pt-4 md:pt-6 w-full sm:w-auto px-2 sm:px-0"
+            className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 md:gap-6 pt-4 md:pt-6 w-full sm:w-auto px-2 sm:px-0 mx-auto lg:mx-0"
           >
             <Link href="#contact" className="group interactive-pill flex items-center justify-center gap-3 bg-primary text-primary-foreground px-8 py-4 text-base hover:shadow-[0_0_40px_-5px_hsl(var(--primary)/0.6)] w-full sm:w-auto active:scale-95">
               Jetzt Angebot anfordern

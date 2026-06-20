@@ -4,7 +4,9 @@ import type { Metadata } from "next";
 import { GrowthHero } from "@/components/products/waas/GrowthHero";
 import { RealityCheckSection } from "@/components/products/waas/RealityCheckSection";
 import { AntiPortfolioSection } from "@/components/products/waas/AntiPortfolioSection";
+import { BlueprintFlow } from "@/components/products/waas/BlueprintFlow";
 import { GrowthParadigm } from "@/components/products/waas/GrowthParadigm";
+import { FaqSection } from "@/components/products/waas/FaqSection";
 import { BuildCTA } from "@/components/products/waas/BuildCTA";
 
 export const metadata: Metadata = {
@@ -25,10 +27,16 @@ export default function WaasProductsPage() {
       {/* 3. AntiPortfolioSection from main page (/) */}
       <AntiPortfolioSection />
 
-      {/* 4. GrowthParadigm from /growth */}
+      {/* 4. Blueprint Flow (Apple-style interactive process) */}
+      <BlueprintFlow />
+
+      {/* 5. GrowthParadigm from /growth */}
       <GrowthParadigm />
 
-      {/* 5. Contact form from /build */}
+      {/* 6. Objection-Killing FAQ */}
+      <FaqSection />
+
+      {/* 7. Contact form from /build */}
       <BuildCTA />
     </main>
   );

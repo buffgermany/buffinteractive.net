@@ -79,7 +79,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-6xl sm:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.9]"
+            className="text-6xl sm:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] md:leading-[0.9]"
           >
             {product.name.split(" ").map((word, i) => (
               <span key={i} className="inline-block mr-4">
@@ -169,7 +169,7 @@ export function ProductDetailClient({ product }: { product: Product }) {
                   <div className="space-y-2">
                      <span className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Investment</span>
                      <div className="flex items-baseline gap-2">
-                        <WigglyUnderline className="text-5xl sm:text-6xl font-bold">
+                        <WigglyUnderline className="text-4xl sm:text-5xl lg:text-6xl font-bold">
                            {formatCurrency(product.priceCents, product.currency)}
                         </WigglyUnderline>
                         {product.type === "saas" && (

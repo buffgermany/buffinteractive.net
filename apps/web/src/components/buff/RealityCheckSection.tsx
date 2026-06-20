@@ -22,7 +22,7 @@ const WHITE_COLOR = "#ffffff";
  * word is fully visible — ensuring the "scroll lock" is never released while
  * words are still being revealed.
  */
-const REVEAL_END = 0.4;
+const REVEAL_END = 0.25;
 
 /**
  * Content envelope fade keyframes.
@@ -300,7 +300,7 @@ export function RealityCheckSection() {
           "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
       }}
     >
-      <div className="sticky top-0 h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
+      <div className="sticky top-0 h-dvh flex flex-col items-center justify-center px-6 overflow-hidden">
         {/* Top gradient vignette */}
         <div className="absolute top-0 left-0 w-full h-[25vh] bg-linear-to-b from-background to-transparent z-20 pointer-events-none" />
 

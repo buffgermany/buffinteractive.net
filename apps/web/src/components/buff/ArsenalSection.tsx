@@ -32,9 +32,9 @@ const BUILD_LOGOS: TechLogo[] = [
   { name: "Docker", slug: "docker", showName: true }
 ];
 
-const GROWTH_LOGOS: TechLogo[] = [ 
+const GROWTH_LOGOS: TechLogo[] = [
   { name: "Google Ads", slug: "googleads", showName: true },
-  { name: "Google AdSense", slug: "googleadsense", showName: true, scale: 1.1  },
+  { name: "Google AdSense", slug: "googleadsense", showName: true, scale: 1.1 },
   { name: "Google AdMob", slug: "googleadmob", showName: true },
   { name: "Google Analytics", slug: "googleanalytics", showName: true },
   { name: "TikTok Ads", slug: "tiktok", showName: true },
@@ -42,7 +42,7 @@ const GROWTH_LOGOS: TechLogo[] = [
   { name: "Meta Ads", slug: "meta", showName: true, scale: 1.2 },
   { name: "Salesforce", slug: "salesforce", customLogoUrl: "https://upload.wikimedia.org/wikipedia/commons/f/f9/Salesforce.com_logo.svg", showName: true },
   { name: "Resend", slug: "resend", showName: true },
-  { name: "Snapchat Ads", slug: "snapchat", showName: true, scale: 1.1  },
+  { name: "Snapchat Ads", slug: "snapchat", showName: true, scale: 1.1 },
   { name: "Shopify", slug: "shopify", showName: true },
 ];
 
@@ -141,15 +141,15 @@ export function ArsenalSection() {
 
   const growthCurves = useMemo(() => {
     return Array.from({ length: 6 }).map((_, i) => {
-        const offset = i * 20;
-        return `M -100 ${300 + offset} Q 200 ${100 + offset} 400 ${400 + offset} T 1000 ${200 + offset} T 1600 ${350 + offset}`;
+      const offset = i * 20;
+      return `M -100 ${300 + offset} Q 200 ${100 + offset} 400 ${400 + offset} T 1000 ${200 + offset} T 1600 ${350 + offset}`;
     });
   }, []);
 
   return (
     <section id="products" className="relative min-h-screen py-24 px-6 flex flex-col items-center justify-center overflow-hidden bg-[#0A0A0A]">
       <div id="services" className="absolute top-0 left-0 w-0 h-0" />
-      
+
       {/* Premium Background Cross-fade Layers */}
       <div className="absolute inset-0 z-0">
         <AnimatePresence initial={false}>
@@ -161,8 +161,8 @@ export function ArsenalSection() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="absolute inset-0"
             style={{
-              backgroundImage: activeTab === "build" 
-                ? "linear-gradient(to bottom, #0A0A0A, hsl(var(--background-build)) 20%, hsl(var(--background-build)) 80%, #0A0A0A)" 
+              backgroundImage: activeTab === "build"
+                ? "linear-gradient(to bottom, #0A0A0A, hsl(var(--background-build)) 20%, hsl(var(--background-build)) 80%, #0A0A0A)"
                 : "linear-gradient(to bottom, #0A0A0A, hsl(var(--background-growth)) 20%, hsl(var(--background-growth)) 85%, #0A0A0A)"
             }}
           />
@@ -170,112 +170,112 @@ export function ArsenalSection() {
       </div>
 
       <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden"
-           style={{
-             maskImage: `linear-gradient(to bottom, transparent 0%, black 20%, black 82%, transparent 100%)`,
-             WebkitMaskImage: `linear-gradient(to bottom, transparent 0%, black 20%, black 82%, transparent 100%)`
-           }}
+        style={{
+          maskImage: `linear-gradient(to bottom, transparent 0%, black 20%, black 82%, transparent 100%)`,
+          WebkitMaskImage: `linear-gradient(to bottom, transparent 0%, black 20%, black 82%, transparent 100%)`
+        }}
       >
         <AnimatePresence>
-            {activeTab === "build" && (
-                <motion.div 
-                    key="bg-build"
-                    initial={{ opacity: 0, scale: 1.1 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute inset-0 w-full h-full overflow-hidden"
-                >
-                  {/* Static dot grid via SVG */}
-                  <svg
-                    className="absolute inset-0 w-full h-full opacity-60"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <defs>
-                      <pattern id="dot-grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-                        <circle cx="20" cy="20" r="1.2" fill="rgba(0,240,255,0.25)" />
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#dot-grid)" />
-                  </svg>
+          {activeTab === "build" && (
+            <motion.div
+              key="bg-build"
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 w-full h-full overflow-hidden"
+            >
+              {/* Static dot grid via SVG */}
+              <svg
+                className="absolute inset-0 w-full h-full opacity-60"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <pattern id="dot-grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <circle cx="20" cy="20" r="1.2" fill="rgba(0,240,255,0.25)" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#dot-grid)" />
+              </svg>
 
-                  {/* Premium scanner beam — GPU-composited, no blur filters */}
-                  <motion.div
-                    className="absolute left-0 right-0 pointer-events-none"
-                    style={{
-                      top: 0,
-                      willChange: "transform",
-                      transform: "translateZ(0)", // force own GPU layer
-                    }}
-                    animate={{ y: ["0vh", "100vh"] }}
+              {/* Premium scanner beam — GPU-composited, no blur filters */}
+              <motion.div
+                className="absolute left-0 right-0 pointer-events-none"
+                style={{
+                  top: 0,
+                  willChange: "transform",
+                  transform: "translateZ(0)", // force own GPU layer
+                }}
+                animate={{ y: ["0vh", "100vh"] }}
+                transition={{
+                  duration: 7,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatType: "mirror",
+                }}
+              >
+                {/* Wide ambient halo — gradient only, no blur (GPU safe) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    height: "200px",
+                    top: "-100px",
+                    background: "radial-gradient(ellipse 80% 50% at 50% 50%, rgba(0,240,255,0.07) 0%, rgba(0,240,255,0.03) 40%, transparent 70%)",
+                  }}
+                />
+                {/* Core beam line — 1px with strong box-shadow glow (GPU composited) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "8%",
+                    right: "8%",
+                    height: "1px",
+                    background: "linear-gradient(to right, transparent 0%, rgba(0,240,255,0.3) 15%, rgba(0,240,255,0.9) 40%, rgba(0,240,255,1) 50%, rgba(0,240,255,0.9) 60%, rgba(0,240,255,0.3) 85%, transparent 100%)",
+                    boxShadow: "0 0 4px 1px rgba(0,240,255,0.5), 0 0 12px 2px rgba(0,240,255,0.2), 0 0 30px 4px rgba(0,240,255,0.08)",
+                  }}
+                />
+              </motion.div>
+            </motion.div>
+          )}
+
+          {activeTab === "growth" && (
+            <motion.div
+              key="bg-growth"
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 w-full h-full flex items-center justify-center opacity-10"
+            >
+              <svg className="w-full h-full overflow-hidden" viewBox="0 0 1200 800" preserveAspectRatio="none">
+                {growthCurves.map((d, i) => (
+                  <motion.path
+                    key={i}
+                    d={d}
+                    fill="none"
+                    stroke="#CCFF00"
+                    strokeWidth="2"
+                    animate={{ y: [20, -20, 20] }}
                     transition={{
-                      duration: 7,
-                      ease: "easeInOut",
+                      duration: 10 + i,
                       repeat: Infinity,
-                      repeatType: "mirror",
+                      ease: "easeInOut"
                     }}
-                  >
-                    {/* Wide ambient halo — gradient only, no blur (GPU safe) */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        left: 0,
-                        right: 0,
-                        height: "200px",
-                        top: "-100px",
-                        background: "radial-gradient(ellipse 80% 50% at 50% 50%, rgba(0,240,255,0.07) 0%, rgba(0,240,255,0.03) 40%, transparent 70%)",
-                      }}
-                    />
-                    {/* Core beam line — 1px with strong box-shadow glow (GPU composited) */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        left: "8%",
-                        right: "8%",
-                        height: "1px",
-                        background: "linear-gradient(to right, transparent 0%, rgba(0,240,255,0.3) 15%, rgba(0,240,255,0.9) 40%, rgba(0,240,255,1) 50%, rgba(0,240,255,0.9) 60%, rgba(0,240,255,0.3) 85%, transparent 100%)",
-                        boxShadow: "0 0 4px 1px rgba(0,240,255,0.5), 0 0 12px 2px rgba(0,240,255,0.2), 0 0 30px 4px rgba(0,240,255,0.08)",
-                      }}
-                    />
-                  </motion.div>
-                </motion.div>
-            )}
-
-            {activeTab === "growth" && (
-                <motion.div 
-                    key="bg-growth"
-                    initial={{ opacity: 0, scale: 1.1 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute inset-0 w-full h-full flex items-center justify-center opacity-10"
-                >
-                    <svg className="w-full h-full overflow-hidden" viewBox="0 0 1200 800" preserveAspectRatio="none">
-                        {growthCurves.map((d, i) => (
-                            <motion.path
-                                key={i}
-                                d={d}
-                                fill="none"
-                                stroke="#CCFF00"
-                                strokeWidth="2"
-                                animate={{ y: [20, -20, 20] }}
-                                transition={{
-                                    duration: 10 + i,
-                                    repeat: Infinity,
-                                    ease: "easeInOut"
-                                }}
-                            />
-                        ))}
-                    </svg>
-                </motion.div>
-            )}
+                  />
+                ))}
+              </svg>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
 
       <div className="z-10 w-full max-w-4xl mx-auto flex flex-col items-center mb-16 md:mb-12">
-        
+
         {/* Switch Toggle */}
         <div className="relative flex items-center p-1 bg-surface rounded-full mb-10 md:mb-12 shadow-inner border border-white/5 w-full max-w-sm">
-          <motion.div 
+          <motion.div
             layoutId="tab-indicator"
             className={`absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full ${activeTab === "build" ? "bg-[#00F0FF]" : "bg-[#CCFF00]"}`}
             initial={false}
@@ -287,9 +287,8 @@ export function ArsenalSection() {
             onClick={() => setActiveTab("build")}
             animate={activeTab !== "build" ? { opacity: [0.45, 0.65, 0.45] } : { opacity: 1 }}
             transition={activeTab !== "build" ? { duration: 2.8, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
-            className={`relative z-10 py-3 md:py-3.5 flex-1 flex items-center justify-center gap-2 text-xs md:text-sm font-bold tracking-widest uppercase transition-colors duration-300 ${
-              activeTab === "build" ? "text-[#050A15]" : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`relative z-10 py-3 md:py-3.5 flex-1 flex items-center justify-center gap-2 text-xs md:text-sm font-bold tracking-widest uppercase transition-colors duration-300 ${activeTab === "build" ? "text-[#050A15]" : "text-muted-foreground hover:text-foreground"
+              }`}
           >
             <Cpu size={14} strokeWidth={2.5} />
             <span>{t('build_tab_label', { defaultMessage: 'The Build' })}</span>
@@ -299,9 +298,8 @@ export function ArsenalSection() {
             onClick={() => setActiveTab("growth")}
             animate={activeTab !== "growth" ? { opacity: [0.45, 0.65, 0.45] } : { opacity: 1 }}
             transition={activeTab !== "growth" ? { duration: 2.8, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
-            className={`relative z-10 py-3 md:py-3.5 flex-1 flex items-center justify-center gap-2 text-xs md:text-sm font-bold tracking-widest uppercase transition-colors duration-300 ${
-              activeTab === "growth" ? "text-[#100515]" : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`relative z-10 py-3 md:py-3.5 flex-1 flex items-center justify-center gap-2 text-xs md:text-sm font-bold tracking-widest uppercase transition-colors duration-300 ${activeTab === "growth" ? "text-[#100515]" : "text-muted-foreground hover:text-foreground"
+              }`}
           >
             <span>{t('growth_tab_label', { defaultMessage: 'The Growth' })}</span>
             <TrendingUp size={14} strokeWidth={2.5} />
@@ -310,7 +308,7 @@ export function ArsenalSection() {
 
         <div className="w-full relative min-h-[300px] md:h-[280px] flex justify-center">
           <AnimatePresence mode="popLayout">
-            
+
             {activeTab === "build" && (
               <motion.div
                 key="build-content"
@@ -330,10 +328,10 @@ export function ArsenalSection() {
                 <p className="text-lg md:text-xl text-foreground-muted max-w-2xl mb-8 relative z-10 leading-relaxed">
                   {t('build_description')}
                 </p>
-                
+
                 {/* Call to Action */}
                 <div className="flex justify-center relative z-10 w-full mt-4">
-                  <MotionLink 
+                  <MotionLink
                     href="/build"
                     prefetch={true}
                     whileHover="hover"
@@ -371,7 +369,7 @@ export function ArsenalSection() {
 
                 {/* Call to Action */}
                 <div className="flex justify-center relative z-10 w-full mt-4">
-                  <MotionLink 
+                  <MotionLink
                     href="/growth"
                     prefetch={true}
                     whileHover="hover"
