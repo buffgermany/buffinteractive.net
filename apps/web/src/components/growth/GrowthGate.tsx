@@ -1,23 +1,17 @@
-'use client';
+"use client";
 
-import { FormEvent, useState } from 'react';
-import { ChevronDown, ArrowRight } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslations } from "next-intl";
+import { Mail, ArrowUpRight } from "lucide-react";
+import { BentoCard } from "@/components/buff/BentoCard";
 
 export function GrowthGate() {
   const t = useTranslations('GrowthGate');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const tContact = useTranslations('WaasContact');
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    // simulated delay for premium feel
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setHasSubmitted(true);
-    }, 1500);
-  };
+  const whatsappNumber = tContact('whatsapp_number');
+  const whatsappText = t('whatsapp_text');
+  const emailAddress = tContact('email_address');
+  const emailSubject = t('email_subject');
 
   return (
     <section id="contact" className="relative z-10 w-full py-32 md:py-48 bg-[#050207] border-t border-white/5">
@@ -33,54 +27,69 @@ export function GrowthGate() {
           </p>
         </div>
 
-        {hasSubmitted ? (
-            <div className="flex flex-col items-center justify-center py-24 glass rounded-3xl text-center border-t border-white/10 shadow-[0_0_100px_-20px_rgba(204,255,0,0.15)]">
-               <div className="w-16 h-16 rounded-full bg-[#CCFF00] text-black flex items-center justify-center font-bold text-3xl mb-8">✓</div>
-               <h3 className="text-3xl font-heading font-bold text-white mb-4">{t('success_title')}</h3>
-               <p className="text-[#A0A0B0] text-lg font-sans max-w-md">{t('success_text')}</p>
-            </div>
-        ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-8 w-full glass rounded-3xl p-8 md:p-14 shadow-2xl relative overflow-hidden backdrop-blur-2xl">
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 w-full">
-                <div className="flex flex-col gap-3 relative group">
-                <label htmlFor="name" className="text-sm font-bold uppercase tracking-widest text-[#A0A0B0] group-focus-within:text-[#CCFF00] transition-colors">{t('form_name')}</label>
-                <input required type="text" id="name" className="bg-transparent border-b-2 border-white/10 py-3 text-white font-sans text-xl outline-none focus:border-[#CCFF00] transition-colors placeholder:text-white/20 w-full rounded-none" placeholder="Jane Doe" />
+        <div className="flex flex-col gap-6 w-full mt-4 max-w-2xl mx-auto">
+          {/* WhatsApp Card */}
+          <a 
+            href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block group"
+          >
+            <BentoCard 
+              glowColor="rgba(37,211,102,0.18)"
+              className="border-white/5 bg-[#121212]/40 backdrop-blur-md hover:border-[#25D366]/30 shadow-sm transition-all duration-500 h-full"
+            >
+              <div className="flex items-start gap-6">
+                <div className="w-14 h-14 rounded-2xl bg-[#25D366]/10 flex items-center justify-center text-[#25D366] shrink-0 border border-[#25D366]/20 group-hover:scale-105 transition-all duration-500">
+                  <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.87 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
                 </div>
-                
-                <div className="flex flex-col gap-3 relative group">
-                <label htmlFor="company" className="text-sm font-bold uppercase tracking-widest text-[#A0A0B0] group-focus-within:text-[#CCFF00] transition-colors">{t('form_company')}</label>
-                <input required type="text" id="company" className="bg-transparent border-b-2 border-white/10 py-3 text-white font-sans text-xl outline-none focus:border-[#CCFF00] transition-colors placeholder:text-white/20 w-full rounded-none" placeholder="Acme Corp" />
+                <div className="flex flex-col gap-2 min-w-0 text-left">
+                  <h3 className="text-xl md:text-2xl font-bold font-heading text-white group-hover:text-[#25D366] transition-colors duration-500">
+                    {tContact('whatsapp_title')}
+                  </h3>
+                  <p className="text-sm text-white/50 leading-relaxed font-sans">
+                    {tContact('whatsapp_desc')}
+                  </p>
+                  <div className="flex items-center flex-wrap gap-1.5 text-xs font-bold text-[#25D366] tracking-wider uppercase font-sans mt-2">
+                    <span>{tContact('whatsapp_cta')}</span>
+                    <ArrowUpRight className="w-4.5 h-4.5 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
                 </div>
-            </div>
+              </div>
+            </BentoCard>
+          </a>
 
-            <div className="flex flex-col gap-3 relative group mt-4">
-                <label htmlFor="mrr" className="text-sm font-bold uppercase tracking-widest text-[#A0A0B0] group-focus-within:text-[#CCFF00] transition-colors">{t('form_mrr')}</label>
-                <div className="relative">
-                <select required id="mrr" defaultValue="" className="w-full appearance-none bg-transparent border-b-2 border-white/10 py-3 text-white font-sans text-xl outline-none focus:border-[#CCFF00] transition-colors [&>option]:bg-[#100515] [&>option]:text-white cursor-pointer rounded-none">
-                    <option value="" disabled className="text-white/20">{t('form_mrr_placeholder')}</option>
-                    <option value="under50k">{t('form_mrr_option1')}</option>
-                    <option value="50k-250k">{t('form_mrr_option2')}</option>
-                    <option value="250k-1m">{t('form_mrr_option3')}</option>
-                    <option value="over1m">{t('form_mrr_option4')}</option>
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-[#CCFF00] pointer-events-none" />
+          {/* Email Card */}
+          <a 
+            href={`mailto:${emailAddress}?subject=${encodeURIComponent(emailSubject)}`}
+            className="block group"
+          >
+            <BentoCard 
+              glowColor="rgba(255,255,255,0.08)"
+              className="border-white/5 bg-[#121212]/40 backdrop-blur-md hover:border-white/10 shadow-sm transition-all duration-500 h-full"
+            >
+              <div className="flex items-start gap-6">
+                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-white shrink-0 border border-white/10 group-hover:scale-105 transition-all duration-500">
+                  <Mail className="w-6 h-6" />
                 </div>
-            </div>
-
-            <div className="flex flex-col gap-3 relative group mt-4">
-                <label htmlFor="bottleneck" className="text-sm font-bold uppercase tracking-widest text-[#A0A0B0] group-focus-within:text-[#CCFF00] transition-colors">{t('form_bottleneck')}</label>
-                <textarea required id="bottleneck" rows={4} className="bg-transparent border-b-2 border-white/10 py-3 text-white font-sans text-xl outline-none focus:border-[#CCFF00] transition-colors resize-none placeholder:text-white/20 w-full rounded-none" placeholder={t('form_bottleneck_placeholder')} />
-            </div>
-
-            <div className="mt-8 w-full flex">
-                <button disabled={isSubmitting} type="submit" className="w-full group flex items-center justify-center gap-3 bg-[#CCFF00] text-[#0A0A0A] font-bold text-xl py-6 rounded-2xl hover:shadow-[0_0_40px_-10px_rgba(204,255,0,0.5)] disabled:opacity-50 transition-all uppercase tracking-tighter">
-                {isSubmitting ? t('form_submit_pending') : t('form_submit')}
-                {!isSubmitting && <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />}
-                </button>
-            </div>
-            </form>
-        )}
+                <div className="flex flex-col gap-2 min-w-0 text-left">
+                  <h3 className="text-xl md:text-2xl font-bold font-heading text-white group-hover:text-primary transition-colors duration-500">
+                    {tContact('email_title')}
+                  </h3>
+                  <p className="text-sm text-white/50 leading-relaxed font-sans">
+                    {tContact('email_desc')}
+                  </p>
+                  <div className="flex items-center flex-wrap gap-1.5 text-xs font-bold text-primary tracking-wider uppercase font-sans mt-2 break-all">
+                    <span>{tContact('email_cta')}</span>
+                    <ArrowUpRight className="w-4.5 h-4.5 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+                </div>
+              </div>
+            </BentoCard>
+          </a>
+        </div>
       </div>
     </section>
   );

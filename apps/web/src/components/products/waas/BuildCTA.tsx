@@ -3,12 +3,15 @@
 import { motion } from "framer-motion";
 import { Mail, ArrowUpRight } from "lucide-react";
 import { BentoCard } from "@/components/buff/BentoCard";
+import { useTranslations } from "next-intl";
 
 export const BuildCTA = () => {
-  const whatsappNumber = "4915678692146";
-  const whatsappText = "Hallo Buff-Team! Ich habe Interesse an einer Website auf Autopilot für mein Geschäft. Könnt ihr mich dazu unverbindlich beraten?";
-  const emailAddress = "service@buffinteractive.net";
-  const emailSubject = "Anfrage: Website auf Autopilot";
+  const t = useTranslations('WaasContact');
+
+  const whatsappNumber = t('whatsapp_number');
+  const whatsappText = t('whatsapp_text');
+  const emailAddress = t('email_address');
+  const emailSubject = t('email_subject');
 
   return (
     <section id="contact" className="py-32 px-6 border-t border-border/50 relative overflow-hidden bg-transparent">
@@ -17,10 +20,12 @@ export const BuildCTA = () => {
         {/* Left Column: Direct Hook Copy */}
         <div className="flex flex-col gap-6 text-left">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-foreground tracking-tight leading-tight">
-            Lass uns deine<br />Traum-Website starten.
+            {t.rich('cta_header', {
+              br: () => <br />
+            })}
           </h2>
           <p className="text-foreground-muted text-lg md:text-xl leading-relaxed font-sans max-w-md">
-            Kein langes Ausfüllen, kein technischer Stress. Melde dich einfach direkt bei uns über den Kanal deiner Wahl. Wir beraten dich unverbindlich und kostenlos.
+            {t('cta_subtext')}
           </p>
         </div>
 
@@ -46,13 +51,13 @@ export const BuildCTA = () => {
                 </div>
                 <div className="flex flex-col gap-2 min-w-0 text-left">
                   <h3 className="text-xl md:text-2xl font-bold font-heading text-white group-hover:text-[#25D366] transition-colors duration-500">
-                    WhatsApp Chat starten
+                    {t('whatsapp_title')}
                   </h3>
                   <p className="text-sm text-white/50 leading-relaxed font-sans">
-                    Der schnellste Weg. Schreibe uns einfach direkt und unkompliziert per WhatsApp.
+                    {t('whatsapp_desc')}
                   </p>
                   <div className="flex items-center gap-1.5 text-xs font-bold text-[#25D366] tracking-wider uppercase font-sans mt-2">
-                    <span>Jetzt auf WhatsApp schreiben</span>
+                    <span>{t('whatsapp_cta')}</span>
                     <ArrowUpRight className="w-4.5 h-4.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </div>
                 </div>
@@ -75,14 +80,14 @@ export const BuildCTA = () => {
                 </div>
                 <div className="flex flex-col gap-2 min-w-0 text-left">
                   <h3 className="text-xl md:text-2xl font-bold font-heading text-white group-hover:text-primary transition-colors duration-500">
-                    E-Mail schreiben
+                    {t('email_title')}
                   </h3>
                   <p className="text-sm text-white/50 leading-relaxed font-sans">
-                    Du bevorzugst den klassischen Weg? Sende uns eine Mail mit deinen Wünschen.
+                    {t('email_desc')}
                   </p>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-primary tracking-wider uppercase font-sans mt-2">
-                    <span>service@buffinteractive.net</span>
-                    <ArrowUpRight className="w-4.5 h-4.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="flex items-center flex-wrap gap-1.5 text-xs font-bold text-primary tracking-wider uppercase font-sans mt-2 break-all">
+                    <span>{t('email_cta')}</span>
+                    <ArrowUpRight className="w-4.5 h-4.5 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </div>
                 </div>
               </div>
