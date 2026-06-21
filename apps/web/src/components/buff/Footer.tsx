@@ -71,6 +71,7 @@ export function Footer() {
             <div className="flex flex-col gap-3">
                 <h5 className="font-bold text-sm uppercase tracking-widest text-foreground-muted mb-4">{t('nav_title')}</h5>
                 <Link href="/#services" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_services')}</Link>
+                <Link href="/products/waas" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_waas')}</Link>
                 <Link href="/#about" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_about')}</Link>
                 <Link href="/#contact" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_start_project')}</Link>
             </div>

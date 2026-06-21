@@ -86,7 +86,7 @@
   "EnterpriseBento": {
     "section_headline": "Built for Europe's most valuable brand.<sup1>1</sup1>",
     "nda_hint": "Further undisclosed market leaders under NDA",
-    "card1_headline": "Scaling sales operations for T-Mobile on a national level.<sup2>2</sup2>",
+    "card1_headline": "Scaling sales operations for <blur>••••••• •••••••</blur> on a national level.<sup2>2</sup2>",
     "card2_title": "Zero-second latency.",
     "card2_text": "Built for real-time customer interactions. This means zero tolerance for lag or errors. The tool never gets in the way. High-speed performance wasn't a feature—it was the core design principle.",
     "card3_title": "Complexity, made invisible.",
@@ -107,6 +107,7 @@
     "nav_title": "Navigation",
     "nav_products": "Products",
     "nav_services": "Services",
+    "nav_waas": "Website-as-a-Service",
     "nav_about": "About Us",
     "nav_start_project": "Start Project",
     "legal_title": "Legal",
@@ -139,8 +140,8 @@
     "step4": "Ready."
   },
   "Footnotes": {
-    "note1": "Based on the 2026 'Brand Finance Global 500' report, which ranks Deutsche Telekom as the most valuable brand in Europe.",
-    "note2": "Refers to the development and nationwide rollout of a multifunctional consulting tool for employees of Deutsche Telekom Service GmbH."
+    "note1": "Based on the 2026 'Brand Finance Global 500' report, which ranks the leading European telecommunications group as the most valuable brand in Europe.",
+    "note2": "Refers to the development and nationwide rollout of a multifunctional consulting tool for employees of the respective group."
   },
   "GrowthArsenal": {
     "title": "The Arsenal",
@@ -266,7 +267,8 @@
     "btn_es": "Cambiar a Español",
     "btn_en": "Continue in English",
     "switching": "Switching...",
-    "continue": "Continue in English"
+    "continue": "Continue in English",
+    "other_languages": "Other Languages"
   },
   "WaasRealityCheck": {
     "text": "An outdated website that looks terrible on mobile, or having no website at all, costs you valuable customers every single day. If you can't be found professionally online today, you simply don't exist for most people.",

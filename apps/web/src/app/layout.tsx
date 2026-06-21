@@ -23,6 +23,7 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://buffinteractive.net"),
   title: {
     default: "Raw Tech. Ruthless Growth.",
     template: "%s | Buff",
@@ -38,6 +39,9 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  alternates: {
+    canonical: "/",
   },
 };
 

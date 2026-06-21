@@ -86,7 +86,7 @@
   "EnterpriseBento": {
     "section_headline": "Gebaut für Europas wertvollsten Konzern.<sup1>1</sup1>",
     "nda_hint": "Weitere verschwiegene Marktführer unter NDA",
-    "card1_headline": "Wir skalieren die Vertriebssteuerung der Deutschen Telekom bundesweit.<sup2>2</sup2>",
+    "card1_headline": "Wir skalieren die Vertriebssteuerung der <blur>••••••• •••••••</blur> bundesweit.<sup2>2</sup2>",
     "card2_title": "Null Sekunden Bedenkzeit.",
     "card2_text": "Eingesetzt live im Kundengespräch. Das bedeutet: Null Toleranz für Ladezeiten & Fehler. Das Tool steht nie im Weg. Absolute Höchstgeschwindigkeit war hier keine Option, sondern das fundamentale Design-Prinzip.",
     "card3_title": "Komplexität, unsichtbar gemacht.",
@@ -102,11 +102,12 @@
   },
   "Footer": {
     "title": "Wir sind Buff.",
-    "description": "Wir liefern das technische Fundament, die kreative Durchschlagskraft und die strategic Klarheit, die deiner Marke derzeit fehlt.",
+    "description": "Wir liefern das technische Fundament, die kreative Durchschlagskraft und die strategische Klarheit, die deiner Marke derzeit fehlt.",
     "no_bullshit": "Ohne Bullshit.",
     "nav_title": "Navigation",
     "nav_products": "Produkte",
     "nav_services": "Dienstleistungen",
+    "nav_waas": "Website-as-a-Service",
     "nav_about": "Über Uns",
     "nav_start_project": "Projekt Starten",
     "legal_title": "Rechtliches",
@@ -139,8 +140,8 @@
     "step4": "Bereit."
   },
   "Footnotes": {
-    "note1": "Basierend auf dem 'Brand Finance Global 500' Bericht 2026, der die Deutsche Telekom als wertvollste Marke in Europa einstuft.",
-    "note2": "Bezieht sich auf die Entwicklung und den bundesweiten Rollout eines multifunktionalen Beratungstools für die Mitarbeiter der Deutschen Telekom Service GmbH."
+    "note1": "Basierend auf dem 'Brand Finance Global 500' Bericht 2026, der den führenden europäischen Telekommunikationskonzern als wertvollste Marke in Europa einstuft.",
+    "note2": "Bezieht sich auf die Entwicklung und den bundesweiten Rollout eines multifunktionalen Beratungstools für die Mitarbeiter des besagten Konzerns."
   },
   "GrowthArsenal": {
     "title": "Das Arsenal",
@@ -266,7 +267,8 @@
     "btn_es": "Cambiar a Español",
     "btn_en": "Switch to English",
     "switching": "Wird umgestellt...",
-    "continue": "Auf Deutsch fortfahren"
+    "continue": "Auf Deutsch fortfahren",
+    "other_languages": "Andere Sprachen"
   },
   "WaasRealityCheck": {
     "text": "Eine veraltete Website, die auf Handys schlecht aussieht, oder gar keine eigene Präsenz im Netz kostet dich täglich wertvolle Kunden. Wer heute online nicht professionell gefunden wird, existiert für viele Menschen gar nicht.",

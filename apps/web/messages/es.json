@@ -83,7 +83,7 @@
   "EnterpriseBento": {
     "section_headline": "Construido para la mayor corporación de Europa.<sup1>1</sup1>",
     "nda_hint": "Otros líderes del mercado no revelados bajo NDA",
-    "card1_headline": "Escalamos la gestión de ventas de T-Mobile en toda Alemania.<sup2>2</sup2>",
+    "card1_headline": "Escalamos la gestión de ventas de <blur>••••••• •••••••</blur> en toda Alemania.<sup2>2</sup2>",
     "card2_title": "Tiempo de respuesta: Cero.",
     "card2_text": "Implementado en tiempo real durante la atención al cliente. Cero tolerancia a esperas o errores. La herramienta fluye sin interrupciones. La máxima velocidad no fue una opción, sino el principio fundamental de su diseño.",
     "card3_title": "Complejidad invisible.",
@@ -104,6 +104,7 @@
     "nav_title": "Navegación",
     "nav_products": "Productos",
     "nav_services": "Servicios",
+    "nav_waas": "Website-as-a-Service",
     "nav_about": "Sobre Nosotros",
     "nav_start_project": "Iniciar Proyecto",
     "legal_title": "Legal",
@@ -136,8 +137,8 @@
     "step4": "Listo."
   },
   "Footnotes": {
-    "note1": "Basado en el informe 'Brand Finance Global 500' de 2026, que sitúa a Deutsche Telekom como la marca más valiosa de Europa.",
-    "note2": "Se refiere al desarrollo y despliegue nacional de una herramienta de consultoría multifuncional para los empleados de Deutsche Telekom Service GmbH."
+    "note1": "Basado en el informe 'Brand Finance Global 500' de 2026, que sitúa al grupo líder europeo de telecomunicaciones como la marca más valiosa de Europa.",
+    "note2": "Se refiere al desarrollo y despliegue nacional de una herramienta de consultoría multifuncional para los empleados del respectivo grupo."
   },
   "GrowthArsenal": {
     "title": "El Arsenal",
@@ -263,7 +264,8 @@
     "btn_es": "Continuar en Español",
     "btn_en": "Switch to English",
     "switching": "Cambiando...",
-    "continue": "Continuar en Español"
+    "continue": "Continuar en Español",
+    "other_languages": "Otros Idiomas"
   },
   "WaasRealityCheck": {
     "text": "Una página web obsoleta que se ve mal en el móvil, o no tener presencia propia, te cuesta clientes valiosos todos los días. Si hoy no te encuentran de forma profesional en internet, simplemente no existes para la mayoría.",
