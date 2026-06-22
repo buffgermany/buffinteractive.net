@@ -43,7 +43,7 @@ export const leadsRoutes = new Elysia({ prefix: "/v1" })
       const resend = getResend();
       if (resend) {
         resend.emails.send({
-          from: "Buff <no-reply.buffinteractive.net>", // Or a verified domain
+          from: "Buff <contracts@no-reply.buffinteractive.net>", // Or a verified domain
           to: process.env["ADMIN_EMAIL"] || "hello@flxk.nz",
           subject: `New Lead: ${name} from ${company}`,
           html: `

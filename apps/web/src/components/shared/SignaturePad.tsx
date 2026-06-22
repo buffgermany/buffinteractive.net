@@ -21,11 +21,26 @@ export function SignaturePad({ onSave, label = "Ihre Unterschrift" }: SignatureP
       const resizeCanvas = () => {
         if (canvas.offsetWidth > 0 && canvas.offsetHeight > 0) {
           if (canvas.width !== canvas.offsetWidth || canvas.height !== canvas.offsetHeight) {
+            // Save the current strokes data before resizing
+            const strokes = sigCanvas.current?.toData();
+            const wasEmpty = sigCanvas.current?.isEmpty() ?? true;
+
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
             sigCanvas.current?.clear();
-            setIsEmpty(true);
-            onSave(null);
+
+            // Restore the strokes if there were any
+            if (strokes && strokes.length > 0 && !wasEmpty) {
+              sigCanvas.current?.fromData(strokes);
+              setIsEmpty(false);
+              // Recalculate signature image URL with new size
+              onSave(sigCanvas.current?.getTrimmedCanvas().toDataURL("image/png") || null);
+            } else {
+              setIsEmpty(true);
+              if (!wasEmpty) {
+                onSave(null);
+              }
+            }
           }
         }
       };
@@ -64,9 +79,9 @@ export function SignaturePad({ onSave, label = "Ihre Unterschrift" }: SignatureP
     <div className="flex flex-col gap-2 w-full max-w-2xl">
       <div className="flex justify-between items-center">
         <label className="text-sm font-medium text-foreground">{label}</label>
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={handleClear}
           type="button"
           disabled={isEmpty}
@@ -74,24 +89,31 @@ export function SignaturePad({ onSave, label = "Ihre Unterschrift" }: SignatureP
           Löschen
         </Button>
       </div>
-      <div 
-        className="border-2 border-neutral-600 rounded-lg bg-white overflow-hidden shadow-inner"
+      <div
+        className="relative border-2 border-neutral-600 rounded-lg bg-white overflow-hidden shadow-inner h-48"
         onMouseDown={handlePointerDown}
         onTouchStart={handlePointerDown}
       >
         <SignatureCanvas
           ref={sigCanvas}
           canvasProps={{
-            className: "signature-canvas w-full h-48 touch-none", // touch-none prevents scrolling while signing
+            className: "signature-canvas w-full h-full touch-none", // touch-none prevents scrolling while signing
           }}
           onEnd={handleEnd}
           backgroundColor="white"
           penColor="black"
         />
+        {isEmpty && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none opacity-25">
+            <span className="text-4xl font-light text-neutral-500">X</span>
+            <span className="text-[10px] uppercase tracking-widest mt-1 text-neutral-500 font-bold">Hier unterschreiben</span>
+          </div>
+        )}
       </div>
       <p className="text-xs text-muted-foreground mt-1">
-        Bitte unterschreiben Sie innerhalb des Feldes.
+        Bitte unterschreib innerhalb des Feldes.
       </p>
     </div>
   );
 }
+

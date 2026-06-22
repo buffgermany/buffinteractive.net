@@ -21,8 +21,8 @@ export const contracts = pgTable("contracts", {
   zahlungsrhythmus: contractPaymentCycleEnum("zahlungsrhythmus").notNull(),
   
   // Using string for decimals to avoid precision loss, but decimal type works too
-  setupPreisNetto: decimal("setup_preis_netto", { precision: 10, scale: 2 }).notNull(),
-  laufendPreisNetto: decimal("laufend_preis_netto", { precision: 10, scale: 2 }).notNull(),
+  setupPreisBrutto: decimal("setup_preis_brutto", { precision: 10, scale: 2 }).notNull(),
+  laufendPreisBrutto: decimal("laufend_preis_brutto", { precision: 10, scale: 2 }).notNull(),
 
   // Kundendaten
   firma: text("firma").notNull(),

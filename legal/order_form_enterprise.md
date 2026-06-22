@@ -28,22 +28,23 @@ E-Mail: service@buffinteractive.net
 
 ## 2. Leistungsbeschreibung & Vergütung
 
-Der Kunde beauftragt den Anbieter verbindlich mit der Erstellung und dem Hosting einer Individual-Website im Tarif **Enterprise**. 
-Der exakte Leistungsumfang (inkl. Sonderfunktionen, Schnittstellen und spezifischem Seitenumfang) ergibt sich aus dem als Anlage beigefügten **Angebotsdokument vom [Datum einfügen]**, welches hiermit Vertragsbestandteil wird.
+Der Leistungsumfang (inkl. Sonderfunktionen, Schnittstellen und spezifischem Seitenumfang) ergibt sich aus dem als Anlage beigefügten **Angebotsdokument**, welches hiermit Vertragsbestandteil wird.
+
+**Angebotsdatum:** ________________________________________________________
 
 **Individuell vereinbarte Vergütung:**
 
 **Einmaliges Projekt-Setup:** 
-___________________________ € netto
+___________________________ € inkl. MwSt.
 
 **Laufende Pauschale (Hosting, Wartung & Pflege):** 
-___________________________ € netto pro Monat
+___________________________ € inkl. MwSt. pro Monat
 
 **Zahlungsrhythmus der laufenden Pauschale:**
 [  ] Monatlich
 [  ] Jährlich (Abrechnung im Voraus)
 
-*Alle Preise verstehen sich zzgl. der gesetzlichen Umsatzsteuer.*
+*Alle Preise verstehen sich inkl. der gesetzlichen Umsatzsteuer (brutto).*
 
 ---
 

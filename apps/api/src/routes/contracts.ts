@@ -6,6 +6,7 @@ import { eq } from "@platform/db";
 import pdfmake from "pdfmake";
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 
 const getResend = () => {
   const key = process.env["RESEND_API_KEY"];
@@ -64,7 +65,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
     "/contracts/generate",
     async ({ db, body, headers, request }) => {
       const {
-        tarif, zahlungsrhythmus, setupPreisNetto, laufendPreisNetto,
+        tarif, zahlungsrhythmus, setupPreisBrutto, laufendPreisBrutto,
         firma, ansprechpartner, strasse, plz, ort, email, telefon, ustId,
         iban, bic, bank, kontoinhaber,
         consentB2b, consentAgb, consentAvv, consentMarketing,
@@ -102,6 +103,9 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
       // Load legal texts from legal directory
       const termsMd = readLegalFile("terms.md");
       const avvMd = readLegalFile("avv.md");
+
+      const mandatsreferenz = `MANDAT-${crypto.randomUUID().substring(0, 8).toUpperCase()}`;
+      const sepaMd = readLegalFile("sepa_mandat.md").replace("Wird separat mitgeteilt", mandatsreferenz);
 
       // Load branding logo PNG
       let logoDataUrl = "";
@@ -158,11 +162,12 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           { text: '2. Leistungsbeschreibung & Vergütung', style: 'subheader', margin: [0, 20, 0, 5] },
           { text: `Tarif: ${tarif.toUpperCase()}` },
           { text: `Zahlungsrhythmus: ${zahlungsrhythmus}` },
-          { text: `Einmalige Setup-Gebühr: ${setupPreisNetto} € netto` },
-          { text: `Laufende Pauschale: ${laufendPreisNetto} € netto / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}` },
+          { text: `Einmalige Setup-Gebühr: ${setupPreisBrutto} € inkl. MwSt.` },
+          { text: `Laufende Pauschale: ${laufendPreisBrutto} € inkl. MwSt. / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}` },
 
           { text: '3. SEPA-Lastschriftmandat', style: 'subheader', margin: [0, 20, 0, 5] },
           { text: 'Gläubiger-Identifikationsnummer: DE15WEB00002924152' },
+          { text: `Mandatsreferenz: ${mandatsreferenz}` },
           { text: 'Ich ermächtige die Buff Interactive GbR, Zahlungen von meinem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von der Buff Interactive GbR auf mein Konto gezogenen Lastschriften einzulösen.', margin: [0, 5, 0, 5] },
           {
             table: {
@@ -176,7 +181,8 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             }
           },
           { text: 'Unterschrift SEPA-Mandat:', margin: [0, 10, 0, 5] },
-          { image: signatureSepaB64, width: 200, margin: [0, 0, 0, 20] },
+          { image: signatureSepaB64, width: 200, margin: [0, 0, 0, 5] },
+          { text: `${ort}, den ${signedAt.toLocaleDateString("de-DE")} ${signedAt.toLocaleTimeString("de-DE")} UTC`, margin: [0, 0, 0, 20], fontSize: 9 },
 
           { text: '4. Vertragsabschluss & Einverständniserklärungen', style: 'subheader', margin: [0, 20, 0, 5] },
           { text: `[${consentB2b ? 'X' : ' '}] B2B-Bestätigung` },
@@ -185,7 +191,8 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           { text: `[${consentMarketing ? 'X' : ' '}] Marketing-Einwilligung` },
 
           { text: 'Rechtsverbindliche Unterschrift:', margin: [0, 10, 0, 5] },
-          { image: signatureContractB64, width: 200, margin: [0, 0, 0, 10] },
+          { image: signatureContractB64, width: 200, margin: [0, 0, 0, 5] },
+          { text: `${ort}, den ${signedAt.toLocaleDateString("de-DE")} ${signedAt.toLocaleTimeString("de-DE")} UTC`, margin: [0, 0, 0, 10], fontSize: 9 },
 
           { text: 'Audit-Trail', style: 'subheader', margin: [0, 20, 0, 5], fontSize: 8, color: 'gray' },
           { text: `IP-Adresse: ${derivedClientIp}`, fontSize: 8, color: 'gray' },
@@ -226,8 +233,8 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
         .values({
           tarif: tarif as any,
           zahlungsrhythmus: zahlungsrhythmus as any,
-          setupPreisNetto: String(setupPreisNetto),
-          laufendPreisNetto: String(laufendPreisNetto),
+          setupPreisBrutto: String(setupPreisBrutto),
+          laufendPreisBrutto: String(laufendPreisBrutto),
           firma, ansprechpartner, strasse, plz, ort, email,
           telefon: telefon || null,
           ustId: ustId || null,
@@ -251,45 +258,56 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
       if (resend) {
         try {
           const pdfBuffer = fs.readFileSync(pdfPath);
+          const emailAttachments: any[] = [
+            {
+              filename: 'Vertrag_Buff_Interactive.pdf',
+              content: pdfBuffer,
+            }
+          ];
+
+          try {
+            const logoPath = getBrandingPath("buff_interactive.acid-lime_white.png");
+            if (fs.existsSync(logoPath)) {
+              emailAttachments.push({
+                filename: 'logo.png',
+                content: fs.readFileSync(logoPath),
+                contentId: 'logo'
+              });
+            }
+          } catch (e) {
+            console.error("[contracts] Could not attach logo, continuing without it.", e);
+          }
+
           const { data, error } = await resend.emails.send({
-            from: "Buff <no-reply@buffinteractive.net>",
+            from: "Buff <contracts@no-reply.buffinteractive.net>",
             to: email,
             bcc: process.env["ADMIN_EMAIL"] || "hello@flxk.nz",
             subject: `Ihre Vertragsunterlagen - Buff Interactive`,
             html: `
-              <div style="font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #0A0A0A; color: #FFFFFF; padding: 40px 20px; text-align: center;">
-                <div style="max-width: 600px; margin: 0 auto; background-color: #1A1A1A; border: 1px solid #2C2C2C; border-radius: 24px; padding: 40px; text-align: left; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
-                  <div style="margin-bottom: 32px;">
-                    <img src="cid:logo" style="height: 32px;" alt="Buff Interactive" />
-                  </div>
-                  <h2 style="font-size: 22px; font-weight: 700; margin-top: 0; margin-bottom: 16px; color: #FFFFFF; border-bottom: 2px solid #CCFF00; padding-bottom: 12px;">Willkommen bei Buff Interactive!</h2>
-                  <p style="font-size: 16px; line-height: 1.6; color: #D1D1D6; margin-bottom: 24px;">Hallo ${ansprechpartner},</p>
-                  <p style="font-size: 16px; line-height: 1.6; color: #D1D1D6; margin-bottom: 24px;">vielen Dank für Ihr Vertrauen. Wir freuen uns sehr auf die Zusammenarbeit mit der <strong>${firma}</strong>!</p>
-                  <p style="font-size: 15px; line-height: 1.6; color: #A0A0B0; margin-bottom: 32px;">Anbei finden Sie das rechtskräftig unterzeichnete Bestellformular für Ihren Web-as-a-Service (WaaS) Tarif als PDF-Dokument im Anhang zu Ihrer bequemen Ablage.</p>
-                  <div style="background: rgba(204, 255, 0, 0.05); border: 1px solid rgba(204, 255, 0, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 32px;">
-                    <h4 style="margin: 0 0 10px 0; color: #CCFF00; font-size: 14px; text-transform: uppercase; tracking-wider: 0.1em; font-family: sans-serif;">Details Ihrer Buchung</h4>
-                    <p style="margin: 0 0 6px 0; font-size: 14px; color: #FFFFFF;"><strong>Tarif:</strong> ${tarif.toUpperCase()} (${zahlungsrhythmus})</p>
-                    <p style="margin: 0 0 6px 0; font-size: 14px; color: #FFFFFF;"><strong>Einmaliges Setup:</strong> ${setupPreisNetto} € netto</p>
-                    <p style="margin: 0; font-size: 14px; color: #FFFFFF;"><strong>Laufende Gebühr:</strong> ${laufendPreisNetto} € netto / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}</p>
-                  </div>
-                  <div style="border-top: 1px solid #2C2C2C; padding-top: 24px; font-size: 14px; color: #8E8E93;">
-                    Mit freundlichen Grüßen<br/>
-                    <span style="color: #CCFF00; font-weight: 700;">Ihr Team von Buff Interactive</span>
+                <div style="font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #0A0A0A; color: #FFFFFF; padding: 40px 20px; text-align: center;">
+                  <div style="max-width: 600px; margin: 0 auto; background-color: #1A1A1A; border: 1px solid #2C2C2C; border-radius: 24px; padding: 40px; text-align: left; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+                    <div style="margin-bottom: 32px;">
+                      <img src="cid:logo" style="height: 32px;" alt="Buff Interactive" />
+                    </div>
+                    <h2 style="font-size: 22px; font-weight: 700; margin-top: 0; margin-bottom: 16px; color: #FFFFFF; border-bottom: 2px solid #CCFF00; padding-bottom: 12px;">Willkommen bei Buff</h2>
+                    <p style="font-size: 16px; line-height: 1.6; color: #D1D1D6; margin-bottom: 24px;">Hallo ${ansprechpartner},</p>
+                    <p style="font-size: 16px; line-height: 1.6; color: #D1D1D6; margin-bottom: 24px;">vielen Dank für Dein Vertrauen. Wir freuen uns sehr auf die Zusammenarbeit mit <strong>${firma}</strong>!</p>
+                    <p style="font-size: 15px; line-height: 1.6; color: #A0A0B0; margin-bottom: 32px;">Anbei findest Du das rechtskräftig unterzeichnete Bestellformular für Deinen Website as a Service (WaaS)-Tarif als PDF-Dokument im Anhang zu Deiner bequemen Ablage.</p>
+                    <div style="background: rgba(204, 255, 0, 0.05); border: 1px solid rgba(204, 255, 0, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 32px;">
+                      <h4 style="margin: 0 0 10px 0; color: #CCFF00; font-size: 14px; text-transform: uppercase; tracking-wider: 0.1em; font-family: sans-serif;">Details Deiner Buchung</h4>
+                      <p style="margin: 0 0 6px 0; font-size: 14px; color: #FFFFFF;"><strong>Tarif:</strong> ${tarif.toUpperCase()} (${zahlungsrhythmus})</p>
+                      <p style="margin: 0 0 6px 0; font-size: 14px; color: #FFFFFF;"><strong>Einmaliges Setup:</strong> ${setupPreisBrutto} € inkl. MwSt.</p>
+                      <p style="margin: 0; font-size: 14px; color: #FFFFFF;"><strong>Laufende Gebühr:</strong> ${laufendPreisBrutto} € inkl. MwSt. / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}</p>
+                    </div>
+                    <p style="padding-top: 24px; font-size: 15px; line-height: 1.6; color: #A0A0B0; margin-bottom: 32px;">Bei Fragen, antworte bitte nicht auf diese E-Mail. Diese Adresse kann keine Antworten empfangen.<br/>Schreib uns an <a href="mailto:service@buffinteractive.net">service@buffinteractive.net</a>.</p>
+                    <div style="border-top: 1px solid #2C2C2C; padding-top: 24px; font-size: 14px; color: #8E8E93;">
+                      Beste Grüße<br/>
+                      <span style="color: #CCFF00; font-weight: 700;">Dein Team von Buff Interactive</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            `,
-            attachments: [
-              {
-                filename: 'Vertrag_Buff_Interactive.pdf',
-                content: pdfBuffer,
-              },
-              {
-                filename: 'logo.png',
-                content: fs.readFileSync(getBrandingPath("buff_interactive.acid-lime_white.png")),
-                contentId: 'logo'
-              }
-            ]
+              `,
+            attachments: emailAttachments
           });
 
           if (error) {
@@ -318,8 +336,8 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
       body: t.Object({
         tarif: t.String(),
         zahlungsrhythmus: t.String(),
-        setupPreisNetto: t.Numeric(),
-        laufendPreisNetto: t.Numeric(),
+        setupPreisBrutto: t.Numeric(),
+        laufendPreisBrutto: t.Numeric(),
         firma: t.String(),
         ansprechpartner: t.String(),
         strasse: t.String(),
@@ -348,10 +366,10 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
 function parseMarkdownToPdfmake(md: string): any[] {
   const content: any[] = [];
   if (!md) return content;
-  
+
   const lines = md.split(/\r?\n/);
   let currentParagraph = "";
-  
+
   const flushParagraph = () => {
     if (currentParagraph.trim()) {
       content.push({ text: currentParagraph.trim(), margin: [0, 4, 0, 4], fontSize: 9, color: '#333333' });
@@ -417,7 +435,7 @@ function parseMarkdownToPdfmake(md: string): any[] {
       }
     }
   }
-  
+
   flushParagraph();
   return content;
 }

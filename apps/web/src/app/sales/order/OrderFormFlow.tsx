@@ -9,24 +9,24 @@ import { LegalScrollBox } from "@/components/shared/LegalScrollBox";
 import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/primitives";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { CheckCircle2, FileText, User, CreditCard, PenTool, Heart } from "lucide-react";
+import { CheckCircle2, FileText, User, CreditCard, PenTool, ArrowLeft, ArrowRight, Heart } from "lucide-react";
 
 const formSchema = z.object({
   tarif: z.enum(["essential", "growth", "enterprise"]),
   zahlungsrhythmus: z.enum(["monatlich", "jaehrlich"]),
-  setupPreisNetto: z.number().min(0),
-  laufendPreisNetto: z.number().min(0),
+  setupPreisBrutto: z.number().min(0, "Setup-Preis muss mindestens 0 sein"),
+  laufendPreisBrutto: z.number().min(0, "Laufende Gebühr muss mindestens 0 sein"),
 
   firma: z.string().min(2, "Firma ist erforderlich"),
   ansprechpartner: z.string().min(2, "Ansprechpartner ist erforderlich"),
-  strasse: z.string().min(2, "Straße ist erforderlich"),
-  plz: z.string().min(4, "PLZ ist erforderlich"),
+  strasse: z.string().min(2, "Straße & Hausnummer ist erforderlich"),
+  plz: z.string().min(4, "Ungültige PLZ"),
   ort: z.string().min(2, "Ort ist erforderlich"),
-  email: z.string().email("Ungültige E-Mail Adresse"),
+  email: z.string().email("Ungültige E-Mail-Adresse"),
   telefon: z.string().optional(),
   ustId: z.string().optional(),
 
-  iban: z.string().min(15, "Ungültige IBAN"),
+  iban: z.string().min(15, "IBAN muss mindestens 15 Zeichen lang sein"),
   bic: z.string().optional(),
   bank: z.string().optional(),
   kontoinhaber: z.string().optional(),
@@ -42,27 +42,108 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-interface HeartParticle {
+interface SparkleParticle {
   id: number;
   x: number;
+  y: number;
   size: number;
   delay: number;
   duration: number;
   color: string;
+  angle: number;
+  velocity: number;
+}
+
+function SparkleCelebration() {
+  const [particles, setParticles] = useState<SparkleParticle[]>([]);
+
+  useEffect(() => {
+    const colors = ["#CCFF00", "#FFFFFF", "#A0A0B0", "#1C1C1C"];
+    const newParticles = Array.from({ length: 45 }).map((_, i) => ({
+      id: i,
+      x: 50,
+      y: 40,
+      size: Math.random() * 8 + 4,
+      delay: Math.random() * 0.4,
+      duration: Math.random() * 2 + 1.5,
+      color: colors[Math.floor(Math.random() * colors.length)] || "#CCFF00",
+      angle: Math.random() * 360,
+      velocity: Math.random() * 140 + 60,
+    }));
+    setParticles(newParticles);
+  }, []);
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 bg-gradient-to-b from-transparent to-emerald-950/5">
+      <style>{`
+        @keyframes particleBurst {
+          0% {
+            transform: translate(0, 0) scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: translate(var(--tx), var(--ty)) scale(0.2);
+            opacity: 0;
+          }
+        }
+        .animate-burst-particle {
+          animation-name: particleBurst;
+          animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          animation-fill-mode: forwards;
+        }
+      `}</style>
+      {particles.map((p) => {
+        const rad = (p.angle * Math.PI) / 180;
+        const tx = Math.cos(rad) * p.velocity;
+        const ty = Math.sin(rad) * p.velocity;
+
+        return (
+          <span
+            key={p.id}
+            className="absolute rounded-full animate-burst-particle"
+            style={{
+              left: `${p.x}%`,
+              top: `${p.y}%`,
+              width: `${p.size}px`,
+              height: `${p.size}px`,
+              backgroundColor: p.color,
+              animationDelay: `${p.delay}s`,
+              animationDuration: `${p.duration}s`,
+              "--tx": `${tx}px`,
+              "--ty": `${ty}px`,
+            } as React.CSSProperties}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+interface HeartParticle {
+  id: number;
+  left: number;
+  size: number;
+  delay: number;
+  duration: number;
+  opacity: number;
+  swayDistance: number;
+  swayDuration: number;
 }
 
 function FloatingHearts() {
   const [hearts, setHearts] = useState<HeartParticle[]>([]);
 
   useEffect(() => {
-    const colors = ["#CCFF00", "#FF2D55", "#FF9500", "#4CD964", "#5AC8FA"];
-    const newHearts = Array.from({ length: 45 }).map((_, i) => ({
+    // Smooth, slow, elegant floating
+    const newHearts = Array.from({ length: 12 }).map((_, i) => ({
       id: i,
-      x: Math.random() * 100,
-      size: Math.random() * 24 + 12,
-      delay: Math.random() * 3,
-      duration: Math.random() * 4 + 3,
-      color: colors[Math.floor(Math.random() * colors.length)] || "#CCFF00",
+      left: Math.random() * 90 + 5, // 5% to 95%
+      size: Math.random() * 24 + 16, // 16 to 40
+      delay: Math.random() * 4, // staggered start
+      duration: Math.random() * 6 + 6, // 6s to 12s float up
+      opacity: Math.random() * 0.4 + 0.3, // 0.3 to 0.7 opacity
+      swayDistance: (Math.random() * 40 + 20) * (Math.random() > 0.5 ? 1 : -1), // -60 to 60px sway
+      swayDuration: Math.random() * 3 + 4, // 4s to 7s sway cycle
     }));
     setHearts(newHearts);
   }, []);
@@ -70,42 +151,40 @@ function FloatingHearts() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
       <style>{`
-        @keyframes floatHeart {
-          0% {
-            transform: translateY(10vh) scale(0.5) rotate(0deg);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.8;
-          }
-          90% {
-            opacity: 0.8;
-          }
-          100% {
-            transform: translateY(-110vh) scale(1.2) rotate(360deg);
-            opacity: 0;
-          }
+        @keyframes floatUp {
+          0% { top: 110%; opacity: 0; }
+          10% { opacity: var(--max-opacity); }
+          80% { opacity: var(--max-opacity); }
+          100% { top: -20%; opacity: 0; }
+        }
+        @keyframes sway {
+          0%, 100% { transform: translateX(0) rotate(-5deg); }
+          50% { transform: translateX(var(--sway)) rotate(5deg); }
         }
         .animate-float-heart {
-          animation-name: floatHeart;
-          animation-timing-function: ease-in-out;
-          animation-iteration-count: infinite;
+          animation: floatUp var(--duration) linear infinite,
+                     sway var(--sway-duration) ease-in-out infinite alternate;
+          animation-delay: var(--delay), 0s;
         }
       `}</style>
       {hearts.map((h) => (
-        <span
+        <div
           key={h.id}
-          className="absolute bottom-0 animate-float-heart opacity-0"
+          className="absolute animate-float-heart text-red-500 drop-shadow-lg"
           style={{
-            left: `${h.x}%`,
-            fontSize: `${h.size}px`,
-            color: h.color,
-            animationDelay: `${h.delay}s`,
-            animationDuration: `${h.duration}s`,
-          }}
+            left: `${h.left}%`,
+            width: `${h.size}px`,
+            height: `${h.size}px`,
+            '--delay': `${h.delay}s`,
+            '--duration': `${h.duration}s`,
+            '--max-opacity': h.opacity,
+            '--sway': `${h.swayDistance}px`,
+            '--sway-duration': `${h.swayDuration}s`,
+            opacity: 0,
+          } as React.CSSProperties}
         >
-          ❤️
-        </span>
+          <Heart className="w-full h-full fill-red-500/50 stroke-[1.5]" />
+        </div>
       ))}
     </div>
   );
@@ -116,17 +195,20 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Track scroll status for step 2
   const [agbRead, setAgbRead] = useState(false);
   const [avvRead, setAvvRead] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step, success]);
 
   const { register, handleSubmit, control, watch, setValue, trigger, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       tarif: "growth",
       zahlungsrhythmus: "monatlich",
-      setupPreisNetto: 379.99,
-      laufendPreisNetto: 89.00,
+      setupPreisBrutto: 379.99,
+      laufendPreisBrutto: 89.00,
       firma: "",
       ansprechpartner: "",
       strasse: "",
@@ -146,28 +228,34 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
   const currentTarif = watch("tarif");
   const currentZahlungsrhythmus = watch("zahlungsrhythmus");
 
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("de-DE", {
+      style: "currency",
+      currency: "EUR",
+      minimumFractionDigits: 2,
+    }).format(price);
+  };
+
   const handleTarifChange = (t: "essential" | "growth" | "enterprise", z: "monatlich" | "jaehrlich") => {
     setValue("tarif", t);
     setValue("zahlungsrhythmus", z);
 
     if (t === "essential") {
-      setValue("setupPreisNetto", 359.99);
-      setValue("laufendPreisNetto", z === "monatlich" ? 75.00 : 71.25);
+      setValue("setupPreisBrutto", 359.99);
+      setValue("laufendPreisBrutto", z === "monatlich" ? 75.00 : 71.25);
     } else if (t === "growth") {
-      setValue("setupPreisNetto", 379.99);
-      setValue("laufendPreisNetto", z === "monatlich" ? 89.00 : 84.55);
+      setValue("setupPreisBrutto", 379.99);
+      setValue("laufendPreisBrutto", z === "monatlich" ? 89.00 : 84.55);
     } else {
-      // Enterprise default values, but allow manual input in the UI
-      setValue("setupPreisNetto", 0);
-      setValue("laufendPreisNetto", 0);
+      setValue("setupPreisBrutto", 0);
+      setValue("laufendPreisBrutto", 0);
     }
   };
 
   const nextStep = async () => {
-    // Validate current step fields before proceeding
     let fieldsToValidate: (keyof FormValues)[] = [];
     if (step === 0) {
-      fieldsToValidate = ["tarif", "zahlungsrhythmus", "setupPreisNetto", "laufendPreisNetto"];
+      fieldsToValidate = ["tarif", "zahlungsrhythmus", "setupPreisBrutto", "laufendPreisBrutto"];
     } else if (step === 1) {
       fieldsToValidate = ["firma", "ansprechpartner", "strasse", "plz", "ort", "email"];
     } else if (step === 4) {
@@ -191,13 +279,14 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
+          iban: data.iban.replace(/\s/g, ""),
           salesUserId
         })
       });
       if (res.ok) {
         setSuccess(true);
       } else {
-        alert("Ein Fehler ist aufgetreten. Bitte prüfen Sie die Verbindung.");
+        alert("Ein Fehler ist aufgetreten. Bitte prüfe die Verbindung.");
       }
     } catch (err) {
       console.error(err);
@@ -208,24 +297,26 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
 
   if (success) {
     return (
-      <Card className="w-full text-center py-16 relative overflow-hidden bg-card border-2 border-primary/40 shadow-2xl animate-in zoom-in-95 duration-500">
+      <Card className="w-full text-center py-16 relative overflow-hidden bg-card border-2 border-emerald-500/40 shadow-2xl animate-in zoom-in-95 duration-500">
+        <SparkleCelebration />
         <FloatingHearts />
 
-        {/* Style for the pulsing heart */}
         <style>{`
-          @keyframes heartPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
+          @keyframes checkPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
           }
-          .animate-heart-pulse {
-            animation: heartPulse 2s infinite ease-in-out;
+          .animate-check-pulse {
+            animation: checkPulse 2s infinite ease-in-out;
           }
         `}</style>
 
         <CardHeader className="relative z-10 space-y-6">
           <div className="relative flex justify-center items-center py-4">
-            <Heart className="w-24 h-24 text-[#FF2D55] fill-[#FF2D55] animate-heart-pulse z-10" />
+            <div className="w-24 h-24 rounded-full bg-emerald-500/10 border-4 border-emerald-500 flex items-center justify-center animate-check-pulse">
+              <CheckCircle2 className="w-12 h-12 text-emerald-400 fill-emerald-950/20" />
+            </div>
           </div>
 
           <CardTitle className="text-4xl sm:text-5xl font-extrabold text-foreground tracking-tight">
@@ -233,16 +324,16 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
           </CardTitle>
 
           <CardDescription className="text-xl sm:text-2xl mt-4 font-medium text-foreground max-w-2xl mx-auto leading-relaxed">
-            Du hast den Vertrag rechtskräftig unterschrieben.
-            Wir freuen uns riesig auf die Partnerschaft mit <span className="text-primary font-bold">{watch("firma")}</span>!
+            Der Vertrag wurde erfolgreich und rechtskräftig unterzeichnet.
+            Wir freuen uns riesig auf die Zusammenarbeit mit <span className="text-primary font-bold">{watch("firma")}</span>!
           </CardDescription>
         </CardHeader>
 
         <CardContent className="mt-6 relative z-10 max-w-xl mx-auto">
-          <div className="bg-primary/5 border-2 border-[#CCFF00] p-6 rounded-2xl text-sm text-muted-foreground shadow-lg backdrop-blur-sm">
+          <div className="bg-background/80 border border-primary/20 p-6 rounded-2xl text-sm text-muted-foreground shadow-lg backdrop-blur-sm">
             <p className="text-foreground text-center leading-relaxed">
-              Die vollständigen Vertragsunterlagen als PDF wurden soeben sicher an <br />
-              <span className="font-bold text-[#CCFF00] text-base underline decoration-dotted">{watch("email")}</span> versendet.
+              Die vollständigen Vertragsunterlagen als PDF wurden soeben an <br />
+              <span className="font-bold text-primary">{watch("email")}</span> gesendet.
             </p>
           </div>
         </CardContent>
@@ -251,27 +342,28 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <div className="flex flex-col space-y-4">
+    <Card className="w-full shadow-lg border border-border">
+      <CardHeader className="border-b border-border bg-muted/30">
+        <div className="flex flex-col space-y-2">
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle className="text-2xl flex items-center gap-2">
-                <FileText className="w-6 h-6 text-primary" /> Digitaler Vertragsabschluss
+              <CardTitle className="text-xl flex items-center gap-2">
+                {step === 0 ? "Tarif-Konfiguration" : `Schritt ${step} von 5`}
               </CardTitle>
-              <CardDescription className="mt-1">
-                {step === 0 ? "Schritt 0: Tarifauswahl (Nur Vertrieb)" : `Schritt ${step} von 5`}
+              <CardDescription className="mt-1 text-xs">
+                {step === 1 && "Bitte trag Deine Firmendaten ein."}
+                {step === 2 && "Bitte lies und bestätige die AGB."}
+                {step === 3 && "Bitte lies und bestätige den AVV."}
+                {step === 4 && "Bitte erteile uns Dein SEPA-Lastschriftmandat."}
+                {step === 5 && "Bitte prüfe Deine Angaben und unterschreibe."}
               </CardDescription>
-            </div>
-            <div className="text-sm font-bold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
-              Buff Interactive
             </div>
           </div>
 
           {step > 0 && (
-            <div className="flex items-center w-full gap-2 mt-4">
+            <div className="flex items-center w-full gap-2 pt-2">
               {[1, 2, 3, 4, 5].map((s) => (
-                <div key={s} className="flex-1 h-2 rounded-full overflow-hidden bg-muted">
+                <div key={s} className="flex-1 h-2 rounded-full overflow-hidden bg-muted border border-border/50">
                   <div className={`h-full transition-all duration-500 ${step >= s ? 'bg-primary' : 'bg-transparent'}`} />
                 </div>
               ))}
@@ -279,62 +371,83 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
           )}
         </div>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="pt-6 px-4 sm:px-8">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
           {/* STEP 0: Sales Rep Selection */}
           {step === 0 && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {["essential", "growth", "enterprise"].map((t) => (
-                  <div
-                    key={t}
-                    className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${currentTarif === t ? 'border-primary bg-primary/5' : 'border-border'}`}
-                    onClick={() => handleTarifChange(t as any, currentZahlungsrhythmus)}
-                  >
-                    <h3 className="font-bold text-lg capitalize">{t}</h3>
-                    {t !== "enterprise" && (
-                      <p className="text-sm text-muted-foreground mt-2">
-                        Standard WaaS Paket
-                      </p>
-                    )}
-                  </div>
-                ))}
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {["essential", "growth", "enterprise"].map((t) => {
+                  let priceInfo = "";
+                  if (t === "essential") {
+                    priceInfo = `Setup: ${formatPrice(359.99)} | Laufend: ${formatPrice(75.00)} / Monat (oder ${formatPrice(71.25)} / Monat bei jährlicher Zahlung)`;
+                  } else if (t === "growth") {
+                    priceInfo = `Setup: ${formatPrice(379.99)} | Laufend: ${formatPrice(89.00)} / Monat (oder ${formatPrice(84.55)} / Monat bei jährlicher Zahlung)`;
+                  } else {
+                    priceInfo = "Setup-Gebühr & monatliche Pauschale individuell verhandelbar";
+                  }
+                  return (
+                    <div
+                      key={t}
+                      className={`border-2 rounded-xl p-5 cursor-pointer transition-all flex flex-col justify-between ${currentTarif === t
+                        ? 'border-primary bg-primary/5 shadow-md'
+                        : 'border-border bg-card/50 hover:border-neutral-500 hover:bg-card'
+                        }`}
+                      onClick={() => handleTarifChange(t as any, currentZahlungsrhythmus)}
+                    >
+                      <div>
+                        <h3 className="font-bold text-lg capitalize">{t}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {t === "enterprise" ? "Individuelles High-End Paket" : "Standard WaaS-Paket"}
+                        </p>
+                      </div>
+                      <div className="mt-6 pt-4 border-t border-border/40 text-xs font-semibold text-primary">
+                        {priceInfo}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="flex bg-muted p-1 rounded-lg w-full mt-4 border border-border">
                 <button
                   type="button"
                   onClick={() => handleTarifChange(currentTarif, "monatlich")}
-                  className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${currentZahlungsrhythmus === "monatlich" ? 'bg-background shadow-sm' : 'text-muted-foreground hover:bg-muted-foreground/10'}`}
+                  className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${currentZahlungsrhythmus === "monatlich" ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:bg-muted-foreground/10'}`}
                 >
                   Monatlich
                 </button>
                 <button
                   type="button"
                   onClick={() => handleTarifChange(currentTarif, "jaehrlich")}
-                  className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${currentZahlungsrhythmus === "jaehrlich" ? 'bg-background shadow-sm' : 'text-muted-foreground hover:bg-muted-foreground/10'}`}
+                  className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${currentZahlungsrhythmus === "jaehrlich" ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:bg-muted-foreground/10'}`}
                 >
                   Jährlich (-5%)
                 </button>
               </div>
 
               {currentTarif === "enterprise" && (
-                <div className="grid grid-cols-2 gap-4 bg-muted p-4 rounded-lg mt-4 border border-border">
-                  <div>
-                    <Label>Individueller Setup-Preis (Netto €)</Label>
-                    <Input type="number" step="0.01" {...register("setupPreisNetto", { valueAsNumber: true })} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-muted/50 p-6 rounded-xl mt-4 border border-border">
+                  <div className="space-y-2">
+                    <Label required>Individueller Setup-Preis (inkl. MwSt., einmalig in €)</Label>
+                    <Input type="number" step="0.01" {...register("setupPreisBrutto", { valueAsNumber: true })} error={errors.setupPreisBrutto?.message} />
                   </div>
-                  <div>
-                    <Label>Individuelle Laufende Pauschale (Netto €)</Label>
-                    <Input type="number" step="0.01" {...register("laufendPreisNetto", { valueAsNumber: true })} />
+                  <div className="space-y-2">
+                    <Label required>Individuelle Laufzeit-Gebühr (inkl. MwSt., laufend in €)</Label>
+                    <Input type="number" step="0.01" {...register("laufendPreisBrutto", { valueAsNumber: true })} error={errors.laufendPreisBrutto?.message} />
                   </div>
                 </div>
               )}
 
-              <Button type="button" className="w-full mt-8" onClick={nextStep}>
-                Tablet an Kunden übergeben ➔
-              </Button>
+              <div className="mt-8 bg-primary/5 p-4 rounded-xl border border-primary/20 text-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                <span className="text-muted-foreground text-center sm:text-left">
+                  Konfiguration abgeschlossen. Bitte übergib das Tablet nun an den Kunden.
+                </span>
+                <Button type="button" size="lg" className="w-full sm:w-auto shrink-0" onClick={nextStep}>
+                  Tablet an Kunden übergeben ➔
+                </Button>
+              </div>
             </div>
           )}
 
@@ -343,55 +456,55 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex items-center gap-2 border-b pb-2">
                 <User className="w-5 h-5 text-primary" />
-                <h3 className="text-xl font-medium">1. Kundendaten</h3>
+                <h3 className="text-xl font-medium">Deine Daten</h3>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label>Firma *</Label>
-                  <Input {...register("firma")} placeholder="Muster GmbH" />
-                  {errors.firma && <p className="text-xs text-red-500">{errors.firma.message}</p>}
+                  <Label required>Firma</Label>
+                  <Input {...register("firma")} placeholder="Muster GmbH" error={errors.firma?.message} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Ansprechpartner *</Label>
-                  <Input {...register("ansprechpartner")} placeholder="Max Mustermann" />
-                  {errors.ansprechpartner && <p className="text-xs text-red-500">{errors.ansprechpartner.message}</p>}
+                  <Label required>Ansprechpartner</Label>
+                  <Input {...register("ansprechpartner")} placeholder="Max Mustermann (Vor- & Nachname)" error={errors.ansprechpartner?.message} />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Straße & Hausnummer *</Label>
-                <Input {...register("strasse")} />
-                {errors.strasse && <p className="text-xs text-red-500">{errors.strasse.message}</p>}
+                <Label required>Straße & Hausnummer</Label>
+                <Input {...register("strasse")} placeholder="Hauptstraße 12" error={errors.strasse?.message} />
               </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2 col-span-1">
-                  <Label>PLZ *</Label>
-                  <Input {...register("plz")} />
-                  {errors.plz && <p className="text-xs text-red-500">{errors.plz.message}</p>}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="space-y-2 sm:col-span-1">
+                  <Label required>PLZ</Label>
+                  <Input {...register("plz")} placeholder="12345" error={errors.plz?.message} />
                 </div>
-                <div className="space-y-2 col-span-2">
-                  <Label>Ort *</Label>
-                  <Input {...register("ort")} />
-                  {errors.ort && <p className="text-xs text-red-500">{errors.ort.message}</p>}
+                <div className="space-y-2 sm:col-span-2">
+                  <Label required>Ort</Label>
+                  <Input {...register("ort")} placeholder="Musterstadt" error={errors.ort?.message} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label>E-Mail-Adresse *</Label>
-                  <Input type="email" {...register("email")} />
-                  {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+                  <Label required>E-Mail-Adresse</Label>
+                  <Input type="email" {...register("email")} placeholder="name@firma.de" error={errors.email?.message} />
+                  <p className="text-[11px] text-muted-foreground">An diese Adresse werden die unterzeichneten Vertragsunterlagen gesendet.</p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Telefonnummer</Label>
-                  <Input {...register("telefon")} />
+                  <Label>Telefonnummer (Optional)</Label>
+                  <Input {...register("telefon")} placeholder="+49 170 1234567" />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Umsatzsteuer-ID (Optional)</Label>
-                <Input {...register("ustId")} placeholder="DE..." />
+                <Label>Umsatzsteuer-Identifikationsnummer (USt-IdNr.) (Optional)</Label>
+                <Input {...register("ustId")} placeholder="DE123456789" />
               </div>
 
-              <div className="flex justify-end pt-4">
-                <Button type="button" onClick={nextStep}>Weiter</Button>
+              <div className="flex flex-row justify-between items-center gap-4 pt-4 border-t border-border/40">
+                <Button type="button" variant="ghost" size="lg" className="w-full sm:w-auto" onClick={() => setStep(0)}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Zurück
+                </Button>
+                <Button type="button" size="lg" className="w-full sm:w-auto" onClick={nextStep}>Weiter
+                  <ArrowRight className="w-4 h-4 ml-2" /></Button>
               </div>
             </div>
           )}
@@ -404,7 +517,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                 <h3 className="text-xl font-medium">2. Allgemeine Geschäftsbedingungen</h3>
               </div>
               <p className="text-sm text-muted-foreground">
-                Bitte nehmen Sie sich einen Moment Zeit, die AGB zu lesen und zum Ende zu scrollen.
+                Bitte nimm Dir einen Moment Zeit, die AGB zu lesen. Scroll dazu bitte bis zum Ende des Dokuments.
               </p>
 
               <LegalScrollBox
@@ -413,9 +526,14 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                 onRead={() => setAgbRead(true)}
               />
 
-              <div className="flex justify-end pt-4">
-                <Button type="button" onClick={nextStep} disabled={!agbRead}>
-                  Weiter zur AVV
+              <div className="flex flex-row justify-between items-center gap-4 pt-4 border-t border-border/40">
+                <Button type="button" variant="ghost" size="lg" className="w-full sm:w-auto" onClick={() => setStep(1)}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Zurück
+                </Button>
+                <Button type="button" size="lg" className="w-full sm:w-auto" onClick={nextStep} disabled={!agbRead}>
+                  Weiter zum AVV
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
             </div>
@@ -426,10 +544,10 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex items-center gap-2 border-b pb-2">
                 <FileText className="w-5 h-5 text-primary" />
-                <h3 className="text-xl font-medium">3. Vertrag zur Auftragsverarbeitung</h3>
+                <h3 className="text-xl font-bold">Vertrag zur Auftragsverarbeitung</h3>
               </div>
               <p className="text-sm text-muted-foreground">
-                Bitte nehmen Sie sich einen Moment Zeit, die AVV zu lesen und zum Ende zu scrollen.
+                Bitte nimm Dir einen Moment Zeit, die AVV zu lesen. Scroll dazu bitte bis zum Ende des Dokuments.
               </p>
 
               <LegalScrollBox
@@ -438,9 +556,14 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                 onRead={() => setAvvRead(true)}
               />
 
-              <div className="flex justify-end pt-4">
-                <Button type="button" onClick={nextStep} disabled={!avvRead}>
+              <div className="flex flex-row justify-between items-center gap-4 pt-4 border-t border-border/40">
+                <Button type="button" variant="ghost" size="lg" className="w-full sm:w-auto" onClick={() => setStep(2)}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Zurück
+                </Button>
+                <Button type="button" size="lg" className="w-full sm:w-auto" onClick={nextStep} disabled={!avvRead}>
                   Weiter zur Zahlungsart
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
             </div>
@@ -453,41 +576,55 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                 <CreditCard className="w-5 h-5 text-primary" />
                 <h3 className="text-xl font-medium">4. SEPA-Lastschriftmandat</h3>
               </div>
-              <div className="bg-background border-2 border-primary/20 p-6 rounded-xl text-sm prose prose-sm dark:prose-invert max-w-none shadow-inner">
-                <p className="text-primary font-bold mb-4">Gläubiger-Identifikationsnummer: DE15WEB00002924152</p>
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{sepaContent}</ReactMarkdown>
+
+              <div className="bg-primary/5 border border-primary/20 p-5 rounded-xl text-sm shadow-inner relative overflow-hidden">
+                <div className="absolute top-0 right-0 bg-primary/20 text-foreground text-[10px] font-bold px-3 py-1 rounded-bl-lg border-l border-b border-primary/30 uppercase tracking-wider">
+                  B2B Mandat
+                </div>
+                <p className="text-primary font-bold mb-2">Gläubiger-Identifikationsnummer: DE15WEB00002924152</p>
+                <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground mt-4 leading-relaxed">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{sepaContent}</ReactMarkdown>
+                </div>
               </div>
 
-              <div className="space-y-4 mt-4">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4 mt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label>Kontoinhaber (falls abweichend)</Label>
+                    <Label>Kontoinhaber (falls abweichend von Firma)</Label>
                     <Input {...register("kontoinhaber")} placeholder="Max Mustermann" />
                   </div>
                   <div className="space-y-2">
-                    <Label>Bank (Optional)</Label>
-                    <Input {...register("bank")} />
+                    <Label>Kreditinstitut / Bank (Optional)</Label>
+                    <Input {...register("bank")} placeholder="Musterbank" />
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2 col-span-2">
-                    <Label>IBAN *</Label>
-                    <Input {...register("iban")} placeholder="DE..." />
-                    {errors.iban && <p className="text-xs text-red-500">{errors.iban.message}</p>}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label required>IBAN</Label>
+                    <Input
+                      {...register("iban", {
+                        onChange: (e) => {
+                          const raw = e.target.value.toUpperCase().replace(/\s/g, "");
+                          e.target.value = raw.replace(/(.{4})/g, "$1 ").trim();
+                        }
+                      })}
+                      placeholder="DE12 3456 7890 ..."
+                      error={errors.iban?.message}
+                    />
                   </div>
-                  <div className="space-y-2 col-span-1">
+                  <div className="space-y-2 sm:col-span-1">
                     <Label>BIC (Optional)</Label>
-                    <Input {...register("bic")} />
+                    <Input {...register("bic")} placeholder="GENODEM1MUB" />
                   </div>
                 </div>
 
-                <div className="mt-8">
+                <div className="mt-8 pt-4 border-t border-border/40">
                   <Controller
                     name="signatureSepaB64"
                     control={control}
                     render={({ field }) => (
                       <SignaturePad
-                        label="Unterschrift SEPA-Mandat"
+                        label="Unterschrift für SEPA-Lastschriftmandat"
                         onSave={(val) => {
                           field.onChange(val);
                           trigger("signatureSepaB64");
@@ -499,8 +636,11 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                 </div>
               </div>
 
-              <div className="flex justify-end pt-4">
-                <Button type="button" onClick={nextStep}>
+              <div className="flex flex-row justify-between items-center gap-4 pt-4 border-t border-border/40">
+                <Button type="button" variant="secondary" size="lg" className="w-full sm:w-auto" onClick={() => setStep(3)}>
+                  ← Zurück
+                </Button>
+                <Button type="button" size="lg" className="w-full sm:w-auto" onClick={nextStep}>
                   Weiter zum Vertragsabschluss
                 </Button>
               </div>
@@ -515,98 +655,129 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                 <h3 className="text-xl font-medium">5. Vertragsabschluss</h3>
               </div>
 
-              <div className="bg-primary/10 p-6 rounded-xl border-2 border-primary/30 space-y-2">
-                <h4 className="font-bold text-primary flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5" /> Ihre Buchung: Tarif {currentTarif.toUpperCase()}
-                </h4>
-                <p className="text-sm">Setup: {watch("setupPreisNetto")} € netto</p>
-                <p className="text-sm">Laufend: {watch("laufendPreisNetto")} € netto ({currentZahlungsrhythmus})</p>
+              <div className="bg-primary/5 p-6 rounded-xl border-2 border-primary/20 space-y-4 shadow-sm">
+                <h4 className="font-bold text-primary flex items-center gap-2 text-lg">
+                  <CheckCircle2 className="w-5 h-5" />
+                  Dein neuer Tarif wird: {currentTarif.charAt(0).toUpperCase() + currentTarif.slice(1).toLowerCase()}                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-sm">
+                  <div className="bg-background/40 p-4 rounded-lg border border-border">
+                    <span className="text-xs text-muted-foreground block uppercase font-semibold">Einmalige Einrichtungsgebühr</span>
+                    <span className="text-xl font-bold text-foreground">{formatPrice(watch("setupPreisBrutto"))}</span>
+                    <span className="text-[10px] text-muted-foreground block mt-1">Inkl. 19% MwSt.</span>
+                  </div>
+                  <div className="bg-background/40 p-4 rounded-lg border border-border">
+                    <span className="text-xs text-muted-foreground block uppercase font-semibold">Laufende Gebühr</span>
+                    <span className="text-xl font-bold text-foreground">{formatPrice(watch("laufendPreisBrutto"))}</span>
+                    <span className="text-[10px] text-muted-foreground block mt-1">{currentZahlungsrhythmus.charAt(0).toUpperCase() + currentZahlungsrhythmus.slice(1).toLowerCase()}, inkl. 19% MwSt.</span>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Alle Preise verstehen sich Brutto, also inkl. der gesetzlichen Umsatzsteuer (19%) und sind absetzbar.
+                </p>
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <Controller
-                    name="consentB2b"
-                    control={control}
-                    render={({ field }) => (
-                      <input
-                        type="checkbox"
-                        id="b2b"
-                        checked={field.value}
-                        onChange={field.onChange}
-                        className="mt-1 h-4 w-4 rounded border-border"
-                      />
-                    )}
+                {/* Checkbox 1: B2B */}
+                <div
+                  onClick={() => setValue("consentB2b", !watch("consentB2b"), { shouldValidate: true })}
+                  className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${watch("consentB2b")
+                    ? 'border-emerald-500/40 bg-emerald-500/5'
+                    : 'border-border bg-card/40 hover:bg-card/80'
+                    }`}
+                >
+                  <input
+                    type="checkbox"
+                    id="b2b"
+                    {...register("consentB2b")}
+                    checked={watch("consentB2b")}
+                    readOnly
+                    className="mt-1 h-5 w-5 rounded border-neutral-600 accent-primary pointer-events-none"
                   />
-                  <div className="space-y-1 leading-none">
-                    <Label htmlFor="b2b">Ich bestätige, dass ich ausschließlich gewerblich/selbstständig handle (B2B).</Label>
-                    {errors.consentB2b && <p className="text-xs text-red-500">{errors.consentB2b.message}</p>}
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <Controller
-                    name="consentAgb"
-                    control={control}
-                    render={({ field }) => (
-                      <input
-                        type="checkbox"
-                        id="agb"
-                        checked={field.value}
-                        onChange={field.onChange}
-                        className="mt-1 h-4 w-4 rounded border-border"
-                      />
-                    )}
-                  />
-                  <div className="space-y-1 leading-none">
-                    <Label htmlFor="agb">Ich habe die AGB zur Kenntnis genommen und akzeptiere diese.</Label>
-                    {errors.consentAgb && <p className="text-xs text-red-500">{errors.consentAgb.message}</p>}
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3">
-                  <Controller
-                    name="consentAvv"
-                    control={control}
-                    render={({ field }) => (
-                      <input
-                        type="checkbox"
-                        id="avv"
-                        checked={field.value}
-                        onChange={field.onChange}
-                        className="mt-1 h-4 w-4 rounded border-border"
-                      />
-                    )}
-                  />
-                  <div className="space-y-1 leading-none">
-                    <Label htmlFor="avv">Ich schließe den Vertrag zur Auftragsverarbeitung (AVV) ab.</Label>
-                    {errors.consentAvv && <p className="text-xs text-red-500">{errors.consentAvv.message}</p>}
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-3 pt-4 border-t border-border">
-                  <Controller
-                    name="consentMarketing"
-                    control={control}
-                    render={({ field }) => (
-                      <input
-                        type="checkbox"
-                        id="marketing"
-                        checked={field.value}
-                        onChange={field.onChange}
-                        className="mt-1 h-4 w-4 rounded border-border"
-                      />
-                    )}
-                  />
-                  <div className="space-y-1 leading-none">
-                    <Label htmlFor="marketing" className="text-muted-foreground">
-                      (Optional) Ich möchte gelegentlich Infos zu Optimierungen erhalten.
+                  <div className="space-y-1 leading-none flex-1">
+                    <Label className="cursor-pointer font-medium block">
+                      Ich bestätige, dass ich ausschließlich gewerblich/selbstständig handle (B2B). *
                     </Label>
+                    <p className="text-xs text-muted-foreground mt-1">Dieser Vertrag gilt ausschließlich für Geschäftskunden.</p>
+                    {errors.consentB2b && <p className="text-xs text-red-500 mt-1">{errors.consentB2b.message}</p>}
+                  </div>
+                </div>
+
+                {/* Checkbox 2: AGB */}
+                <div
+                  onClick={() => setValue("consentAgb", !watch("consentAgb"), { shouldValidate: true })}
+                  className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${watch("consentAgb")
+                    ? 'border-emerald-500/40 bg-emerald-500/5'
+                    : 'border-border bg-card/40 hover:bg-card/80'
+                    }`}
+                >
+                  <input
+                    type="checkbox"
+                    id="agb"
+                    {...register("consentAgb")}
+                    checked={watch("consentAgb")}
+                    readOnly
+                    className="mt-1 h-5 w-5 rounded border-neutral-600 accent-primary pointer-events-none"
+                  />
+                  <div className="space-y-1 leading-none flex-1">
+                    <Label className="cursor-pointer font-medium block">
+                      Ich habe die Allgemeinen Geschäftsbedingungen (AGB) zur Kenntnis genommen und akzeptiere diese. *
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">Das Dokument wird Dir später erneut zugesandt.</p>
+                    {errors.consentAgb && <p className="text-xs text-red-500 mt-1">{errors.consentAgb.message}</p>}
+                  </div>
+                </div>
+
+                {/* Checkbox 3: AVV */}
+                <div
+                  onClick={() => setValue("consentAvv", !watch("consentAvv"), { shouldValidate: true })}
+                  className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${watch("consentAvv")
+                    ? 'border-emerald-500/40 bg-emerald-500/5'
+                    : 'border-border bg-card/40 hover:bg-card/80'
+                    }`}
+                >
+                  <input
+                    type="checkbox"
+                    id="avv"
+                    {...register("consentAvv")}
+                    checked={watch("consentAvv")}
+                    readOnly
+                    className="mt-1 h-5 w-5 rounded border-neutral-600 accent-primary pointer-events-none"
+                  />
+                  <div className="space-y-1 leading-none flex-1">
+                    <Label className="cursor-pointer font-medium block">
+                      Ich schließe den Vertrag zur Auftragsverarbeitung (AVV) ab. *
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">Erforderlich für datenschutzkonformes Website-Hosting.</p>
+                    {errors.consentAvv && <p className="text-xs text-red-500 mt-1">{errors.consentAvv.message}</p>}
+                  </div>
+                </div>
+
+                {/* Checkbox 4: Marketing (Optional) */}
+                <div
+                  onClick={() => setValue("consentMarketing", !watch("consentMarketing"), { shouldValidate: true })}
+                  className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${watch("consentMarketing")
+                    ? 'border-primary/20 bg-primary/5'
+                    : 'border-border bg-card/40 hover:bg-card/80'
+                    }`}
+                >
+                  <input
+                    type="checkbox"
+                    id="marketing"
+                    {...register("consentMarketing")}
+                    checked={watch("consentMarketing")}
+                    readOnly
+                    className="mt-1 h-5 w-5 rounded border-neutral-600 accent-primary pointer-events-none"
+                  />
+                  <div className="space-y-1 leading-none flex-1">
+                    <Label className="cursor-pointer text-muted-foreground block font-medium">
+                      Ich möchte gelegentlich Infos zu Optimierungen und Angeboten erhalten.
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">Erhalten Sie nützliche Tipps zur Webseiten-Optimierung und exklusive Angebote (jederzeit widerrufbar & optional).</p>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-8">
+              <div className="mt-8 pt-4 border-t border-border/40">
                 <Controller
                   name="signatureContractB64"
                   control={control}
@@ -623,8 +794,11 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                 {errors.signatureContractB64 && <p className="text-xs text-red-500 mt-1">{errors.signatureContractB64.message}</p>}
               </div>
 
-              <div className="flex justify-end pt-8">
-                <Button type="submit" size="lg" disabled={isSubmitting} className="w-full md:w-auto">
+              <div className="flex flex-row justify-between items-center gap-4 pt-8 border-t border-border/40">
+                <Button type="button" variant="secondary" size="lg" className="w-full sm:w-auto px-8" onClick={() => setStep(4)}>
+                  ← Zurück
+                </Button>
+                <Button type="submit" size="lg" disabled={isSubmitting || !watch("consentB2b") || !watch("consentAgb") || !watch("consentAvv") || !watch("signatureContractB64") || watch("signatureContractB64").length < 10} className="w-full sm:w-auto px-12 py-6 text-base shadow-lg shadow-primary/20 hover:shadow-primary/30">
                   {isSubmitting ? "Wird verarbeitet..." : "Zahlungspflichtig bestellen"}
                 </Button>
               </div>
@@ -636,3 +810,4 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
     </Card>
   );
 }
+

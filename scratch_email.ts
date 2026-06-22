@@ -15,7 +15,7 @@ async function testEmail() {
   console.log("Sending email via Resend...");
   try {
     const result = await resend.emails.send({
-      from: "Buff <mail@no-reply.buffinteractive.net>",
+      from: "Buff <contracts@no-reply.buffinteractive.net>",
       to: "tona4a+testbuff@gmail.com",
       subject: "Test Email from Buff API",
       html: "<p>This is a test email.</p>"

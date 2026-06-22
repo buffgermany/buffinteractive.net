@@ -83,7 +83,7 @@ Diese Vereinbarung über die Auftragsverarbeitung (nachfolgend „AVV") ist Best
 
 ### § 8 Meldepflicht bei Datenschutzverletzungen
 
-1. Der Auftragsverarbeiter meldet dem Verantwortlichen eine Verletzung des Schutzes personenbezogener Daten (Art. 4 Nr. 12 DSGVO) **unverzüglich und in jedem Fall innerhalb von 24 Stunden** nach Bekanntwerden in Textform (E-Mail oder postalisch).
+1. Der Auftragsverarbeiter meldet dem Verantwortlichen eine Verletzung des Schutzes personenbezogener Daten (Art. 4 Nr. 12 DSGVO) **unverzüglich und in jedem Fall innerhalb von 72 Stunden** nach Bekanntwerden in Textform (E-Mail oder postalisch).
 2. Die Meldung enthält mindestens:
    - Art der Verletzung (soweit feststellbar: Kategorien und ungefähre Anzahl betroffener Personen und Datensätze)
    - Name und Kontaktdaten des Datenschutzbeauftragten oder einer anderen Kontaktperson
