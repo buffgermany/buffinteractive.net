@@ -488,7 +488,10 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                     render={({ field }) => (
                       <SignaturePad
                         label="Unterschrift SEPA-Mandat"
-                        onSave={field.onChange}
+                        onSave={(val) => {
+                          field.onChange(val);
+                          trigger("signatureSepaB64");
+                        }}
                       />
                     )}
                   />
@@ -610,7 +613,10 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                   render={({ field }) => (
                     <SignaturePad
                       label="Rechtsverbindliche Vertragsunterschrift"
-                      onSave={field.onChange}
+                      onSave={(val) => {
+                        field.onChange(val);
+                        trigger("signatureContractB64");
+                      }}
                     />
                   )}
                 />
