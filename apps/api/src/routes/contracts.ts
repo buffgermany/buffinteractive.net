@@ -258,7 +258,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
               {
                 filename: 'logo.png',
                 content: fs.readFileSync(path.join(brandingDir, "buff_interactive.acid-lime_white.png")),
-                cid: 'logo'
+                contentId: 'logo'
               }
             ]
           });

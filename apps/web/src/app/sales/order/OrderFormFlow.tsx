@@ -34,7 +34,7 @@ const formSchema = z.object({
   consentB2b: z.boolean().refine(v => v === true, "B2B-Bestätigung ist erforderlich"),
   consentAgb: z.boolean().refine(v => v === true, "AGB-Zustimmung ist erforderlich"),
   consentAvv: z.boolean().refine(v => v === true, "AVV-Zustimmung ist erforderlich"),
-  consentMarketing: z.boolean().default(false),
+  consentMarketing: z.boolean(),
 
   signatureSepaB64: z.string().min(10, "SEPA-Unterschrift ist erforderlich"),
   signatureContractB64: z.string().min(10, "Vertragsunterschrift ist erforderlich"),
@@ -176,7 +176,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const apiUrl = process.env["NEXT_PUBLIC_API_URL"] || "http://localhost:3001";
       const res = await fetch(`${apiUrl}/v1/contracts/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
