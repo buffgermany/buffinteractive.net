@@ -9,6 +9,7 @@ import { AntiPortfolioSection } from "@/components/products/waas/AntiPortfolioSe
 import { BlueprintFlow } from "@/components/products/waas/BlueprintFlow";
 import { GrowthParadigm } from "@/components/products/waas/GrowthParadigm";
 import { FaqSection } from "@/components/products/waas/FaqSection";
+import { FootnotesSection } from "@/components/buff/FootnotesSection";
 import { BuildCTA } from "@/components/products/waas/BuildCTA";
 
 export const metadata: Metadata = {
@@ -65,6 +66,9 @@ export default async function WaasProductsPage() {
 
       {/* 7. Contact form from /build */}
       <BuildCTA />
+
+      {/* Footnotes */}
+      <FootnotesSection />
     </main>
   );
 }

@@ -34,7 +34,7 @@ const faqs: FaqItem[] = [
   {
     category: "ablauf",
     question: "Wie kann ich Bilder oder Texte für Änderungen einreichen?",
-    answer: "Einfach per WhatsApp oder E-Mail. Du musst dich nie wieder in ein kompliziertes CMS wie WordPress einarbeiten, Plugins updaten oder Angst haben, das Layout zu zerschießen. Schick uns Textfetzen, rohe Bilder oder Sprachnachrichten. Wir schneiden, komprimieren und pflegen alles pixelgenau ein. Du lehnst dich entspannt zurück."
+    answer: "Einfach per E-Mail oder über unseren Support-Kanal. Du musst dich in kein CMS wie WordPress einarbeiten. Wir bitten dich lediglich im Rahmen unserer Fair-Use Policy, Änderungswünsche gebündelt und nachvollziehbar zu liefern (bitte keine unstrukturierten Text-Schnipsel oder fragmentierten Sprachnachrichten). Teile uns strukturiert mit, wo welcher neue vollständige Text hin soll, und wir pflegen ihn pixelgenau für dich ein. Du lehnst dich entspannt zurück."
   },
   {
     category: "ablauf",

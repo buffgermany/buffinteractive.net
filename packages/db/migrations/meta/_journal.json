@@ -22,6 +22,13 @@
       "when": 1780334436301,
       "tag": "0002_free_umar",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782151911787,
+      "tag": "0003_past_yellow_claw",
+      "breakpoints": true
     }
   ]
 }

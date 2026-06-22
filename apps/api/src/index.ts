@@ -7,6 +7,7 @@ import { stripeWebhook } from "./routes/webhooks/stripe.js";
 import { licenseConnect } from "./routes/license/connect.js";
 import { adminLicenseRoutes } from "./routes/admin/licenses.js";
 import { leadsRoutes } from "./routes/leads.js";
+import { contractsRoutes } from "./routes/contracts.js";
 
 // ============================================================
 // API Engine — ElysiaJS on Bun
@@ -65,6 +66,7 @@ const app = new Elysia()
 
   // ---- Public / Contact Routes ----
   .use(leadsRoutes)
+  .use(contractsRoutes)
 
   // ---- Global error handler ----
   .onError(({ code, error, set }) => {

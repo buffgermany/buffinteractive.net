@@ -13,7 +13,7 @@ interface PricingCardProps {
   period: string;
   setupFee: string;
   desc: string;
-  features: string[];
+  features: (string | React.ReactNode)[];
   specialFeature?: string;
   cta: string;
   isPopular?: boolean;
@@ -301,13 +301,14 @@ export function GrowthParadigm() {
     "Optimiert für Handys & Tablets",
     "Premium Hosting & SSL-Sicherheit",
     "Einfache Updates inklusive (Texte/Bilder)",
-    "Google Maps & lokale SEO-Basics"
+    "Lokale SEO-Basics"
   ];
 
   const tier2Features = [
     "Mehrseitige Website (bis zu 5 Seiten)",
+    "Integration Google Maps",
     "Kompletter DSGVO-Schutz & Cookie-Banner",
-    "Unbegrenzte Änderungen (Bilder & Texte)",
+    <span key="changes">Unbegrenzte Änderungen (Bilder & Texte)<sup className="text-[0.6em] ml-0.5 text-white/50">3</sup></span>,
     "Aktive Google & Suchmaschinen-Optimierung",
     "WhatsApp- & E-Mail-Direktsupport",
     "Inklusive Domain- & E-Mail-Einrichtung"
@@ -443,7 +444,7 @@ export function GrowthParadigm() {
                       name="Essential"
                       price={billingInterval === 'monthly' ? "75 €" : "71.25 €"}
                       period="/ Monat"
-                      setupFee={billingInterval === 'monthly' ? "zzgl. 359,99 € Einmalgebühr" : "zzgl. 229,99 € Einmalgebühr (bei jährlicher Zahlung)"}
+                      setupFee={billingInterval === 'monthly' ? "zzgl. 359,99 € Einmalgebühr" : "zzgl. 359,99 € Einmalgebühr (bei jährlicher Zahlung)"}
                       desc="Der perfekte Einstieg für dein lokales Geschäft, deine Praxis oder dein Restaurant."
                       features={tier1Features}
                       cta="Mit Essential starten"
@@ -610,7 +611,7 @@ export function GrowthParadigm() {
                     name="Essential"
                     price={billingInterval === 'monthly' ? "75 €" : "71.25 €"}
                     period="/ Monat"
-                    setupFee={billingInterval === 'monthly' ? "zzgl. 359,99 € Einmalgebühr" : "zzgl. 229,99 € Einmalgebühr (bei jährlicher Zahlung)"}
+                    setupFee={billingInterval === 'monthly' ? "zzgl. 359,99 € Einmalgebühr" : "zzgl. 359,99 € Einmalgebühr (bei jährlicher Zahlung)"}
                     desc="Der perfekte Einstieg für dein lokales Geschäft, deine Praxis oder dein Restaurant."
                     features={tier1Features}
                     cta="Mit Essential starten"
