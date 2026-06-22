@@ -48,13 +48,15 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           finalSalesUserId = firstUser.id;
         } else {
           // If no users at all, create a dev user to satisfy foreign key constraint
-          const [newDevUser] = await db.insert(users).values({
+          const insertedUsers = await db.insert(users).values({
             id: salesUserId,
             name: "Dev User",
             email: "dev@buffinteractive.net",
             role: "admin"
           }).returning();
-          finalSalesUserId = newDevUser.id;
+          if (insertedUsers[0]) {
+            finalSalesUserId = insertedUsers[0].id;
+          }
         }
       }
 
