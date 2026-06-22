@@ -8,24 +8,41 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Admin — Platform" };
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminOverviewPage() {
-  const [
-    totalUsers,
-    totalOrders,
-    totalLicenses,
-    activeLicenses,
-    recentOrders,
-  ] = await Promise.all([
-    db.select({ count: sql<number>`count(*)` }).from(schema.users),
-    db.select({ count: sql<number>`count(*)`, revenue: sql<number>`coalesce(sum(amount_cents), 0)` }).from(schema.orders).where(eq(schema.orders.status, "paid")),
-    db.select({ count: sql<number>`count(*)` }).from(schema.licenses),
-    db.select({ count: sql<number>`count(*)` }).from(schema.licenses).where(eq(schema.licenses.status, "active")),
-    db.select({ order: schema.orders, user: schema.users })
-      .from(schema.orders)
-      .innerJoin(schema.users, eq(schema.orders.userId, schema.users.id))
-      .orderBy(desc(schema.orders.createdAt))
-      .limit(8),
-  ]);
+  let totalUsers = [{ count: 0 }];
+  let totalOrders = [{ count: 0, revenue: 0 }];
+  let totalLicenses = [{ count: 0 }];
+  let activeLicenses = [{ count: 0 }];
+  let recentOrders: any[] = [];
+
+  try {
+    const [
+      u,
+      o,
+      l,
+      a,
+      r,
+    ] = await Promise.all([
+      db.select({ count: sql<number>`count(*)` }).from(schema.users),
+      db.select({ count: sql<number>`count(*)`, revenue: sql<number>`coalesce(sum(amount_cents), 0)` }).from(schema.orders).where(eq(schema.orders.status, "paid")),
+      db.select({ count: sql<number>`count(*)` }).from(schema.licenses),
+      db.select({ count: sql<number>`count(*)` }).from(schema.licenses).where(eq(schema.licenses.status, "active")),
+      db.select({ order: schema.orders, user: schema.users })
+        .from(schema.orders)
+        .innerJoin(schema.users, eq(schema.orders.userId, schema.users.id))
+        .orderBy(desc(schema.orders.createdAt))
+        .limit(8),
+    ]);
+    totalUsers = u;
+    totalOrders = o;
+    totalLicenses = l;
+    activeLicenses = a;
+    recentOrders = r;
+  } catch (error) {
+    console.error("Failed to load admin overview metrics:", error);
+  }
 
   const stats = [
     {

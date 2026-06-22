@@ -3,6 +3,7 @@ import { AdminLicensesClient } from "@/components/admin/licenses-client";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Licenses — Admin" };
+export const dynamic = "force-dynamic";
 
 export default async function AdminLicensesPage() {
   let licenses: typeof schema.licenses.$inferSelect[] = [];

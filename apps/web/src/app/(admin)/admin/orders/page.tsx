@@ -3,6 +3,7 @@ import { AdminOrdersClient } from "@/components/admin/orders-client";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Orders — Admin" };
+export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage() {
   let orders: any[] = [];

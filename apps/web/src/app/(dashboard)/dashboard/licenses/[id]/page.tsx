@@ -10,6 +10,7 @@ import type { Metadata } from "next";
 interface PageProps { params: Promise<{ id: string }> }
 
 export const metadata: Metadata = { title: "License Detail — Platform" };
+export const dynamic = "force-dynamic";
 
 const STATUS_BADGE: Record<string, "success" | "destructive" | "warning" | "secondary"> = {
   active: "success", suspended: "warning", expired: "secondary", revoked: "destructive",

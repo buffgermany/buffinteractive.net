@@ -9,18 +9,23 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const [product] = await db
-    .select()
-    .from(schema.products)
-    .where(eq(schema.products.slug, slug))
-    .limit(1);
+  try {
+    const [product] = await db
+      .select()
+      .from(schema.products)
+      .where(eq(schema.products.slug, slug))
+      .limit(1);
 
-  if (!product) return { title: "Product not found" };
+    if (!product) return { title: "Product not found" };
 
-  return {
-    title: `${product.name} — Platform`,
-    description: product.shortDescription ?? product.description,
-  };
+    return {
+      title: `${product.name} — Platform`,
+      description: product.shortDescription ?? product.description,
+    };
+  } catch (error) {
+    console.error("Failed to generate metadata for product slug:", slug, error);
+    return { title: "Product — Platform" };
+  }
 }
 
 export default async function ProductPage({ params }: PageProps) {

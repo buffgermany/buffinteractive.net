@@ -3,6 +3,7 @@ import { AdminProductsClient } from "@/components/admin/products-client";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Products — Admin" };
+export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
   let products: typeof schema.products.$inferSelect[] = [];

@@ -8,6 +8,7 @@ import { formatDate } from "@/lib/utils";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Downloads — Platform" };
+export const dynamic = "force-dynamic";
 
 export default async function DownloadsPage() {
   const session = await auth.api.getSession({ headers: await headers() });

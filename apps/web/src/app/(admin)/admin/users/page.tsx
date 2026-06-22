@@ -3,6 +3,7 @@ import { AdminUsersClient } from "@/components/admin/users-client";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Users — Admin" };
+export const dynamic = "force-dynamic";
 
 export default async function AdminUsersPage() {
   let users: typeof schema.users.$inferSelect[] = [];

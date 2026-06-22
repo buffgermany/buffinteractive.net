@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: "Your licenses, orders and assets in one place.",
 };
 
+export const dynamic = "force-dynamic";
+
 async function DashboardData({ userId }: { userId: string }) {
   const [userOrders, userLicenses] = await Promise.all([
     db.select().from(schema.orders)
