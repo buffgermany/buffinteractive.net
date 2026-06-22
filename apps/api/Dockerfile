@@ -18,6 +18,8 @@ COPY packages/db/ ./packages/db/
 COPY packages/client-sdk/ ./packages/client-sdk/
 COPY apps/api/ ./apps/api/
 COPY tsconfig.base.json ./
+COPY legal/ ./legal/
+COPY apps/web/public/branding/ ./branding/
 
 # Build a single compiled binary for production
 WORKDIR /app/apps/api
@@ -30,8 +32,10 @@ WORKDIR /app
 # Install wget for health checks
 RUN apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/*
 
-# Copy the compiled binary
+# Copy the compiled binary and legal/branding files
 COPY --from=base /app/dist/api ./api
+COPY --from=base /app/legal ./legal
+COPY --from=base /app/branding ./branding
 
 EXPOSE 3001
 

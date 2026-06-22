@@ -16,19 +16,26 @@ export default async function SalesOrderPage() {
     redirect("/auth");
   }
 
-  const legalDir = path.join(process.cwd(), "..", "..", "legal");
-  
-  let termsContent = "AGB konnten nicht geladen werden.";
-  let avvContent = "AVV konnte nicht geladen werden.";
-  let sepaContent = "SEPA-Mandat konnte nicht geladen werden.";
-
-  try {
-    termsContent = fs.readFileSync(path.join(legalDir, "terms.md"), "utf8");
-    avvContent = fs.readFileSync(path.join(legalDir, "avv.md"), "utf8");
-    sepaContent = fs.readFileSync(path.join(legalDir, "sepa_mandat.md"), "utf8");
-  } catch (err) {
-    console.error("Failed to read legal documents", err);
+  function readLegalFile(filename: string): string {
+    const paths = [
+      path.join(process.cwd(), "legal", filename),
+      path.join(process.cwd(), "..", "..", "legal", filename),
+    ];
+    for (const p of paths) {
+      try {
+        if (fs.existsSync(p)) {
+          return fs.readFileSync(p, "utf8");
+        }
+      } catch (e) {
+        // ignore and try next
+      }
+    }
+    return `${filename} konnte nicht geladen werden.`;
   }
+
+  const termsContent = readLegalFile("terms.md");
+  const avvContent = readLegalFile("avv.md");
+  const sepaContent = readLegalFile("sepa_mandat.md");
 
   return (
     <div className="w-full max-w-4xl mx-auto">

@@ -24,6 +24,40 @@ const fonts = {
 };
 pdfmake.setFonts(fonts);
 
+function readLegalFile(filename: string): string {
+  const paths = [
+    path.join(process.cwd(), "legal", filename),
+    path.join(process.cwd(), "..", "..", "legal", filename),
+  ];
+  for (const p of paths) {
+    try {
+      if (fs.existsSync(p)) {
+        return fs.readFileSync(p, "utf8");
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+  return "";
+}
+
+function getBrandingPath(filename: string): string {
+  const paths = [
+    path.join(process.cwd(), "branding", filename),
+    path.join(process.cwd(), "..", "web", "public", "branding", filename),
+  ];
+  for (const p of paths) {
+    try {
+      if (fs.existsSync(p)) {
+        return p;
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+  return path.join(process.cwd(), "branding", filename);
+}
+
 export const contractsRoutes = new Elysia({ prefix: "/v1" })
   .use(dbPlugin)
   .post(
@@ -66,22 +100,17 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
       const signedAt = new Date();
 
       // Load legal texts from legal directory
-      const legalDir = path.join(process.cwd(), "..", "..", "legal");
-      let termsMd = "";
-      let avvMd = "";
-      try {
-        termsMd = fs.readFileSync(path.join(legalDir, "terms.md"), "utf8");
-        avvMd = fs.readFileSync(path.join(legalDir, "avv.md"), "utf8");
-      } catch (err) {
-        console.error("[contracts] Failed to read legal files for PDF:", err);
-      }
+      const termsMd = readLegalFile("terms.md");
+      const avvMd = readLegalFile("avv.md");
 
       // Load branding logo PNG
-      const brandingDir = path.join(process.cwd(), "..", "web", "public", "branding");
       let logoDataUrl = "";
       try {
-        const logoBuffer = fs.readFileSync(path.join(brandingDir, "buff_interactive.acid-lime_white.png"));
-        logoDataUrl = `data:image/png;base64,${logoBuffer.toString("base64")}`;
+        const logoPath = getBrandingPath("buff_interactive.acid-lime_white.png");
+        if (fs.existsSync(logoPath)) {
+          const logoBuffer = fs.readFileSync(logoPath);
+          logoDataUrl = `data:image/png;base64,${logoBuffer.toString("base64")}`;
+        }
       } catch (err) {
         console.error("[contracts] Failed to read branding logo PNG:", err);
       }
@@ -257,7 +286,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
               },
               {
                 filename: 'logo.png',
-                content: fs.readFileSync(path.join(brandingDir, "buff_interactive.acid-lime_white.png")),
+                content: fs.readFileSync(getBrandingPath("buff_interactive.acid-lime_white.png")),
                 contentId: 'logo'
               }
             ]
