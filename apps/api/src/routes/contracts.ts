@@ -64,6 +64,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
   .post(
     "/contracts/generate",
     async ({ db, body, headers, request, set }) => {
+      try {
       const {
         tarif, zahlungsrhythmus, setupPreisBrutto, laufendPreisBrutto,
         firma, ansprechpartner, strasse, plz, ort, email, telefon, ustId,
@@ -347,6 +348,14 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
         success: true,
         contractId: newContract?.id
       };
+      } catch (globalError) {
+        console.error("[contracts] ❌ Critical unhandled error in /generate:", globalError);
+        set.status = 500;
+        return {
+          success: false,
+          error: "Ein unerwarteter Serverfehler ist aufgetreten (Fehler bei der Vertragserstellung). Bitte den Support kontaktieren."
+        };
+      }
     },
     {
       body: t.Object({
