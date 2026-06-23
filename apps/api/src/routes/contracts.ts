@@ -256,42 +256,53 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
 
         // 3. Send email with PDF attachment
         const resend = getResend();
-        if (resend) {
-          try {
-            const pdfBuffer = fs.readFileSync(pdfPath);
-            const emailAttachments: any[] = [
-              {
-                filename: 'Vertrag_Buff_Interactive.pdf',
-                content: pdfBuffer,
-              }
-            ];
+        if (!resend) {
+          console.error("[contracts] ❌ RESEND_API_KEY is not set.");
+          if (newContract) {
+            await db.delete(contracts).where(eq(contracts.id, newContract.id));
+          }
+          set.status = 500;
+          return {
+            success: false,
+            error: "E-Mail-Server ist nicht konfiguriert (API Key fehlt). Bitte den Support kontaktieren."
+          };
+        }
 
-            try {
-              const logoPath = getBrandingPath("buff_interactive.acid-lime_white.png");
-              if (fs.existsSync(logoPath)) {
-                emailAttachments.push({
-                  filename: 'logo.png',
-                  content: fs.readFileSync(logoPath),
-                  contentId: 'logo'
-                });
-              }
-            } catch (e) {
-              console.error("[contracts] Could not attach logo, continuing without it.", e);
+        try {
+          const pdfBuffer = fs.readFileSync(pdfPath);
+          const emailAttachments: any[] = [
+            {
+              filename: 'Vertrag_Buff_Interactive.pdf',
+              content: pdfBuffer,
             }
+          ];
 
-            const { data, error } = await resend.emails.send({
-              from: "Buff <contracts@no-reply.buffinteractive.net>",
-              to: email,
-              bcc: process.env["ADMIN_EMAIL"] || "hello@flxk.nz",
-              subject: `Ihre Vertragsunterlagen - Buff Interactive`,
-              html: `
+          try {
+            const logoPath = getBrandingPath("buff_interactive.acid-lime_white.png");
+            if (fs.existsSync(logoPath)) {
+              emailAttachments.push({
+                filename: 'logo.png',
+                content: fs.readFileSync(logoPath),
+                contentId: 'logo'
+              });
+            }
+          } catch (e) {
+            console.error("[contracts] Could not attach logo, continuing without it.", e);
+          }
+
+          const { data, error } = await resend.emails.send({
+            from: "Buff <contracts@no-reply.buffinteractive.net>",
+            to: email,
+            bcc: process.env["ADMIN_EMAIL"] || "hello@flxk.nz",
+            subject: `Willkommen bei Buff | Deine Vertragsunterlagen`,
+            html: `
                 <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0a0a0a; color: #F5F5F7; padding: 60px 0; width: 100%; text-align: center;">
                   <div style="max-width: 560px; margin: 0 auto; background-color: #000000; padding: 0 20px; text-align: left;">
                     <div style="margin-bottom: 48px;">
                       <img src="cid:logo" style="height: 28px; display: block;" alt="Buff Interactive" />
                     </div>
                     <h1 style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 16px 0; color: #FFFFFF;">
-                      Willkommen bei Buff.
+                      Willkommen bei Buff
                     </h1>
                     <p style="font-size: 16px; line-height: 1.6; color: #A1A1A6; margin: 0 0 8px 0;">
                       Hallo ${ansprechpartner},
@@ -333,40 +344,39 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
                   </div>
                 </div>
               `,
-              attachments: emailAttachments
-            });
+            attachments: emailAttachments
+          });
 
-            if (error) {
-              console.error("[contracts] ❌ Failed to send email (Resend API Error):", error);
-              if (newContract) {
-                await db.delete(contracts).where(eq(contracts.id, newContract.id));
-              }
-              set.status = 400;
-              return {
-                success: false,
-                error: "E-Mail konnte nicht versendet werden. Bitte prüfe die E-Mail-Adresse."
-              };
-            } else {
-              console.log("[contracts] 📧 Email sent successfully via Resend:", data);
-              // update db to mark email as sent
-              if (newContract) {
-                await db
-                  .update(contracts)
-                  .set({ emailSentAt: new Date() })
-                  .where(eq(contracts.id, newContract.id));
-              }
-            }
-          } catch (err) {
-            console.error("[contracts] ❌ Failed to send email:", err);
+          if (error) {
+            console.error("[contracts] ❌ Failed to send email (Resend API Error):", error);
             if (newContract) {
               await db.delete(contracts).where(eq(contracts.id, newContract.id));
             }
-            set.status = 500;
+            set.status = 400;
             return {
               success: false,
-              error: "Interner Fehler beim E-Mail-Versand."
+              error: "E-Mail konnte nicht versendet werden. Bitte prüfe die E-Mail-Adresse."
             };
+          } else {
+            console.log("[contracts] 📧 Email sent successfully via Resend:", data);
+            // update db to mark email as sent
+            if (newContract) {
+              await db
+                .update(contracts)
+                .set({ emailSentAt: new Date() })
+                .where(eq(contracts.id, newContract.id));
+            }
           }
+        } catch (err) {
+          console.error("[contracts] ❌ Failed to send email:", err);
+          if (newContract) {
+            await db.delete(contracts).where(eq(contracts.id, newContract.id));
+          }
+          set.status = 500;
+          return {
+            success: false,
+            error: "Interner Fehler beim E-Mail-Versand."
+          };
         }
 
         return {

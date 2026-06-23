@@ -386,11 +386,11 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                 {["essential", "growth", "enterprise"].map((t) => {
                   let priceInfo = "";
                   if (t === "essential") {
-                    priceInfo = `Setup: ${formatPrice(359.99)} | Laufend: ${formatPrice(75.00)} / Monat (oder ${formatPrice(71.25)} / Monat bei jährlicher Zahlung)`;
+                    priceInfo = `Einmalgebühr: ${formatPrice(359.99)} | Laufende Gebühr: ${formatPrice(75.00)} / Monat (oder ${formatPrice(71.25)} / Monat bei jährlicher Zahlung)`;
                   } else if (t === "growth") {
-                    priceInfo = `Setup: ${formatPrice(379.99)} | Laufend: ${formatPrice(89.00)} / Monat (oder ${formatPrice(84.55)} / Monat bei jährlicher Zahlung)`;
+                    priceInfo = `Einmalgebühr: ${formatPrice(379.99)} | Laufende Gebühr: ${formatPrice(89.00)} / Monat (oder ${formatPrice(84.55)} / Monat bei jährlicher Zahlung)`;
                   } else {
-                    priceInfo = "Setup-Gebühr & monatliche Pauschale individuell verhandelbar";
+                    priceInfo = "Einmalgebühr & Laufende Gebühr individuell verhandelbar";
                   }
                   return (
                     <div
@@ -435,11 +435,11 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
               {currentTarif === "enterprise" && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-muted/50 p-6 rounded-xl mt-4 border border-border">
                   <div className="space-y-2">
-                    <Label required>Individueller Setup-Preis (inkl. MwSt., einmalig in €)</Label>
+                    <Label required>Individuelle Einmalgebühr (inkl. MwSt., einmalig in €)</Label>
                     <Input type="number" step="0.01" {...register("setupPreisBrutto", { valueAsNumber: true })} error={errors.setupPreisBrutto?.message} />
                   </div>
                   <div className="space-y-2">
-                    <Label required>Individuelle Laufzeit-Gebühr (inkl. MwSt., laufend in €)</Label>
+                    <Label required>Individuelle Laufende Gebühr (inkl. MwSt., laufend in €)</Label>
                     <Input type="number" step="0.01" {...register("laufendPreisBrutto", { valueAsNumber: true })} error={errors.laufendPreisBrutto?.message} />
                   </div>
                 </div>
@@ -666,14 +666,14 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                   Dein neuer Tarif wird: {currentTarif.charAt(0).toUpperCase() + currentTarif.slice(1).toLowerCase()}                </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-sm">
                   <div className="bg-background/40 p-4 rounded-lg border border-border">
-                    <span className="text-xs text-muted-foreground block uppercase font-semibold">Einmalige Einrichtungsgebühr</span>
+                    <span className="text-xs text-muted-foreground block uppercase font-semibold">Einmalgebühr</span>
                     <span className="text-xl font-bold text-foreground">{formatPrice(watch("setupPreisBrutto"))}</span>
                     <span className="text-[10px] text-muted-foreground block mt-1">Inkl. 19% MwSt.</span>
                   </div>
                   <div className="bg-background/40 p-4 rounded-lg border border-border">
                     <span className="text-xs text-muted-foreground block uppercase font-semibold">Laufende Gebühr</span>
                     <span className="text-xl font-bold text-foreground">{formatPrice(watch("laufendPreisBrutto"))}</span>
-                    <span className="text-[10px] text-muted-foreground block mt-1">{currentZahlungsrhythmus.charAt(0).toUpperCase() + currentZahlungsrhythmus.slice(1).toLowerCase()}, inkl. 19% MwSt.</span>
+                    <span className="text-[10px] text-muted-foreground block mt-1">{currentZahlungsrhythmus === "jaehrlich" ? "Jährlich" : "Monatlich"}, inkl. 19% MwSt.</span>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">

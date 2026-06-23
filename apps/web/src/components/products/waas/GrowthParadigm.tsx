@@ -506,7 +506,7 @@ export function GrowthParadigm() {
                       name="Enterprise"
                       price="Individuell"
                       period=""
-                      setupFee="Einmaliges Setup nach Aufwand"
+                      setupFee="Einmalgebühr nach Aufwand"
                       desc="Für größere Betriebe, Gemeinschaftspraxen und anspruchsvolle Sonderwünsche."
                       features={tier3Features}
                       specialFeature="Alles von Growth"
@@ -655,7 +655,7 @@ export function GrowthParadigm() {
                     name="Enterprise"
                     price="Individuell"
                     period=""
-                    setupFee="Einmaliges Setup nach Aufwand"
+                    setupFee="Einmalgebühr nach Aufwand"
                     desc="Für größere Betriebe, Gemeinschaftspraxen und anspruchsvolle Sonderwünsche."
                     features={tier3Features}
                     specialFeature="Alles von Growth"
