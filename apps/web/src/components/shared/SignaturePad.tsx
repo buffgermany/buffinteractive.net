@@ -13,6 +13,11 @@ export function SignaturePad({ onSave, label = "Ihre Unterschrift" }: SignatureP
   const sigCanvas = useRef<SignatureCanvas>(null);
   const [isEmpty, setIsEmpty] = useState(true);
 
+  const onSaveRef = useRef(onSave);
+  useEffect(() => {
+    onSaveRef.current = onSave;
+  }, [onSave]);
+
   // Set internal resolution of the canvas to match its displayed offset size.
   // This is required to prevent coordinate offset and blurry drawings.
   useEffect(() => {
@@ -34,11 +39,11 @@ export function SignaturePad({ onSave, label = "Ihre Unterschrift" }: SignatureP
               sigCanvas.current?.fromData(strokes);
               setIsEmpty(false);
               // Recalculate signature image URL with new size
-              onSave(sigCanvas.current?.getTrimmedCanvas().toDataURL("image/png") || null);
+              onSaveRef.current(sigCanvas.current?.getCanvas().toDataURL("image/png") || null);
             } else {
               setIsEmpty(true);
               if (!wasEmpty) {
-                onSave(null);
+                onSaveRef.current(null);
               }
             }
           }
@@ -49,22 +54,22 @@ export function SignaturePad({ onSave, label = "Ihre Unterschrift" }: SignatureP
       window.addEventListener("resize", resizeCanvas);
       return () => window.removeEventListener("resize", resizeCanvas);
     }
-  }, [onSave]);
+  }, []); // Run only once on mount to prevent infinite resize loops
 
   const handleClear = () => {
     sigCanvas.current?.clear();
     setIsEmpty(true);
-    onSave(null);
+    onSaveRef.current(null);
   };
 
   const handleEnd = () => {
     if (sigCanvas.current?.isEmpty()) {
       setIsEmpty(true);
-      onSave(null);
+      onSaveRef.current(null);
     } else {
       setIsEmpty(false);
-      // Generate standard PNG base64
-      onSave(sigCanvas.current?.getTrimmedCanvas().toDataURL("image/png") || null);
+      // Generate standard PNG base64, avoiding getTrimmedCanvas() which can fail in production
+      onSaveRef.current(sigCanvas.current?.getCanvas().toDataURL("image/png") || null);
     }
   };
 
