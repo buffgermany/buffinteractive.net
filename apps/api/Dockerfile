@@ -37,6 +37,9 @@ COPY --from=base /app/dist/api ./api
 COPY --from=base /app/legal ./legal
 COPY --from=base /app/branding ./branding
 
+# Copy pdfkit standard font metrics which are loaded dynamically at runtime by the compiled binary
+COPY --from=base /app/node_modules/pdfkit/js/data /app/node_modules/pdfkit/js/data
+
 EXPOSE 3001
 
 # Run the compiled binary directly — no Node.js or Bun runtime needed
