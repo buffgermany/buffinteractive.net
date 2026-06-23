@@ -63,7 +63,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
   .use(dbPlugin)
   .post(
     "/contracts/generate",
-    async ({ db, body, headers, request }) => {
+    async ({ db, body, headers, request, set }) => {
       const {
         tarif, zahlungsrhythmus, setupPreisBrutto, laufendPreisBrutto,
         firma, ansprechpartner, strasse, plz, ort, email, telefon, ustId,
@@ -312,6 +312,14 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
 
           if (error) {
             console.error("[contracts] ❌ Failed to send email (Resend API Error):", error);
+            if (newContract) {
+              await db.delete(contracts).where(eq(contracts.id, newContract.id));
+            }
+            set.status = 400;
+            return {
+              success: false,
+              error: "E-Mail konnte nicht versendet werden. Bitte prüfe die E-Mail-Adresse."
+            };
           } else {
             console.log("[contracts] 📧 Email sent successfully via Resend:", data);
             // update db to mark email as sent
@@ -324,6 +332,14 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           }
         } catch (err) {
           console.error("[contracts] ❌ Failed to send email:", err);
+          if (newContract) {
+            await db.delete(contracts).where(eq(contracts.id, newContract.id));
+          }
+          set.status = 500;
+          return {
+            success: false,
+            error: "Interner Fehler beim E-Mail-Versand."
+          };
         }
       }
 

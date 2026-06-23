@@ -286,7 +286,12 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
       if (res.ok) {
         setSuccess(true);
       } else {
-        alert("Ein Fehler ist aufgetreten. Bitte prüfe die Verbindung.");
+        try {
+          const json = await res.json();
+          alert(json.error || "Ein Fehler ist aufgetreten. Bitte prüfe die Verbindung.");
+        } catch (e) {
+          alert("Ein Fehler ist aufgetreten. Bitte prüfe die Verbindung.");
+        }
       }
     } catch (err) {
       console.error(err);
