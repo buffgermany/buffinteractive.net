@@ -9,7 +9,7 @@ import type { App } from "@platform/api";
 // Server Actions, and API Route Handlers.
 // ============================================================
 
-const API_URL = process.env["NEXT_PUBLIC_API_URL"] ?? "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 export const api: ReturnType<typeof treaty<App>> = treaty<App>(API_URL, {
   fetch: {

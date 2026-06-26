@@ -26,6 +26,7 @@ export const contracts = pgTable("contracts", {
 
   // Kundendaten
   firma: text("firma").notNull(),
+  rechtsform: text("rechtsform").notNull().default(""),
   ansprechpartner: text("ansprechpartner").notNull(),
   strasse: text("strasse").notNull(),
   plz: text("plz").notNull(),

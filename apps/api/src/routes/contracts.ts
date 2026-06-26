@@ -67,7 +67,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
       try {
         const {
           tarif, zahlungsrhythmus, setupPreisBrutto, laufendPreisBrutto,
-          firma, ansprechpartner, strasse, plz, ort, email, telefon, ustId,
+          firma, rechtsform, ansprechpartner, strasse, plz, ort, email, telefon, ustId,
           iban, bic, bank, kontoinhaber,
           consentB2b, consentAgb, consentAvv, consentMarketing,
           signatureSepaB64, signatureContractB64,
@@ -150,6 +150,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
                 widths: ['30%', '70%'],
                 body: [
                   ['Firma', firma],
+                  ['Rechtsform', rechtsform],
                   ['Ansprechpartner', ansprechpartner],
                   ['Straße, Hausnummer', strasse],
                   ['PLZ, Ort', `${plz} ${ort}`],
@@ -236,7 +237,13 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             zahlungsrhythmus: zahlungsrhythmus as any,
             setupPreisBrutto: String(setupPreisBrutto),
             laufendPreisBrutto: String(laufendPreisBrutto),
-            firma, ansprechpartner, strasse, plz, ort, email,
+            firma,
+            rechtsform,
+            ansprechpartner,
+            strasse,
+            plz,
+            ort,
+            email,
             telefon: telefon || null,
             ustId: ustId || null,
             iban,
@@ -308,7 +315,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
                       Hallo ${ansprechpartner},
                     </p>
                     <p style="font-size: 16px; line-height: 1.6; color: #A1A1A6; margin: 0 0 32px 0;">
-                      vielen Dank für Dein Vertrauen. Wir freuen uns sehr auf die Zusammenarbeit mit <strong style="color: #F5F5F7; font-weight: 600;">${firma}</strong>. Anbei erhältst Du Dein rechtskräftig unterzeichnetes WaaS-Bestellformular als PDF.
+                      vielen Dank für Dein Vertrauen. Wir freuen uns sehr auf die Zusammenarbeit mit <strong style="color: #F5F5F7; font-weight: 600;">${firma}</strong>. Anbei erhältst Du Dein rechtskräftig unterzeichnetes Bestellformular und alle Vertragsdokumente als PDF.
                     </p>
                 
                     <div style="background-color: #111111; border-radius: 16px; padding: 24px; margin-bottom: 40px;">
@@ -399,6 +406,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
         setupPreisBrutto: t.Numeric(),
         laufendPreisBrutto: t.Numeric(),
         firma: t.String(),
+        rechtsform: t.String(),
         ansprechpartner: t.String(),
         strasse: t.String(),
         plz: t.String(),

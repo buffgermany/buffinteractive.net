@@ -69,12 +69,13 @@ const app = new Elysia()
   .use(contractsRoutes)
 
   // ---- Global error handler ----
-  .onError(({ code, error, set }) => {
-    console.error(`[API Error] ${code}:`, error);
+  .onError(({ code, error, set, request }) => {
+    const url = new URL(request.url);
+    console.error(`[API Error] ${code} on ${request.method} ${url.pathname}${url.search}:`, error);
 
     if (code === "NOT_FOUND") {
       set.status = 404;
-      return { error: "Route not found" };
+      return { error: `Route not found: ${request.method} ${url.pathname}` };
     }
     if (code === "VALIDATION") {
       set.status = 422;

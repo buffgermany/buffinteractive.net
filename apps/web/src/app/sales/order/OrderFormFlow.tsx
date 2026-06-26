@@ -10,6 +10,7 @@ import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDes
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CheckCircle2, FileText, User, CreditCard, PenTool, ArrowLeft, ArrowRight, Heart } from "lucide-react";
+import { validateIBAN } from "@/lib/utils";
 
 const formSchema = z.object({
   tarif: z.enum(["essential", "growth", "enterprise"]),
@@ -18,6 +19,7 @@ const formSchema = z.object({
   laufendPreisBrutto: z.number().min(0, "Laufende Gebühr muss mindestens 0 sein"),
 
   firma: z.string().min(2, "Firma ist erforderlich"),
+  rechtsform: z.string().min(1, "Rechtsform ist erforderlich"),
   ansprechpartner: z.string().min(2, "Ansprechpartner ist erforderlich"),
   strasse: z.string().min(2, "Straße & Hausnummer ist erforderlich"),
   plz: z.string().min(4, "Ungültige PLZ"),
@@ -26,7 +28,9 @@ const formSchema = z.object({
   telefon: z.string().optional(),
   ustId: z.string().optional(),
 
-  iban: z.string().min(15, "IBAN muss mindestens 15 Zeichen lang sein"),
+  iban: z.string().refine((val) => validateIBAN(val), {
+    message: "Ungültige IBAN. Bitte überprüfe das Format und die Prüfziffer.",
+  }),
   bic: z.string().optional(),
   bank: z.string().optional(),
   kontoinhaber: z.string().optional(),
@@ -210,6 +214,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
       setupPreisBrutto: 379.99,
       laufendPreisBrutto: 89.00,
       firma: "",
+      rechtsform: "",
       ansprechpartner: "",
       strasse: "",
       plz: "",
@@ -257,7 +262,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
     if (step === 0) {
       fieldsToValidate = ["tarif", "zahlungsrhythmus", "setupPreisBrutto", "laufendPreisBrutto"];
     } else if (step === 1) {
-      fieldsToValidate = ["firma", "ansprechpartner", "strasse", "plz", "ort", "email"];
+      fieldsToValidate = ["firma", "rechtsform", "ansprechpartner", "strasse", "plz", "ort", "email"];
     } else if (step === 4) {
       fieldsToValidate = ["iban", "signatureSepaB64"];
     }
@@ -273,7 +278,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      const apiUrl = process.env["NEXT_PUBLIC_API_URL"] || "http://localhost:3001";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
       const res = await fetch(`${apiUrl}/v1/contracts/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -353,21 +358,22 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="text-xl flex items-center gap-2">
-                {step === 0 ? "Tarif-Konfiguration" : `Schritt ${step} von 5`}
+                {step === 0 ? "Tarif-Konfiguration" : `Schritt ${step} von 6`}
               </CardTitle>
               <CardDescription className="mt-1 text-xs">
                 {step === 1 && "Bitte trag Deine Firmendaten ein."}
                 {step === 2 && "Bitte lies und bestätige die AGB."}
                 {step === 3 && "Bitte lies und bestätige den AVV."}
                 {step === 4 && "Bitte erteile uns Dein SEPA-Lastschriftmandat."}
-                {step === 5 && "Bitte prüfe Deine Angaben und unterschreibe."}
+                {step === 5 && "Bitte prüfe Deine Angaben auf Fehler."}
+                {step === 6 && "Bitte bestätige Deine Zustimmung und unterschreibe."}
               </CardDescription>
             </div>
           </div>
 
           {step > 0 && (
             <div className="flex items-center w-full gap-2 pt-2">
-              {[1, 2, 3, 4, 5].map((s) => (
+              {[1, 2, 3, 4, 5, 6].map((s) => (
                 <div key={s} className="flex-1 h-2 rounded-full overflow-hidden bg-muted border border-border/50">
                   <div className={`h-full transition-all duration-500 ${step >= s ? 'bg-primary' : 'bg-transparent'}`} />
                 </div>
@@ -463,15 +469,33 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                 <User className="w-5 h-5 text-primary" />
                 <h3 className="text-xl font-medium">Deine Daten</h3>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label required>Firma</Label>
-                  <Input {...register("firma")} placeholder="Muster GmbH" error={errors.firma?.message} />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label required>Firma / Unternehmensname</Label>
+                  <Input {...register("firma")} placeholder="Muster" error={errors.firma?.message} />
                 </div>
-                <div className="space-y-2">
-                  <Label required>Ansprechpartner</Label>
-                  <Input {...register("ansprechpartner")} placeholder="Max Mustermann (Vor- & Nachname)" error={errors.ansprechpartner?.message} />
+                <div className="space-y-2 sm:col-span-1">
+                  <Label required>Rechtsform</Label>
+                  <select
+                    {...register("rechtsform")}
+                    className="flex h-10 w-full rounded-lg border border-neutral-600 bg-background px-3 py-2 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-foreground"
+                  >
+                    <option value="" disabled>Bitte wählen...</option>
+                    <option value="GmbH">GmbH</option>
+                    <option value="GbR">GbR</option>
+                    <option value="GmbH & Co. KG">GmbH & Co. KG</option>
+                    <option value="Einzelunternehmen">Einzelunternehmen</option>
+                    <option value="UG (haftungsbeschränkt)">UG (haftungsbeschränkt)</option>
+                    <option value="AG">AG</option>
+                    <option value="e.K.">e.K.</option>
+                    <option value="Andere">Andere / Sonstige</option>
+                  </select>
+                  {errors.rechtsform && <p className="mt-1 text-xs text-destructive">{errors.rechtsform.message}</p>}
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label required>Ansprechpartner</Label>
+                <Input {...register("ansprechpartner")} placeholder="Max Mustermann (Vor- & Nachname)" error={errors.ansprechpartner?.message} />
               </div>
               <div className="space-y-2">
                 <Label required>Straße & Hausnummer</Label>
@@ -646,18 +670,142 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                   ← Zurück
                 </Button>
                 <Button type="button" size="lg" className="w-full sm:w-auto" onClick={nextStep}>
-                  Weiter zum Vertragsabschluss
+                  Weiter zur Zusammenfassung
                 </Button>
               </div>
             </div>
           )}
 
-          {/* STEP 5: Final */}
+          {/* STEP 5: Zusammenfassung / Review */}
           {step === 5 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="flex items-center gap-2 border-b pb-2">
+                <FileText className="w-5 h-5 text-primary" />
+                <h3 className="text-xl font-medium font-bold">5. Zusammenfassung & Prüfung</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Bitte überprüfe alle Angaben sorgfältig auf Fehler, bevor Du den Vertrag unterzeichnest.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* 1. Tarif & Konditionen */}
+                <div className="border border-border rounded-xl p-5 bg-muted/20 space-y-3 shadow-sm">
+                  <h4 className="font-bold text-primary text-sm uppercase tracking-wider">Tarif & Konditionen</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Gewählter Tarif:</span>
+                      <span className="font-medium capitalize">{currentTarif}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Zahlungsrhythmus:</span>
+                      <span className="font-medium">{currentZahlungsrhythmus === "jaehrlich" ? "Jährlich" : "Monatlich"}</span>
+                    </div>
+                    <div className="flex justify-between border-t border-border/40 pt-2">
+                      <span className="text-muted-foreground">Einmalgebühr:</span>
+                      <span className="font-semibold text-foreground">{formatPrice(watch("setupPreisBrutto"))}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Laufende Gebühr:</span>
+                      <span className="font-semibold text-foreground">{formatPrice(watch("laufendPreisBrutto"))}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Firmendaten */}
+                <div className="border border-border rounded-xl p-5 bg-muted/20 space-y-3 shadow-sm">
+                  <h4 className="font-bold text-primary text-sm uppercase tracking-wider">Firmendaten</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Firma / Name:</span>
+                      <span className="font-medium text-foreground">{watch("firma")}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Rechtsform:</span>
+                      <span className="font-medium text-foreground">{watch("rechtsform")}</span>
+                    </div>
+                    {watch("ustId") && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">USt-IdNr.:</span>
+                        <span className="font-medium text-foreground">{watch("ustId")}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 3. Ansprechpartner & Adresse */}
+                <div className="border border-border rounded-xl p-5 bg-muted/20 space-y-3 shadow-sm">
+                  <h4 className="font-bold text-primary text-sm uppercase tracking-wider">Ansprechpartner & Adresse</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Name:</span>
+                      <span className="font-medium text-foreground">{watch("ansprechpartner")}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Straße & Hausnummer:</span>
+                      <span className="font-medium text-foreground">{watch("strasse")}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">PLZ & Ort:</span>
+                      <span className="font-medium text-foreground">{watch("plz")} {watch("ort")}</span>
+                    </div>
+                    <div className="flex justify-between border-t border-border/40 pt-2">
+                      <span className="text-muted-foreground">E-Mail:</span>
+                      <span className="font-medium text-foreground">{watch("email")}</span>
+                    </div>
+                    {watch("telefon") && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Telefon:</span>
+                        <span className="font-medium text-foreground">{watch("telefon")}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 4. Zahlungsdaten */}
+                <div className="border border-border rounded-xl p-5 bg-muted/20 space-y-3 shadow-sm">
+                  <h4 className="font-bold text-primary text-sm uppercase tracking-wider">Zahlungsdaten</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">IBAN:</span>
+                      <span className="font-medium font-mono text-foreground">{watch("iban")}</span>
+                    </div>
+                    {watch("bic") && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">BIC:</span>
+                        <span className="font-medium font-mono text-foreground">{watch("bic")}</span>
+                      </div>
+                    )}
+                    {watch("bank") && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Bank:</span>
+                        <span className="font-medium text-foreground">{watch("bank")}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between border-t border-border/40 pt-2">
+                      <span className="text-muted-foreground">Kontoinhaber:</span>
+                      <span className="font-medium text-foreground">{watch("kontoinhaber") || watch("ansprechpartner")}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-row justify-between items-center gap-4 pt-6 border-t border-border/40">
+                <Button type="button" variant="secondary" size="lg" className="w-full sm:w-auto" onClick={() => setStep(4)}>
+                  ← Zurück
+                </Button>
+                <Button type="button" size="lg" className="w-full sm:w-auto" onClick={nextStep}>
+                  Angaben prüfen & Weiter
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 6: Final (Vertragsabschluss) */}
+          {step === 6 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex items-center gap-2 border-b pb-2">
                 <PenTool className="w-5 h-5 text-primary" />
-                <h3 className="text-xl font-medium">5. Vertragsabschluss</h3>
+                <h3 className="text-xl font-medium">6. Vertragsabschluss</h3>
               </div>
 
               <div className="bg-primary/5 p-6 rounded-xl border-2 border-primary/20 space-y-4 shadow-sm">
@@ -800,7 +948,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
               </div>
 
               <div className="flex flex-row justify-between items-center gap-4 pt-8 border-t border-border/40">
-                <Button type="button" variant="secondary" size="lg" className="w-full sm:w-auto px-8" onClick={() => setStep(4)}>
+                <Button type="button" variant="secondary" size="lg" className="w-full sm:w-auto px-8" onClick={() => setStep(5)}>
                   ← Zurück
                 </Button>
                 <Button type="submit" size="lg" disabled={isSubmitting || !watch("consentB2b") || !watch("consentAgb") || !watch("consentAvv") || !watch("signatureContractB64") || watch("signatureContractB64").length < 10} className="w-full sm:w-auto px-12 py-6 text-base shadow-lg shadow-primary/20 hover:shadow-primary/30">
