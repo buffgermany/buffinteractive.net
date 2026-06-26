@@ -9,6 +9,6 @@ Eulitzstr. 1, 09112 Chemnitz
 
 ---
 
-Ich ermächtige / Wir ermächtigen die Buff Interactive GbR, Zahlungen von meinem / unserem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein / weisen wir unser Kreditinstitut an, die von der Buff Interactive GbR auf mein / unser Konto gezogenen Lastschriften einzulösen.
+Ich ermächtige / Wir ermächtigen die Felix Kinze & Leon Trepesch, Zahlungen von meinem / unserem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein / weisen wir unser Kreditinstitut an, die von der Felix Kinze & Leon Trepesch auf mein / unser Konto gezogenen Lastschriften einzulösen.
 
 *Hinweis: Ich kann / Wir können innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem / unserem Kreditinstitut vereinbarten Bedingungen.*

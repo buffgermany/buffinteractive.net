@@ -38,6 +38,7 @@ const formSchema = z.object({
   consentB2b: z.boolean().refine(v => v === true, "B2B-Bestätigung ist erforderlich"),
   consentAgb: z.boolean().refine(v => v === true, "AGB-Zustimmung ist erforderlich"),
   consentAvv: z.boolean().refine(v => v === true, "AVV-Zustimmung ist erforderlich"),
+  consentDatenschutz: z.boolean().refine(v => v === true, "Datenschutz-Kenntnisnahme ist erforderlich"),
   consentMarketing: z.boolean(),
 
   signatureSepaB64: z.string().min(10, "SEPA-Unterschrift ist erforderlich"),
@@ -226,6 +227,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
       consentB2b: false,
       consentAgb: false,
       consentAvv: false,
+      consentDatenschutz: false,
       consentMarketing: false,
     }
   });
@@ -905,7 +907,32 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                   </div>
                 </div>
 
-                {/* Checkbox 4: Marketing (Optional) */}
+                {/* Checkbox 4: Datenschutz */}
+                <div
+                  onClick={() => setValue("consentDatenschutz", !watch("consentDatenschutz"), { shouldValidate: true })}
+                  className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${watch("consentDatenschutz")
+                    ? 'border-emerald-500/40 bg-emerald-500/5'
+                    : 'border-border bg-card/40 hover:bg-card/80'
+                    }`}
+                >
+                  <input
+                    type="checkbox"
+                    id="datenschutz"
+                    {...register("consentDatenschutz")}
+                    checked={watch("consentDatenschutz")}
+                    readOnly
+                    className="mt-1 h-5 w-5 rounded border-neutral-600 accent-primary pointer-events-none"
+                  />
+                  <div className="space-y-1 leading-none flex-1">
+                    <Label className="cursor-pointer font-medium block">
+                      Ich habe die Datenschutzerklärung zur Kenntnis genommen. *
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-1">Informationen zur Verarbeitung Deiner Daten findest Du in unserer <a href="/legal/privacy" target="_blank" className="underline text-primary hover:text-primary/80 transition-colors">Datenschutzerklärung</a>.</p>
+                    {errors.consentDatenschutz && <p className="text-xs text-red-500 mt-1">{errors.consentDatenschutz.message}</p>}
+                  </div>
+                </div>
+
+                {/* Checkbox 5: Marketing (Optional) */}
                 <div
                   onClick={() => setValue("consentMarketing", !watch("consentMarketing"), { shouldValidate: true })}
                   className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${watch("consentMarketing")
@@ -951,7 +978,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                 <Button type="button" variant="secondary" size="lg" className="w-full sm:w-auto px-8" onClick={() => setStep(5)}>
                   ← Zurück
                 </Button>
-                <Button type="submit" size="lg" disabled={isSubmitting || !watch("consentB2b") || !watch("consentAgb") || !watch("consentAvv") || !watch("signatureContractB64") || watch("signatureContractB64").length < 10} className="w-full sm:w-auto px-12 py-6 text-base shadow-lg shadow-primary/20 hover:shadow-primary/30">
+                <Button type="submit" size="lg" disabled={isSubmitting || !watch("consentB2b") || !watch("consentAgb") || !watch("consentAvv") || !watch("consentDatenschutz") || !watch("signatureContractB64") || watch("signatureContractB64").length < 10} className="w-full sm:w-auto px-12 py-6 text-base shadow-lg shadow-primary/20 hover:shadow-primary/30">
                   {isSubmitting ? "Wird verarbeitet..." : "Zahlungspflichtig bestellen"}
                 </Button>
               </div>

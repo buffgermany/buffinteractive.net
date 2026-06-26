@@ -50,7 +50,7 @@ Der Leistungsumfang umfasst: Individuelles High-End-Design, mobile Optimierung, 
 **Gläubiger-Identifikationsnummer:** DE15WEB00002924152
 **Mandatsreferenz:** Wird separat mitgeteilt.
 
-Ich ermächtige die Buff Interactive GbR, Zahlungen von meinem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von der Buff Interactive GbR auf mein Konto gezogenen Lastschriften einzulösen.
+Ich ermächtige die Felix Kinze & Leon Trepesch, Zahlungen von meinem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von der Felix Kinze & Leon Trepesch auf mein Konto gezogenen Lastschriften einzulösen.
 *Hinweis: Ich kann innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen.*
 
 **Kontoinhaber (falls abweichend von 1.):** _________________________________
@@ -77,7 +77,7 @@ Durch meine Unterschrift bestätige ich den verbindlichen Abschluss des WaaS-Ver
 * **[ ] AVV (Datenschutz):** Ich beauftrage den Anbieter mit der Verarbeitung von personenbezogenen Daten im Rahmen des Hostings und schließe hiermit den Vertrag zur Auftragsverarbeitung (AVV) ab.
 
 *(Optional - Bitte ankreuzen, falls gewünscht)*
-* **[  ] Marketing-Einverständnis:** Ich bin damit einverstanden, von der Buff Interactive GbR gelegentlich per E-Mail oder telefonisch über Neuigkeiten, Optimierungspotenziale und neue Produkte informiert zu werden. Diese Einwilligung kann ich jederzeit widerrufen.
+* **[  ] Marketing-Einverständnis:** Ich bin damit einverstanden, von der Felix Kinze & Leon Trepesch gelegentlich per E-Mail oder telefonisch über Neuigkeiten, Optimierungspotenziale und neue Produkte informiert zu werden. Diese Einwilligung kann ich jederzeit widerrufen.
 
 
 _________________________________________________________________________

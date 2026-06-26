@@ -92,12 +92,7 @@
     "card3_text": "Diseñado para un uso intensivo en toda Alemania. Una interfaz intuitiva con un backend que es una auténtica fortaleza. Control total de permisos, cumplimiento riguroso y máxima disponibilidad."
   },
   "Legal": {
-    "imprint_title": "Aviso Legal",
-    "imprint_content": "Buff Interactive - Felix Kinze & Leon Trepesch GbR\nEulitzstr. 1\n09112 Chemnitz\n\nRepresentado por:\nFelix Kinze & Leon Trepesch\n\nContacto:\nEmail: service@buffinteractive.net\n\nDescargo de responsabilidad:\nEl contenido de estas páginas ha sido creado con gran cuidado. Sin embargo, no podemos garantizar la exactitud, exhaustividad o actualidad del contenido.",
-    "privacy_title": "Política de Privacidad",
-    "privacy_content": "1. Protección de Datos en un Vistazo\nNos tomamos muy en serio la protección de sus datos personales. Tratamos sus datos de forma confidencial y de acuerdo con las normativas legales de protección de datos.\n\n2. Recopilación de Datos en Nuestro Sitio Web\nSolo almacenamos una cookie estrictamente necesaria para guardar sus preferencias de idioma. No se ejecutan rastreadores de terceros sin su consentimiento.\n\n3. Sus Derechos\nUsted tiene derecho a recibir información sobre el origen, destinatario y propósito de sus datos personales almacenados en cualquier momento de forma gratuita.",
-    "terms_title": "Términos de Servicio",
-    "terms_content": "1. Ámbito de Aplicación\nEstos Términos de Servicio se aplican a todas las interacciones con Buff.\n\n2. Servicios Proporcionados\nProporcionamos infraestructura técnica, impacto creativo y claridad estratégica.\n\n3. Responsabilidad\nConstruimos productos de alto rendimiento. Si se rompe, lo arreglamos.\n\n4. Disposiciones Finales\nDeja de aceptar cosas promedio."
+    "original_language_notice": "Este documento solo está disponible en el idioma original alemán."
   },
   "Footer": {
     "title": "Somos Buff.",
@@ -115,7 +110,7 @@
     "legal_terms": "Términos de Servicio",
     "language_title": "Idioma",
     "bitfog_tooltip": "Visita nuestra marca hermana bitfog.",
-    "copyright": "© 2026 Buff. Reservados sin tonterías."
+    "copyright": "© 2026 Buff. Felix Kinze & Leon Trepesch operan como Buff."
   },
   "Growth": {
     "hero_title_part1": "Deja de financiar el",

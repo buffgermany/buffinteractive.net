@@ -105,7 +105,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
         const termsMd = readLegalFile("terms.md");
         const avvMd = readLegalFile("avv.md");
 
-        const mandatsreferenz = `MANDAT-${crypto.randomUUID().substring(0, 8).toUpperCase()}`;
+        const mandatsreferenz = `${crypto.randomUUID().substring(0, 8).toUpperCase()}`;
         const sepaMd = readLegalFile("sepa_mandat.md").replace("Wird separat mitgeteilt", mandatsreferenz);
 
         // Load branding logo PNG
@@ -170,7 +170,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             { text: '3. SEPA-Lastschriftmandat', style: 'subheader', margin: [0, 20, 0, 5] },
             { text: 'Gläubiger-Identifikationsnummer: DE15WEB00002924152' },
             { text: `Mandatsreferenz: ${mandatsreferenz}` },
-            { text: 'Ich ermächtige die Buff Interactive GbR, Zahlungen von meinem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von der Buff Interactive GbR auf mein Konto gezogenen Lastschriften einzulösen.', margin: [0, 5, 0, 5] },
+            { text: 'Ich ermächtige die Felix Kinze & Leon Trepesch, Zahlungen von meinem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von der Felix Kinze & Leon Trepesch auf mein Konto gezogenen Lastschriften einzulösen.', margin: [0, 5, 0, 5] },
             {
               table: {
                 widths: ['30%', '70%'],

@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 import { useTranslations } from "next-intl";
+import fs from "fs";
+import path from "path";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { AlertTriangle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Imprint",
@@ -7,21 +12,47 @@ export const metadata: Metadata = {
 
 export default function ImprintPage() {
   const t = useTranslations('Legal');
-  
-  return (
-      <main className="min-h-screen bg-background text-foreground font-sans pt-40 pb-32 px-6 md:px-12 relative overflow-hidden">
-        {/* Subtle background glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] rounded-full blur-[120px] bg-[radial-gradient(circle,rgba(204,255,0,0.05)_0%,rgba(0,0,0,0)_70%)] pointer-events-none -z-10" />
 
-        <div className="max-w-3xl mx-auto rounded-3xl border border-white/5 bg-[#0A0A0A]/50 backdrop-blur-sm p-8 md:p-16 shadow-2xl relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-           <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-12 text-white tracking-tighter uppercase relative wrap-break-word hyphens-auto">
-             {t('imprint_title')}
-             <span className="absolute -bottom-4 left-0 w-12 h-1 bg-[#CCFF00]" />
-           </h1>
-           <div className="text-foreground-muted leading-relaxed whitespace-pre-line text-sm md:text-base">
-             {t('imprint_content')}
-           </div>
+  function readLegalFile(filename: string): string {
+    const paths = [
+      path.join(process.cwd(), "legal", filename),
+      path.join(process.cwd(), "..", "..", "legal", filename),
+    ];
+    for (const p of paths) {
+      try {
+        if (fs.existsSync(p)) {
+          return fs.readFileSync(p, "utf8");
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    return `${filename} konnte nicht geladen werden.`;
+  }
+
+  const imprintContent = readLegalFile("imprint.md");
+
+  return (
+    <main className="min-h-screen bg-background text-foreground font-sans pt-40 pb-32 px-6 md:px-12 relative overflow-hidden">
+      {/* Subtle background glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] rounded-full blur-[120px] bg-[radial-gradient(circle,rgba(204,255,0,0.05)_0%,rgba(0,0,0,0)_70%)] pointer-events-none -z-10" />
+
+      <div className="max-w-3xl mx-auto rounded-3xl border border-white/5 bg-[#0A0A0A]/50 backdrop-blur-sm p-8 md:p-16 shadow-2xl relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        {t('original_language_notice') && (
+          <div className="mb-8 p-4 rounded-xl border border-amber-500/10 bg-amber-500/5 text-amber-200/80 text-[10px] font-mono tracking-widest uppercase flex items-center gap-3">
+            <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+            <span>
+              {t('original_language_notice')}
+            </span>
+          </div>
+        )}
+
+        <div className="prose prose-sm dark:prose-invert max-w-none text-foreground-muted leading-relaxed">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {imprintContent}
+          </ReactMarkdown>
         </div>
-      </main>
+      </div>
+    </main>
   );
 }

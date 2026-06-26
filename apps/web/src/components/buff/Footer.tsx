@@ -164,7 +164,7 @@ export function Footer() {
         </div>
         
         {/* Absolute Bottom Copy */}
-        <div className="absolute bottom-4 left-6 z-20 text-[10px] uppercase font-bold tracking-widest text-white/20">
+        <div className="absolute bottom-4 left-6 right-6 z-20 text-[10px] uppercase font-bold tracking-widest text-white/20">
             {t('copyright')}
         </div>
     </footer>

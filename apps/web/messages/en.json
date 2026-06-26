@@ -95,12 +95,7 @@
     "card3_text": "Engineered for non-stop use across Germany. The frontend is effortlessly intuitive, while the backend is a digital fortress. Full access control, strict compliance, and maximum resilience."
   },
   "Legal": {
-    "imprint_title": "Imprint",
-    "imprint_content": "Buff Interactive - Felix Kinze & Leon Trepesch GbR\nEulitzstr. 1\n09112 Chemnitz\n\nRepresented by:\nFelix Kinze & Leon Trepesch\n\nContact:\nEmail: service@buffinteractive.net\n\nDisclaimer:\nThe contents of these pages were created with great care. However, we cannot guarantee the accuracy, completeness, and timeliness of the content.",
-    "privacy_title": "Privacy Policy",
-    "privacy_content": "1. Data Protection at a Glance\nWe take the protection of your personal data very seriously. We treat your personal data confidentially and in accordance with the statutory data protection regulations and this privacy policy.\n\n2. Data Collection on Our Website\nWe only store a strictly necessary cookie to save your language preference. No third-party trackers are running without your consent.\n\n3. Your Rights\nYou have the right to receive information about the origin, recipient, and purpose of your stored personal data at any time free of charge.",
-    "terms_title": "Terms of Service",
-    "terms_content": "1. Scope of Application\nThese Terms of Service apply to all interactions with Buff.\n\n2. Services Provided\nWe provide technical backbone, creative punch, and strategic clarity.\n\n3. Liability\nWe build high-performance products. If it breaks, we fix it.\n\n4. Final Provisions\nStop accepting average stuff."
+    "original_language_notice": "This document is only available in the original German language."
   },
   "Footer": {
     "title": "We are Buff.",
@@ -118,7 +113,7 @@
     "legal_terms": "Terms of Service",
     "language_title": "Language",
     "bitfog_tooltip": "Visit our sister brand bitfog.",
-    "copyright": "© 2026 Buff. No bullshit reserved."
+    "copyright": "© 2026 Buff. Felix Kinze & Leon Trepesch are trading as Buff."
   },
   "Growth": {
     "hero_title_part1": "Stop funding",
