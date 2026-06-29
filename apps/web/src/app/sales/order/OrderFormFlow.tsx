@@ -11,6 +11,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { CheckCircle2, FileText, User, CreditCard, PenTool, ArrowLeft, ArrowRight, Heart } from "lucide-react";
 import { validateIBAN } from "@/lib/utils";
+import { PRICING_CONFIG } from "@/config/pricing";
 
 const formSchema = z.object({
   tarif: z.enum(["essential", "growth", "enterprise"]),
@@ -212,8 +213,8 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
     defaultValues: {
       tarif: "growth",
       zahlungsrhythmus: "monatlich",
-      setupPreisBrutto: 379.99,
-      laufendPreisBrutto: 89.00,
+      setupPreisBrutto: PRICING_CONFIG.plans.growth.setupFee,
+      laufendPreisBrutto: PRICING_CONFIG.plans.growth.priceMonthly,
       firma: "",
       rechtsform: "",
       ansprechpartner: "",
@@ -248,11 +249,11 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
     setValue("zahlungsrhythmus", z);
 
     if (t === "essential") {
-      setValue("setupPreisBrutto", 359.99);
-      setValue("laufendPreisBrutto", z === "monatlich" ? 75.00 : 71.25);
+      setValue("setupPreisBrutto", PRICING_CONFIG.plans.essential.setupFee);
+      setValue("laufendPreisBrutto", z === "monatlich" ? PRICING_CONFIG.plans.essential.priceMonthly : PRICING_CONFIG.plans.essential.priceYearly);
     } else if (t === "growth") {
-      setValue("setupPreisBrutto", 379.99);
-      setValue("laufendPreisBrutto", z === "monatlich" ? 89.00 : 84.55);
+      setValue("setupPreisBrutto", PRICING_CONFIG.plans.growth.setupFee);
+      setValue("laufendPreisBrutto", z === "monatlich" ? PRICING_CONFIG.plans.growth.priceMonthly : PRICING_CONFIG.plans.growth.priceYearly);
     } else {
       setValue("setupPreisBrutto", 0);
       setValue("laufendPreisBrutto", 0);
@@ -394,9 +395,9 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                 {["essential", "growth", "enterprise"].map((t) => {
                   let priceInfo = "";
                   if (t === "essential") {
-                    priceInfo = `Einmalgebühr: ${formatPrice(359.99)} | Laufende Gebühr: ${formatPrice(75.00)} / Monat (oder ${formatPrice(71.25)} / Monat bei jährlicher Zahlung)`;
+                    priceInfo = `Einmalgebühr: ${formatPrice(PRICING_CONFIG.plans.essential.setupFee)} | Laufende Gebühr: ${formatPrice(PRICING_CONFIG.plans.essential.priceMonthly)} / Monat (oder ${formatPrice(PRICING_CONFIG.plans.essential.priceYearly)} / Monat bei jährlicher Zahlung)`;
                   } else if (t === "growth") {
-                    priceInfo = `Einmalgebühr: ${formatPrice(379.99)} | Laufende Gebühr: ${formatPrice(89.00)} / Monat (oder ${formatPrice(84.55)} / Monat bei jährlicher Zahlung)`;
+                    priceInfo = `Einmalgebühr: ${formatPrice(PRICING_CONFIG.plans.growth.setupFee)} | Laufende Gebühr: ${formatPrice(PRICING_CONFIG.plans.growth.priceMonthly)} / Monat (oder ${formatPrice(PRICING_CONFIG.plans.growth.priceYearly)} / Monat bei jährlicher Zahlung)`;
                   } else {
                     priceInfo = "Einmalgebühr & Laufende Gebühr individuell verhandelbar";
                   }

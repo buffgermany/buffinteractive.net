@@ -6,6 +6,7 @@ import { Check, ArrowDownRight, Plus, ChevronsRight, Percent, Sliders } from "lu
 import { BentoCard } from "@/components/buff/BentoCard";
 import { WigglyUnderline } from "@/components/premium/organic-ui";
 import { cn } from "@/lib/utils";
+import { PRICING_CONFIG } from "@/config/pricing";
 
 interface PricingCardProps {
   name: string;
@@ -441,11 +442,11 @@ export function GrowthParadigm() {
                     className="h-full border-white/5 bg-[#121212]/40 backdrop-blur-md"
                   >
                     <PricingCardContent
-                      name="Essential"
-                      price={billingInterval === 'monthly' ? "75 €" : "71.25 €"}
+                      name={PRICING_CONFIG.plans.essential.name}
+                      price={billingInterval === 'monthly' ? `${PRICING_CONFIG.plans.essential.priceMonthly} €` : `${PRICING_CONFIG.plans.essential.priceYearly.toLocaleString("de-DE")} €`}
                       period="/ Monat"
-                      setupFee={billingInterval === 'monthly' ? "zzgl. 359,99 € Einmalgebühr" : "zzgl. 359,99 € Einmalgebühr (bei jährlicher Zahlung)"}
-                      desc="Der perfekte Einstieg für dein lokales Geschäft, deine Praxis oder dein Restaurant."
+                      setupFee={billingInterval === 'monthly' ? `zzgl. ${PRICING_CONFIG.plans.essential.setupFee.toLocaleString("de-DE", { minimumFractionDigits: 2 })} € Einmalgebühr` : `zzgl. ${PRICING_CONFIG.plans.essential.setupFee.toLocaleString("de-DE", { minimumFractionDigits: 2 })} € Einmalgebühr (bei jährlicher Zahlung)`}
+                      desc={PRICING_CONFIG.plans.essential.desc}
                       features={tier1Features}
                       cta="Mit Essential starten"
                       onCtaClick={handleCtaClick}
@@ -471,11 +472,11 @@ export function GrowthParadigm() {
                     className="h-full border-[#CCFF00]/30 shadow-[0_0_80px_-20px_rgba(204,255,0,0.15)] bg-[#121212]/80 backdrop-blur-md"
                   >
                     <PricingCardContent
-                      name="Growth"
-                      price={billingInterval === 'monthly' ? "89 €" : "84,55 €"}
+                      name={PRICING_CONFIG.plans.growth.name}
+                      price={billingInterval === 'monthly' ? `${PRICING_CONFIG.plans.growth.priceMonthly} €` : `${PRICING_CONFIG.plans.growth.priceYearly.toLocaleString("de-DE")} €`}
                       period="/ Monat"
-                      setupFee={billingInterval === 'monthly' ? "zzgl. 369,99 € Einmalgebühr" : "zzgl. 369,99 € Einmalgebühr (bei jährlicher Zahlung)"}
-                      desc="Für Betriebe, die online professionell Kunden & Patienten gewinnen wollen."
+                      setupFee={billingInterval === 'monthly' ? `zzgl. ${PRICING_CONFIG.plans.growth.setupFee.toLocaleString("de-DE", { minimumFractionDigits: 2 })} € Einmalgebühr` : `zzgl. ${PRICING_CONFIG.plans.growth.setupFee.toLocaleString("de-DE", { minimumFractionDigits: 2 })} € Einmalgebühr (bei jährlicher Zahlung)`}
+                      desc={PRICING_CONFIG.plans.growth.desc}
                       features={tier2Features}
                       specialFeature="Alles von Essential"
                       cta="Mit Growth anfangen"
@@ -608,11 +609,11 @@ export function GrowthParadigm() {
                   className="h-full border-white/5 bg-[#121212]/40"
                 >
                   <PricingCardContent
-                    name="Essential"
-                    price={billingInterval === 'monthly' ? "75 €" : "71.25 €"}
+                    name={PRICING_CONFIG.plans.essential.name}
+                    price={billingInterval === 'monthly' ? `${PRICING_CONFIG.plans.essential.priceMonthly} €` : `${PRICING_CONFIG.plans.essential.priceYearly.toLocaleString("de-DE")} €`}
                     period="/ Monat"
-                    setupFee={billingInterval === 'monthly' ? "zzgl. 359,99 € Einmalgebühr" : "zzgl. 359,99 € Einmalgebühr (bei jährlicher Zahlung)"}
-                    desc="Der perfekte Einstieg für dein lokales Geschäft, deine Praxis oder dein Restaurant."
+                    setupFee={billingInterval === 'monthly' ? `zzgl. ${PRICING_CONFIG.plans.essential.setupFee.toLocaleString("de-DE", { minimumFractionDigits: 2 })} € Einmalgebühr` : `zzgl. ${PRICING_CONFIG.plans.essential.setupFee.toLocaleString("de-DE", { minimumFractionDigits: 2 })} € Einmalgebühr (bei jährlicher Zahlung)`}
+                    desc={PRICING_CONFIG.plans.essential.desc}
                     features={tier1Features}
                     cta="Mit Essential starten"
                     onCtaClick={handleCtaClick}
@@ -629,11 +630,11 @@ export function GrowthParadigm() {
                   className="h-full border-[#CCFF00]/30 bg-[#121212]/80 shadow-[0_0_50px_-15px_rgba(204,255,0,0.15)]"
                 >
                   <PricingCardContent
-                    name="Growth"
-                    price={billingInterval === 'monthly' ? "89 €" : "84,55 €"}
+                    name={PRICING_CONFIG.plans.growth.name}
+                    price={billingInterval === 'monthly' ? `${PRICING_CONFIG.plans.growth.priceMonthly} €` : `${PRICING_CONFIG.plans.growth.priceYearly.toLocaleString("de-DE")} €`}
                     period="/ Monat"
-                    setupFee={billingInterval === 'monthly' ? "zzgl. 379,99 € Einmalgebühr" : "zzgl. 379,99 € Einmalgebühr (bei jährlicher Zahlung)"}
-                    desc="Für Betriebe, die online professionell Kunden & Patienten gewinnen wollen."
+                    setupFee={billingInterval === 'monthly' ? `zzgl. ${PRICING_CONFIG.plans.growth.setupFee.toLocaleString("de-DE", { minimumFractionDigits: 2 })} € Einmalgebühr` : `zzgl. ${PRICING_CONFIG.plans.growth.setupFee.toLocaleString("de-DE", { minimumFractionDigits: 2 })} € Einmalgebühr (bei jährlicher Zahlung)`}
+                    desc={PRICING_CONFIG.plans.growth.desc}
                     features={tier2Features}
                     specialFeature="Alles von Essential"
                     cta="Mit Growth anfangen"

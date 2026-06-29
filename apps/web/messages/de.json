@@ -1,4 +1,16 @@
 {
+  "NotFound": {
+    "title": "Unser Server hat sich <br></br><span>verflogen.</span>",
+    "description": "Dein digitaler Auftritt sollte nicht so enden – und deine neue Website erst recht nicht. Diese genaue Adresse wurde wohl vom Autopiloten genommen, aber wir bringen dich sofort wieder auf Erfolgskurs.",
+    "cta_primary": "Gratis Erstgespräch vereinbaren",
+    "cta_secondary": "Zur Startseite"
+  },
+  "Error": {
+    "title": "Ups! Da gab es wohl <br></br>einen <span>Kurzschluss.</span>",
+    "description": "Auch bei absolutem High-End Webdesign kann es mal zu einem technischen Stolpern kommen. Keine Sorge, unser Team ist bereits alarmiert – deine neue Website bringen wir trotzdem sicher ans Ziel.",
+    "cta_primary": "Seite neu laden (Erneut versuchen)",
+    "cta_secondary": "Nachricht senden"
+  },
   "Hero": {
     "title_part1": "Macht eure",
     "title_part2": "Konkurrenz nervös",

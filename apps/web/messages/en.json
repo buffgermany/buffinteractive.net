@@ -1,4 +1,16 @@
 {
+  "NotFound": {
+    "title": "Our server got a bit <br></br><span>lost.</span>",
+    "description": "Your digital presence shouldn't end like this. This exact address might have been taken off the autopilot, but we'll get you back on track immediately.",
+    "cta_primary": "Book Free Consultation",
+    "cta_secondary": "Back to Homepage"
+  },
+  "Error": {
+    "title": "Oops! We hit a <br></br><span>short circuit.</span>",
+    "description": "Even absolute high-end web design can experience a technical stumble. Don't worry, our team has already been alerted – we'll still get your new website safely to its destination.",
+    "cta_primary": "Reload Page (Try Again)",
+    "cta_secondary": "Send Message"
+  },
   "Hero": {
     "title_part1": "Make your",
     "title_part2": "competitors nervous",

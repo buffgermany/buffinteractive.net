@@ -3,9 +3,9 @@
 import { useState, useRef, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { Terminal, ChevronUp, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useLanguageStore } from "@/store/languageStore";
 import { useLocale, useTranslations } from 'next-intl';
+import { useRouter, usePathname } from "@/i18n/routing";
 
 const LOCALES = [
   { code: 'en', label: 'English', actionText: 'Switch to English', activeText: 'Continue in English', flagUrl: 'https://flagcdn.com/gb.svg' },
@@ -15,6 +15,7 @@ const LOCALES = [
 
 export function Footer() {
   const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslations('Footer');
   const currentLocale = useLocale();
   const { setLocale } = useLanguageStore();
@@ -49,8 +50,8 @@ export function Footer() {
   const handleLocaleChange = (code: string) => {
     setSwitchingTo(code);
     startTransition(() => {
-      setLocale(code);
-      router.refresh();
+      setLocale(code); // persist cookie as fallback
+      router.replace(pathname, { locale: code });
     });
   };
 
@@ -70,17 +71,17 @@ export function Footer() {
             
             <div className="flex flex-col gap-3">
                 <h5 className="font-bold text-sm uppercase tracking-widest text-foreground-muted mb-4">{t('nav_title')}</h5>
-                <Link href="/#services" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_services')}</Link>
-                <Link href="/products/waas" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_waas')}</Link>
-                <Link href="/#about" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_about')}</Link>
-                <Link href="/#contact" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_start_project')}</Link>
+                <Link href={`/${currentLocale}/#services`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_services')}</Link>
+                <Link href={`/${currentLocale}/products/waas`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_waas')}</Link>
+                <Link href={`/${currentLocale}/#about`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_about')}</Link>
+                <Link href={`/${currentLocale}/#contact`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('nav_start_project')}</Link>
             </div>
 
             <div className="flex flex-col gap-3">
                 <h5 className="font-bold text-sm uppercase tracking-widest text-foreground-muted mb-4">{t('legal_title')}</h5>
-                <Link href="/imprint" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_imprint')}</Link>
-                <Link href="/privacy" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_privacy')}</Link>
-                <Link href="/terms" prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_terms')}</Link>
+                <Link href={`/${currentLocale}/imprint`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_imprint')}</Link>
+                <Link href={`/${currentLocale}/privacy`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_privacy')}</Link>
+                <Link href={`/${currentLocale}/terms`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_terms')}</Link>
                 
                 <div className="mt-4 pt-4 border-t border-white/5 relative">
                     <div className="flex flex-col gap-2 relative">

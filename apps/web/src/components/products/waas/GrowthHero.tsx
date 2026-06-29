@@ -167,7 +167,15 @@ function ReceiptVisual() {
   );
 }
 
-export function GrowthHero() {
+export function GrowthHero({
+  city,
+  title,
+  description,
+}: {
+  city?: string;
+  title?: React.ReactNode;
+  description?: string;
+} = {}) {
   return (
     <section className="relative min-h-[85vh] md:min-h-[92vh] flex items-center pt-24 md:pt-32 pb-20 md:pb-24 px-4 sm:px-6 z-10 w-full overflow-hidden bg-background">
       
@@ -197,9 +205,13 @@ export function GrowthHero() {
             transition={{ type: "spring", stiffness: 200, damping: 25 }}
             className="font-heading font-bold text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-[3.5rem] 2xl:text-[3.75rem] tracking-tighter leading-[1.1] text-foreground mb-6 text-balance w-full max-w-xl lg:max-w-[38rem] xl:max-w-[42rem] mx-auto lg:mx-0"
           >
-            Deine <span className="text-primary font-extrabold">Website auf{' '}
-              Autopilot.</span>{' '}
-            Vollkommen ohne Kopfschmerzen.
+            {title || (
+              <>
+                Deine <span className="text-primary font-extrabold">Website auf{' '}
+                  Autopilot.</span>{' '}
+                Vollkommen ohne Kopfschmerzen.
+              </>
+            )}
           </motion.h1>
 
           <motion.p
@@ -208,7 +220,7 @@ export function GrowthHero() {
             transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.1 }}
             className="w-full max-w-xl lg:max-w-[32rem] xl:max-w-[36rem] text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed pt-2 mb-10 px-2 sm:px-0 text-balance mx-auto lg:mx-0"
           >
-            Keine teuren Einmalzahlungen, kein technisches Kauderwelsch. Wir bauen, hosten und pflegen deine Traum-Website zum fairen monatlichen Festpreis. Damit du dich voll auf dein Geschäft konzentrieren kannst.
+            {description || "Keine teuren Einmalzahlungen, kein technisches Kauderwelsch. Wir bauen, hosten und pflegen deine Traum-Website zum fairen monatlichen Festpreis. Damit du dich voll auf dein Geschäft konzentrieren kannst."}
           </motion.p>
 
           <motion.div

@@ -4,11 +4,12 @@ import { useEffect, useState, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2 } from "lucide-react";
 import { useLanguageStore } from "@/store/languageStore";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 
 export function LanguagePopup() {
   const router = useRouter();
+  const pathname = usePathname();
   const currentLocale = useLocale();
   const t = useTranslations("LanguagePopup");
   const { hasDismissedLanguagePopup, setLocale, dismissLanguagePopup } = useLanguageStore();
@@ -39,8 +40,9 @@ export function LanguagePopup() {
   const handleSwitch = (newLocale: string) => {
     setSwitchingTo(newLocale);
     startTransition(() => {
-      setLocale(newLocale);
-      router.refresh();
+      setLocale(newLocale); // persist cookie as fallback
+      dismissLanguagePopup(newLocale);
+      router.replace(pathname, { locale: newLocale });
     });
   };
 

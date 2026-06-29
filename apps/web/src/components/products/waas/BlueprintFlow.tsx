@@ -55,7 +55,7 @@ export function BlueprintFlow() {
     <section
       ref={containerRef}
       id="blueprint"
-      className="relative w-full bg-[#050505] overflow-visible border-b border-white/5 h-[300vh]"
+      className="relative w-full bg-[#050505] overflow-visible h-[300vh]"
     >
       <div className="sticky top-0 h-[100dvh] flex flex-col justify-center items-center overflow-hidden py-4 xs:py-6 sm:py-10 md:py-16 px-4 sm:px-6">
 

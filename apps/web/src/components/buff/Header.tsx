@@ -20,7 +20,7 @@ import {
 	ArrowUpRight
 } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useSession } from "@/lib/auth-client";
 import { usePathname } from "next/navigation";
 
@@ -101,6 +101,7 @@ const ProductsMenu = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 
 const ServicesMenu = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 	const t = useTranslations("MegaMenu");
+	const locale = useLocale();
 	return (
 		<div className="w-full md:w-[720px] p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
 			{/* Build Service */}
@@ -110,7 +111,7 @@ const ServicesMenu = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 				transition={{ delay: 0.05 }}
 			>
 				<Link
-					href="/build"
+					href={`/${locale}/build`}
 					prefetch={true}
 					onClick={onLinkClick}
 					className="group h-full flex flex-col gap-4 p-6 md:p-8 px-6 md:px-10 rounded-[2rem] md:rounded-[2.5rem] bg-white/5 md:bg-transparent hover:bg-[#00F0FF]/5 border border-white/5 md:border-transparent hover:border-[#00F0FF]/25 transition-all outline-none"
@@ -142,7 +143,7 @@ const ServicesMenu = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 				transition={{ delay: 0.1 }}
 			>
 				<Link
-					href="/growth"
+					href={`/${locale}/growth`}
 					prefetch={true}
 					onClick={onLinkClick}
 					className="group h-full flex flex-col gap-4 p-6 md:p-8 px-6 md:px-10 rounded-[2rem] md:rounded-[2.5rem] bg-white/5 md:bg-transparent hover:bg-[#CCFF00]/5 border border-white/5 md:border-transparent hover:border-[#CCFF00]/25 transition-all outline-none"
@@ -175,7 +176,7 @@ const ServicesMenu = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 				className="md:col-span-2"
 			>
 				<Link
-					href="/audit"
+					href={`/${locale}/audit`}
 					prefetch={true}
 					onClick={onLinkClick}
 					className="group flex items-center gap-6 p-6 md:p-8 px-6 md:px-10 rounded-[2rem] md:rounded-[2.5rem] bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all outline-none"
@@ -212,12 +213,14 @@ export function Header() {
 	const t = useTranslations("Header");
 	const { data: session } = useSession();
 	const pathname = usePathname();
+	const locale = useLocale();
 	const { scrollY } = useScroll();
 	const [activeMenu, setActiveMenu] = useState<string | null>(null);
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	const isHome = pathname === "/" || pathname === "/de" || pathname === "/en" || pathname === "/es";
+	// isHome: pathname is exactly /de, /en, or /es (with or without trailing slash)
+	const isHome = /^\/(?:de|en|es)\/?$/.test(pathname);
 
 	const [scrolledState, setScrolledState] = useState(false);
 
@@ -281,7 +284,7 @@ export function Header() {
 				>
 					{/* Logo */}
 					<Link
-						href="/"
+						href={`/${locale}`}
 						prefetch={true}
 						className="font-heading font-black text-2xl tracking-tighter hover:text-primary transition-colors z-[60]"
 					>
@@ -297,7 +300,7 @@ export function Header() {
 							<div onMouseEnter={() => handleMouseEnter("None")}>
 								<Magnetic>
 									<Link
-										href="/"
+										href={`/${locale}`}
 										prefetch={true}
 										className="font-medium text-muted-foreground hover:text-foreground transition-colors"
 									>
@@ -318,7 +321,7 @@ export function Header() {
 						<div onMouseEnter={() => handleMouseEnter("None")}>
 							<Magnetic>
 								<Link
-									href="/#about"
+									href={`/${locale}/#about`}
 									prefetch={true}
 									className="font-medium text-muted-foreground hover:text-foreground transition-colors"
 								>
@@ -425,7 +428,7 @@ export function Header() {
 						{/* Mobile Menu Header */}
 						<div className="flex items-center justify-between py-8 px-8">
 							<Link
-								href="/"
+								href={`/${locale}`}
 								onClick={() => setIsMobileMenuOpen(false)}
 								className="font-heading font-black text-2xl tracking-tighter hover:text-primary transition-colors"
 							>
@@ -455,9 +458,9 @@ export function Header() {
 								{t("mobile_menu_headline")}
 							</h4>
 							{[
-								...(!isHome ? [{ label: t("nav_home"), href: "/" }] : []),
-								{ label: t("mobile_about"), href: "/#about" },
-								{ label: t("mobile_contact"), href: "/#contact" },
+								...(!isHome ? [{ label: t("nav_home"), href: `/${locale}` }] : []),
+								{ label: t("mobile_about"), href: `/${locale}/#about` },
+								{ label: t("mobile_contact"), href: `/${locale}/#contact` },
 								{
 									label: session ? t("nav_dashboard") : t("nav_login"),
 									href: session ? "/dashboard" : "/auth"
@@ -486,7 +489,7 @@ export function Header() {
 								className="mt-4"
 							>
 								<Link
-									href="/#contact"
+									href={`/${locale}/#contact`}
 									onClick={() => setIsMobileMenuOpen(false)}
 									className="w-full flex items-center justify-center py-4 rounded-full bg-primary text-primary-foreground font-heading font-bold uppercase tracking-widest text-sm active:scale-95 transition-transform"
 								>

@@ -134,12 +134,35 @@ function AccordionItem({ question, answer, isOpen, onToggle }: {
   );
 }
 
-export function FaqSection() {
+export function FaqSection({ city }: { city?: string } = {}) {
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
   const [openIndexes, setOpenIndexes] = useState<{ [key: string]: boolean }>({});
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const filteredFaqs = faqs.filter(
+  // Dynamically localize FAQs if city is provided
+  const localizedFaqs = React.useMemo(() => {
+    if (!city) return faqs;
+    const capitalizedCity = city.charAt(0).toUpperCase() + city.slice(1);
+    return faqs.map(faq => {
+      // Localize common general patterns in questions and answers
+      const question = faq.question
+        .replace(/Website & Domain/g, `Website & Domain in ${capitalizedCity}`)
+        .replace(/die Suchmaschinenoptimierung/g, `die Suchmaschinenoptimierung in ${capitalizedCity}`);
+      
+      const answer = faq.answer
+        .replace(/deine Website/g, `deine Website in ${capitalizedCity}`)
+        .replace(/deine neue Seite/g, `deine neue Seite für ${capitalizedCity}`)
+        .replace(/jede Website/g, `jede Website in ${capitalizedCity}`)
+        .replace(/deinen neuen Web-Autopiloten/g, `deinen neuen Web-Autopiloten in ${capitalizedCity}`)
+        .replace(/Unternehmen und Selbstständige/g, `Unternehmen und Selbstständige in ${capitalizedCity}`)
+        .replace(/für deine Marke/g, `für deine Marke in ${capitalizedCity}`)
+        .replace(/Arbeit im Voraus/g, `Arbeit in ${capitalizedCity} im Voraus`);
+
+      return { ...faq, question, answer };
+    });
+  }, [city]);
+
+  const filteredFaqs = localizedFaqs.filter(
     faq => activeCategory === 'all' || faq.category === activeCategory
   );
 

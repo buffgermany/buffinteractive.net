@@ -1,4 +1,16 @@
 {
+  "NotFound": {
+    "title": "Nuestro servidor se ha <br></br><span>perdido.</span>",
+    "description": "Tu presencia digital no debería terminar así. Puede que esta dirección exacta haya sido retirada del piloto automático, pero te devolveremos al camino del éxito de inmediato.",
+    "cta_primary": "Reserva una consulta gratuita",
+    "cta_secondary": "Volver al inicio"
+  },
+  "Error": {
+    "title": "¡Ups! Tuvimos un <br></br><span>cortocircuito.</span>",
+    "description": "Incluso en el diseño web de más alta gama puede haber tropiezos técnicos. No te preocupes, nuestro equipo ya ha sido alertado – aún así llevaremos tu nueva página web a su destino de forma segura.",
+    "cta_primary": "Recargar página (Reintentar)",
+    "cta_secondary": "Enviar mensaje"
+  },
   "Hero": {
     "title_part1": "Tu estrategia digital",
     "title_part2": "está perdiendo dinero",
