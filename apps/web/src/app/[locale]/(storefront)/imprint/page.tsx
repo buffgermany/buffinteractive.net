@@ -6,9 +6,19 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { AlertTriangle } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Imprint",
+type Props = {
+  params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    title: locale === "de" ? "Impressum" : locale === "es" ? "Aviso Legal" : "Imprint",
+    alternates: {
+      canonical: `/${locale}/imprint`,
+    },
+  };
+}
 
 export default function ImprintPage() {
   const t = useTranslations('Legal');

@@ -159,9 +159,9 @@ export function Footer() {
 
         {/* Massive Typography Baseline */}
         <div className="relative w-full overflow-hidden flex justify-center -mb-[6vw] select-none pointer-events-none">
-            <h1 className="font-heading font-black text-[18vw] leading-none text-white/5 tracking-tighter">
+            <div className="font-heading font-black text-[18vw] leading-none text-white/5 tracking-tighter">
                 BUFF.
-            </h1>
+            </div>
         </div>
         
         {/* Absolute Bottom Copy */}

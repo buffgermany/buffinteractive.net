@@ -6,9 +6,19 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { AlertTriangle } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Terms of Service",
+type Props = {
+  params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    title: locale === "de" ? "AGB" : locale === "es" ? "Términos de Servicio" : "Terms of Service",
+    alternates: {
+      canonical: `/${locale}/terms`,
+    },
+  };
+}
 
 export default function TermsPage() {
   const t = useTranslations('Legal');

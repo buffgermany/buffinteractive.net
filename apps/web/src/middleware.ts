@@ -5,6 +5,13 @@ import { routing } from './i18n/routing';
 const intlMiddleware = createMiddleware(routing);
 
 export default function middleware(request: NextRequest) {
+  const host = request.headers.get('host');
+  if (host && host.startsWith('www.')) {
+    const targetHost = host.slice(4);
+    const newUrl = new URL(request.nextUrl.pathname + request.nextUrl.search, `https://${targetHost}`);
+    return NextResponse.redirect(newUrl, 301);
+  }
+
   const { pathname } = request.nextUrl;
 
   // Skip locale routing for non-storefront paths

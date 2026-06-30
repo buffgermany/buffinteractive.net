@@ -18,7 +18,7 @@ export function MadLibsFooter() {
       
       {/* Decorative large logo or shape behind */}
       <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/3 opacity-5 pointer-events-none">
-        <h1 className="text-[20vw] font-heading font-bold leading-none text-primary">BUFF</h1>
+        <div className="text-[20vw] font-heading font-bold leading-none text-primary">BUFF</div>
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center text-center">

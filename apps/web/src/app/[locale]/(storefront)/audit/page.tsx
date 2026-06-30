@@ -1,10 +1,35 @@
 import type { Metadata } from "next";
 import { AuditQuiz } from "@/components/audit/AuditQuiz";
 
-export const metadata: Metadata = {
-  title: "The Audit | Engineering & Growth Diagnostic | Buff",
-  description: "Get a ruthless, mathematical blueprint for your next stage of scaling. Identify technical bottlenecks and growth plateaus in 120 seconds.",
+type Props = {
+  params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const translations = {
+    de: {
+      title: "The Audit | Tech & Growth Analyse",
+      description: "Erhalte in 120 Sekunden eine schonungslose, mathematische Analyse deiner Infrastruktur und deines Marketings.",
+    },
+    en: {
+      title: "The Audit | Tech & Growth Diagnostic",
+      description: "Get a ruthless, mathematical blueprint for your next stage of scaling. Identify technical bottlenecks and growth plateaus in 120 seconds.",
+    },
+    es: {
+      title: "The Audit | Diagnóstico de Tecnología y Crecimiento",
+      description: "Obtén un plan matemático e implacable para tu escalabilidad. Identifica cuellos de botella técnicos en 120 segundos.",
+    },
+  };
+  const t = translations[locale as keyof typeof translations] || translations.en;
+  return {
+    title: t.title,
+    description: t.description,
+    alternates: {
+      canonical: `/${locale}/audit`,
+    },
+  };
+}
 
 export default function AuditPage() {
   return (

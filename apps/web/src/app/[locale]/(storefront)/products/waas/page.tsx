@@ -12,22 +12,29 @@ import { FaqSection } from "@/components/products/waas/FaqSection";
 import { FootnotesSection } from "@/components/buff/FootnotesSection";
 import { BuildCTA } from "@/components/products/waas/BuildCTA";
 
-export const metadata: Metadata = {
-  title: "Website-as-a-Service // Rundum-Sorglos-Websites",
-  description:
-    "Dein digitaler Maßanzug vollkommen ohne Kopfschmerzen. Keine teuren Einmalzahlungen, kein technisches Kauderwelsch. Wir bauen, hosten und pflegen deine Traum-Website für einen fairen monatlichen Festpreis.",
-  keywords: ["Website-as-a-Service", "WaaS", "Websites auf Autopilot", "Mietwebsites", "Homepage mieten", "Webdesign Chemnitz", "Webentwicklung Flatrate"],
-  alternates: {
-    canonical: "/products/waas",
-  },
-  openGraph: {
-    title: "Website-as-a-Service // Rundum-Sorglos-Websites",
-    description: "Dein digitaler Maßanzug vollkommen ohne Kopfschmerzen. Wir bauen, hosten und pflegen deine Traum-Website für einen fairen monatlichen Festpreis.",
-    type: "website",
-    locale: "de_DE",
-    url: "/products/waas",
-  },
+type Props = {
+  params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    title: locale === "de" 
+      ? "Website-as-a-Service // Rundum-Sorglos-Websites" 
+      : locale === "es"
+      ? "Website-as-a-Service // Sitios web sin preocupaciones"
+      : "Website-as-a-Service // Headache-free Websites",
+    description: locale === "de"
+      ? "Dein digitaler Maßanzug vollkommen ohne Kopfschmerzen. Keine teuren Einmalzahlungen. Wir bauen, hosten und pflegen deine Traum-Website für einen fairen monatlichen Festpreis."
+      : locale === "es"
+      ? "Tu sitio web a medida sin dolores de cabeza. Diseñamos, alojamos y mantenemos la web de tus sueños por una tarifa mensual fija y justa."
+      : "Your custom website, completely headache-free. We build, host, and maintain your dream website for a transparent monthly flat rate.",
+    keywords: ["Website-as-a-Service", "WaaS", "Websites auf Autopilot", "Mietwebsites", "Homepage mieten"],
+    alternates: {
+      canonical: `/${locale}/products/waas`,
+    },
+  };
+}
 
 export default async function WaasProductsPage() {
   const locale = await getLocale();

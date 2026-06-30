@@ -6,9 +6,19 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { AlertTriangle } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
+type Props = {
+  params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    title: locale === "de" ? "Datenschutzerklärung" : locale === "es" ? "Política de Privacidad" : "Privacy Policy",
+    alternates: {
+      canonical: `/${locale}/privacy`,
+    },
+  };
+}
 
 export default function PrivacyPolicyPage() {
   const t = useTranslations('Legal');
