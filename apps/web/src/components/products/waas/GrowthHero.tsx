@@ -220,7 +220,7 @@ export function GrowthHero({
             transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.1 }}
             className="w-full max-w-xl lg:max-w-[32rem] xl:max-w-[36rem] text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed pt-2 mb-10 px-2 sm:px-0 text-balance mx-auto lg:mx-0"
           >
-            {description || "Keine teuren Einmalzahlungen, kein technisches Kauderwelsch. Wir bauen, hosten und pflegen deine Traum-Website zum fairen monatlichen Festpreis. Damit du dich voll auf dein Geschäft konzentrieren kannst."}
+            {description || "Websites auf Autopilot: Rundum-Sorglos statt teurer Einmalzahlung. Wir bauen, hosten und pflegen deine Traum-Website zum fairen monatlichen Festpreis. Damit du dich voll auf dein Geschäft konzentrieren kannst."}
           </motion.p>
 
           <motion.div

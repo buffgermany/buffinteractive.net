@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: "Webdesign Dresden – Professionelle Homepage erstellen lassen | Buff",
     description:
-      `Rundum-Sorglos statt teurer Einmalzahlung. Wir gestalten, hosten und pflegen deine neue Firmen-Homepage direkt vor Ort in Dresden ab ${minPrice}€/Monat. Ideal für Handwerk, Ärzte & KMUs.`,
+      `Rundum-Sorglos statt teurer Einmalzahlung. Wir gestalten, hosten und pflegen deine neue Homepage direkt vor Ort in Dresden ab ${minPrice}€/Monat.`,
     keywords: [
       "Webdesign Dresden",
       "Homepage erstellen lassen Dresden",
@@ -176,7 +176,7 @@ export default async function WebdesignDresdenPage({ params }: Props) {
             <span className="text-primary font-extrabold">Websites auf Autopilot</span>. Für Macher aus Dresden, <span className="text-primary font-extrabold">wie dich.</span>
           </>
         }
-        description={`Rundum-Sorglos statt teurer Einmalzahlung. Wir gestalten, hosten und pflegen deine neue Homepage direkt hier vor Ort in Dresden ab ${basePlan.priceMonthly}€ im Monat. Keine Kopfschmerzen, kein Wartungsstress – damit du dich voll auf dein Geschäft konzentrieren kannst.`}
+        description={`Websites auf Autopilot: Rundum-Sorglos statt teurer Einmalzahlung. Wir gestalten, hosten und pflegen deine neue Homepage direkt hier vor Ort in Dresden ab ${basePlan.priceMonthly}€ im Monat. Damit du dich als Macher voll auf dein Geschäft konzentrieren kannst.`}
       />
       <RealityCheckSection />
       <BlueprintFlow />

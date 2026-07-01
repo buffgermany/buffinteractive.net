@@ -5,6 +5,13 @@ import { routing } from './i18n/routing';
 const intlMiddleware = createMiddleware(routing);
 
 export default function middleware(request: NextRequest) {
+  // Block any POST requests targeting storefront page routes.
+  // Storefront pages only support GET/HEAD; blocking POST prevents bots/scanners
+  // from triggering Next.js internal "Failed to find Server Action" errors.
+  if (request.method === 'POST') {
+    return new NextResponse('Method Not Allowed', { status: 405 });
+  }
+
   const host = request.headers.get('host');
   if (host && host.startsWith('www.')) {
     const targetHost = host.slice(4);

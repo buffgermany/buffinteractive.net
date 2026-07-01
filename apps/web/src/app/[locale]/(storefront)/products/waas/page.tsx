@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ? "Website-as-a-Service // Sitios web sin preocupaciones"
       : "Website-as-a-Service // Headache-free Websites",
     description: locale === "de"
-      ? "Dein digitaler Maßanzug vollkommen ohne Kopfschmerzen. Keine teuren Einmalzahlungen. Wir bauen, hosten und pflegen deine Traum-Website für einen fairen monatlichen Festpreis."
+      ? "Dein digitaler Maßanzug vollkommen ohne Kopfschmerzen. Wir bauen, hosten und pflegen deine Traum-Website für einen fairen monatlichen Festpreis."
       : locale === "es"
       ? "Tu sitio web a medida sin dolores de cabeza. Diseñamos, alojamos y mantenemos la web de tus sueños por una tarifa mensual fija y justa."
       : "Your custom website, completely headache-free. We build, host, and maintain your dream website for a transparent monthly flat rate.",

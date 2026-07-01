@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: "Webdesign Leipzig – Professionelle Homepage erstellen lassen | Buff",
     description:
-      `Rundum-Sorglos statt teurer Einmalzahlung. Wir gestalten, hosten und pflegen deine neue Firmen-Homepage direkt vor Ort in Leipzig ab ${minPrice}€/Monat. Ideal für Handwerk, Ärzte & KMUs.`,
+      `Rundum-Sorglos statt teurer Einmalzahlung. Wir gestalten, hosten und pflegen deine neue Homepage direkt vor Ort in Leipzig ab ${minPrice}€/Monat.`,
     keywords: [
       "Webdesign Leipzig",
       "Homepage erstellen lassen Leipzig",
@@ -176,7 +176,7 @@ export default async function WebdesignLeipzigPage({ params }: Props) {
             <span className="text-primary font-extrabold">Websites auf Autopilot</span>. Für Macher aus Leipzig, <span className="text-primary font-extrabold">wie dich.</span>
           </>
         }
-        description={`Rundum-Sorglos statt teurer Einmalzahlung. Wir gestalten, hosten und pflegen deine neue Homepage direkt hier vor Ort in Leipzig ab ${basePlan.priceMonthly}€ im Monat. Keine Kopfschmerzen, kein Wartungsstress – damit du dich voll auf dein Geschäft konzentrieren kannst.`}
+        description={`Websites auf Autopilot: Rundum-Sorglos statt teurer Einmalzahlung. Wir gestalten, hosten und pflegen deine neue Homepage direkt hier vor Ort in Leipzig ab ${basePlan.priceMonthly}€ im Monat. Damit du dich als Macher voll auf dein Geschäft konzentrieren kannst.`}
       />
       <RealityCheckSection />
       <BlueprintFlow />

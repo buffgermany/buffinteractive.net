@@ -71,12 +71,15 @@ const app = new Elysia()
   // ---- Global error handler ----
   .onError(({ code, error, set, request }) => {
     const url = new URL(request.url);
-    console.error(`[API Error] ${code} on ${request.method} ${url.pathname}${url.search}:`, error);
 
+    // Suppress verbose logging for 404 Route Not Found errors to prevent scanner/bot spam
     if (code === "NOT_FOUND") {
       set.status = 404;
       return { error: `Route not found: ${request.method} ${url.pathname}` };
     }
+
+    console.error(`[API Error] ${code} on ${request.method} ${url.pathname}${url.search}:`, error);
+
     if (code === "VALIDATION") {
       set.status = 422;
       return { error: "Validation error", details: error.message };
