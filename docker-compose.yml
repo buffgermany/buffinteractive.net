@@ -5,9 +5,6 @@ version: "3.9"
 # Designed for Coolify "Zero-Config" Deployment
 # ============================================================
 
-networks:
-  platform:
-    driver: bridge
 
 services:
   # ------------------------------------------------------------
@@ -19,13 +16,6 @@ services:
       dockerfile: apps/api/Dockerfile
     container_name: platform-api
     restart: always
-    networks:
-      - platform
-    # COOLIFY AUTO-CONFIG LABELS
-    labels:
-      - "coolify.managed=true"
-      # Automatically route api.buffinteractive.net to this service
-      - "coolify.traefik.frontend.rule=Host(`api.buffinteractive.net`)"
     expose:
       - "3001"
     ports:
@@ -68,19 +58,13 @@ services:
       dockerfile: apps/web/Dockerfile
     container_name: platform-web
     restart: always
-    networks:
-      - platform
-    # COOLIFY AUTO-CONFIG LABELS
-    labels:
-      - "coolify.managed=true"
-      # Automatically route buffinteractive.net to this service
-      - "coolify.traefik.frontend.rule=Host(`buffinteractive.net`) || Host(`www.buffinteractive.net`)"
     expose:
       - "3000"
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+      - API_URL=http://api:3001
       - NEXT_PUBLIC_API_URL=https://api.buffinteractive.net
       - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
       - BETTER_AUTH_URL=https://buffinteractive.net
