@@ -176,7 +176,7 @@ export default async function WebdesignDresdenPage({ params }: Props) {
             <span className="text-primary font-extrabold">Websites auf Autopilot</span>. Für Macher aus Dresden, <span className="text-primary font-extrabold">wie dich.</span>
           </>
         }
-        description={`Websites auf Autopilot: Rundum-Sorglos statt teurer Einmalzahlung. Wir gestalten, hosten und pflegen deine neue Homepage direkt hier vor Ort in Dresden ab ${basePlan.priceMonthly}€ im Monat. Damit du dich als Macher voll auf dein Geschäft konzentrieren kannst.`}
+        description={`Rundum-Sorglos statt teurer Einmalzahlung oder unvorhergesehenen Wartungskosten. Wir gestalten, hosten und pflegen deine neue Homepage direkt hier vor Ort in Dresden ab ${basePlan.priceMonthly}€ im Monat. Damit du dich voll auf dein Geschäft konzentrieren kannst.`}
       />
       <RealityCheckSection />
       <BlueprintFlow />
