@@ -10,8 +10,8 @@ import type { App } from "@platform/api";
 // ============================================================
 
 const API_URL = typeof window === "undefined"
-  ? (process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001")
-  : (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001");
+  ? (process.env["API_URL"] ?? process.env["NEXT_PUBLIC_API_URL"] ?? "http://localhost:3001")
+  : (process.env["NEXT_PUBLIC_API_URL"] ?? "http://localhost:3001");
 
 export const api: ReturnType<typeof treaty<App>> = treaty<App>(API_URL, {
   fetch: {

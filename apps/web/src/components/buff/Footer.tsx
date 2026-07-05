@@ -13,6 +13,11 @@ const LOCALES = [
   { code: 'es', label: 'Español', actionText: 'Cambiar a Español', activeText: 'Continuar en Español', flagUrl: 'https://flagcdn.com/es.svg' }
 ];
 
+// Client-side cache to avoid spamming /api/status on page transitions
+let cachedStatus: "operational" | "degraded" | "down" | null = null;
+let lastFetchedTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 export function Footer() {
   const router = useRouter();
   const pathname = usePathname();
@@ -22,6 +27,7 @@ export function Footer() {
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [switchingTo, setSwitchingTo] = useState<string | null>(null);
+  const [status, setStatus] = useState<"operational" | "degraded" | "down" | "checking">("checking");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentLanguage = LOCALES.find(l => l.code === currentLocale) || LOCALES[0];
@@ -34,6 +40,36 @@ export function Footer() {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchFooterStatus() {
+      const now = Date.now();
+      if (cachedStatus && now - lastFetchedTime < CACHE_DURATION) {
+        if (isMounted) setStatus(cachedStatus);
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/status", { cache: "no-store" });
+        if (!res.ok) throw new Error();
+        const json = await res.json();
+        const overall = json?.overallStatus || "operational";
+        cachedStatus = overall;
+        lastFetchedTime = now;
+        if (isMounted) setStatus(overall);
+      } catch (_) {
+        if (isMounted) setStatus("operational");
+      }
+    }
+
+    fetchFooterStatus();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Handle automatic closing after transition finishes
@@ -82,6 +118,7 @@ export function Footer() {
                 <Link href={`/${currentLocale}/imprint`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_imprint')}</Link>
                 <Link href={`/${currentLocale}/privacy`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_privacy')}</Link>
                 <Link href={`/${currentLocale}/terms`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_terms')}</Link>
+                <Link href={`/${currentLocale}/status`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_status')}</Link>
                 
                 <div className="mt-4 pt-4 border-t border-white/5 relative">
                     <div className="flex flex-col gap-2 relative">
@@ -165,8 +202,51 @@ export function Footer() {
         </div>
         
         {/* Absolute Bottom Copy */}
-        <div className="absolute bottom-4 left-6 right-6 z-20 text-[10px] uppercase font-bold tracking-widest text-white/20">
-            {t('copyright')}
+        <div className="absolute bottom-4 left-6 right-6 z-20 text-[10px] uppercase font-bold tracking-widest text-white/20 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <div>{t('copyright')}</div>
+            
+            <Link 
+              href={`/${currentLocale}/status`} 
+              className={`flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold tracking-widest uppercase transition-all duration-300 pointer-events-auto ${
+                status === "operational" 
+                  ? "bg-primary/10 border-primary/20 hover:border-primary/40 text-primary hover:bg-primary/20" 
+                  : status === "degraded"
+                  ? "bg-amber-500/10 border-amber-500/20 hover:border-amber-500/40 text-amber-500 hover:bg-amber-500/20"
+                  : status === "down"
+                  ? "bg-red-500/10 border-red-500/20 hover:border-red-500/40 text-red-500 hover:bg-red-500/20"
+                  : "bg-white/5 border-white/10 text-white/40"
+              }`}
+            >
+              <span className="relative flex h-2 w-2">
+                {status !== "checking" && (
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                    status === "operational" 
+                      ? "bg-primary" 
+                      : status === "degraded"
+                      ? "bg-amber-500"
+                      : "bg-red-500"
+                  }`} />
+                )}
+                <span className={`relative inline-flex rounded-full h-2 w-2 ${
+                  status === "operational" 
+                    ? "bg-primary" 
+                    : status === "degraded"
+                    ? "bg-amber-500"
+                    : status === "down"
+                    ? "bg-red-500"
+                    : "bg-white/20"
+                }`} />
+              </span>
+              <span>
+                {status === "operational"
+                  ? t("status_operational")
+                  : status === "degraded"
+                  ? t("status_degraded")
+                  : status === "down"
+                  ? t("status_down")
+                  : t("status_checking")}
+              </span>
+            </Link>
         </div>
     </footer>
   );

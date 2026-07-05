@@ -27,7 +27,7 @@ export function AntiPortfolioSection() {
   }, []);
 
   return (
-    <section 
+    <section
       className="relative py-32 px-6 overflow-hidden bg-[#050505]"
       style={{
         maskImage: `linear-gradient(to bottom, transparent, black 5%, black 95%, transparent)`,
@@ -35,12 +35,12 @@ export function AntiPortfolioSection() {
       }}
     >
       <div className="max-w-6xl mx-auto w-full relative z-10 flex flex-col justify-center min-h-screen">
-        
+
         {/* Section Header */}
         <div className="mb-12 md:mb-16 w-full">
-          <motion.div 
-            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }} 
-            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} 
+          <motion.div
+            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true }}
             transition={{ type: "spring", stiffness: 200, damping: 25 }}
           >
@@ -53,21 +53,21 @@ export function AntiPortfolioSection() {
         </div>
 
         <div className="flex flex-col gap-6 w-full">
-          
+
           {/* Card 1: The Authority — Full width top */}
-          <motion.div 
+          <motion.div
             ref={cardRef}
-            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }} 
-            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} 
-            viewport={{ once: true, margin: "-100px" }} 
+            initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, margin: "-100px" }}
             transition={{ type: "spring", stiffness: 200, damping: 25 }}
             className="w-full"
           >
             <BentoCard className="w-full min-h-[320px] md:min-h-[380px]" glowColor="rgba(226, 0, 116, 0.15)">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8 h-full z-10 relative">
                 <div className="flex flex-col justify-between h-full gap-8">
-                  <Lock 
-                    className="w-10 h-10 md:w-14 md:h-14 text-[#E20074] transition-colors duration-500 group-hover:text-[#F8F8F8]" 
+                  <Lock
+                    className="w-10 h-10 md:w-14 md:h-14 text-[#E20074] transition-colors duration-500 group-hover:text-[#F8F8F8]"
                     strokeWidth={1.5}
                   />
                   <div>
@@ -76,7 +76,7 @@ export function AntiPortfolioSection() {
                         sup2: (chunks) => <sup className="text-[0.6em] ml-0.5 text-muted-foreground/50">{chunks}</sup>,
                         blur: (chunks) => (
                           <span className="relative inline-flex items-center align-baseline select-none overflow-hidden rounded-md px-2.5 py-0.5 bg-[#1F1F1F]/40 border border-white/5 shadow-inner whitespace-nowrap">
-                            <motion.span 
+                            <motion.span
                               className="font-mono tracking-wider text-xl md:text-4xl lg:text-5xl opacity-50 filter blur-[2px] text-[#F8F8F8] block select-none whitespace-nowrap"
                               animate={{ opacity: [0.4, 0.6, 0.4] }}
                               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -106,7 +106,7 @@ export function AntiPortfolioSection() {
               {/* Mobile scroll-reveal gradient fill (from the bottom, like user's scribble) */}
               <motion.div
                 className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-transparent via-[#E20074]/18 to-transparent pointer-events-none md:hidden"
-                style={{ 
+                style={{
                   opacity: gradientOpacity,
                   y: gradientY
                 }}
@@ -116,13 +116,13 @@ export function AntiPortfolioSection() {
 
           {/* Row 2: Card 2 + Card 3 side by side */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-            
+
             {/* Card 2 */}
-            <motion.div 
+            <motion.div
               className="flex"
-              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }} 
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} 
-              viewport={{ once: true, margin: "-100px" }} 
+              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-100px" }}
               transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.15 }}
             >
               <BentoCard className="w-full">
@@ -137,11 +137,11 @@ export function AntiPortfolioSection() {
             </motion.div>
 
             {/* Card 3 */}
-            <motion.div 
+            <motion.div
               className="flex"
-              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }} 
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} 
-              viewport={{ once: true, margin: "-100px" }} 
+              initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-100px" }}
               transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.3 }}
             >
               <BentoCard className="w-full">
@@ -160,11 +160,11 @@ export function AntiPortfolioSection() {
 
         {/* NDA Footer Hint */}
         <motion.div
-           initial={{ opacity: 0, y: 30, filter: "blur(10px)" }} 
-           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} 
-           viewport={{ once: true, margin: "-50px" }} 
-           transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.4 }}
-           className="mt-16 sm:mt-20 flex flex-col sm:flex-row items-center justify-center gap-3 text-center"
+          initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.4 }}
+          className="mt-16 sm:mt-20 flex flex-col sm:flex-row items-center justify-center gap-3 text-center"
         >
           <Lock className="w-4 h-4 text-[#A0A0B0]" />
           <span className="text-[#A0A0B0] text-sm md:text-base font-medium tracking-wide uppercase">
