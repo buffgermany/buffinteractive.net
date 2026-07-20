@@ -52,7 +52,7 @@ ___________________________ € netto pro Monat
 **Gläubiger-Identifikationsnummer:** DE15WEB00002924152
 **Mandatsreferenz:** Wird separat mitgeteilt.
 
-Ich ermächtige die Felix Kinze & Leon Trepesch, Zahlungen von meinem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von der Felix Kinze & Leon Trepesch auf mein Konto gezogenen Lastschriften einzulösen.
+Ich ermächtige die Felix Kinze & Leon Trepesch GbR, Zahlungen von meinem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein Kredit Institut an, die von der Felix Kinze & Leon Trepesch GbR auf mein Konto gezogenen Lastschriften einzulösen.
 *Hinweis: Ich kann innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen.*
 
 **Kontoinhaber (falls abweichend von 1.):** _________________________________

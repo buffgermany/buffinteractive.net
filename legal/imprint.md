@@ -13,6 +13,12 @@ Felix Kinze & Leon Trepesch
 **Kontakt:**  
 E-Mail: service@buffinteractive.net  
 
+**Sitz der Gesellschaft:**  
+Chemnitz  
+
+**Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:**  
+DE463435130
+
 ---
 
 ### Haftungsausschluss (Disclaimer)

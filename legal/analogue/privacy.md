@@ -46,7 +46,7 @@ Die Verarbeitung dieser Daten ist technisch erforderlich, um Ihnen unsere Websit
 
 Unsere Website verwendet Cookies. Cookies sind Textdateien, die im Internetbrowser bzw. vom Internetbrowser auf dem Computersystem des Nutzers gespeichert werden.
 
-Wir nutzen ausschließlich **technisch notwendige Cookies**, um grundlegende Funktionen der Website bereitzustellen (z. B. das Speichern Ihrer Sprachpräferenz).
+Wir nutzen ausschließlich **technisch notwendige Cookies**, um grundlegende Funktionen der Website bereitzustellen. Hierzu gehört insbesondere das Speichern Ihrer Sprachpräferenz über den Cookie `next_locale`.
 * **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer nutzerfreundlichen Gestaltung und Bereitstellung der erforderlichen Kernfunktionen unserer Website).
 * Wir führen **kein Tracking** und keine Webanalyse mittels Cookies von Drittanbietern ohne Ihre ausdrückliche Einwilligung durch.
 
@@ -84,7 +84,28 @@ Die Verarbeitung erfolgt zur Bereitstellung Ihres Benutzerkontos, zur Erstellung
 
 ---
 
-### 6. Ihre Rechte als betroffene Person
+### 6. Einbindung von Inhalten und Diensten Dritter (Content Delivery Networks / CDNs)
+
+Zur ansprechenden, schnellen und einheitlichen Darstellung von visuellen Elementen (wie Flaggen, Icons und Logos) auf unserer Website nutzen wir externe Dienste und Ressourcen von Drittanbietern. Beim Aufruf einer Seite, die diese Elemente enthält, baut Ihr Browser eine direkte Verbindung zu den Servern des jeweiligen Anbieters auf. Hierbei wird Ihre IP-Adresse an den jeweiligen Anbieter übertragen.
+
+#### a) FlagCDN (flagcdn.com)
+Zur Darstellung von Länderflaggen für die Sprachauswahl binden wir Grafiken des Dienstes **FlagCDN** ein. Betreiber ist: *FlagCDN*, ein Open-Source-Projekt (https://flagcdn.com).
+* **Zweck:** Darstellung von Länderflaggen im Sprachwähler.
+* **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der nutzerfreundlichen Visualisierung der Sprachauswahl).
+
+#### b) Simple Icons CDN (simpleicons.org)
+Zur Anzeige von Marken- und Technologie-Icons in unseren Leistungs- und Technologie-Portfolios nutzen wir das CDN von **Simple Icons** (https://simpleicons.org).
+* **Zweck:** Bereitstellung einheitlicher Vektorgrafiken (SVGs) von Technologie-Logos.
+* **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer modernen, visuell ansprechenden und performanten Darstellung unserer genutzten Technologien).
+
+#### c) Wikimedia Commons (wikimedia.org)
+Zur Darstellung bestimmter Logos und Bilder laden wir Grafiken von den Servern von **Wikimedia Commons** (Betreiber: *Wikimedia Foundation Inc.*, 1 Montgomery Street, Suite 1600, San Francisco, CA 94104, USA; https://upload.wikimedia.org).
+* **Zweck:** Bereitstellung von Bilddateien und Logos.
+* **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer visuell ansprechenden und korrekten Darstellung von Logos externer Partner oder Technologien).
+
+---
+
+### 7. Ihre Rechte als betroffene Person
 
 Werden personenbezogene Daten von Ihnen verarbeitet, sind Sie Betroffener im Sinne der DSGVO und es stehen Ihnen folgende Rechte gegenüber uns als Verantwortlichem zu:
 
@@ -99,7 +120,7 @@ Werden personenbezogene Daten von Ihnen verarbeitet, sind Sie Betroffener im Sin
 
 ---
 
-### 7. Datensicherheit
+### 8. Datensicherheit
 
 Wir verwenden innerhalb des Website-Besuchs das verbreitete SSL-Verfahren (Secure Socket Layer) in Verbindung mit der jeweils höchsten Verschlüsselungsstufe, die von Ihrem Browser unterstützt wird. Sie erkennen eine verschlüsselte Verbindung an dem Schloss-Symbol in der Adresszeile Ihres Browsers und an der Kennzeichnung `https://`.
 

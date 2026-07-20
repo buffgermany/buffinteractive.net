@@ -2,7 +2,7 @@
 
 **Angaben gemäß § 5 TMG:**
 
-**Buff Interactive - Felix Kinze & Leon Trepesch GbR**  
+**Felix Kinze & Leon Trepesch GbR**  
 Eulitzstr. 1  
 09112 Chemnitz  
 Deutschland  

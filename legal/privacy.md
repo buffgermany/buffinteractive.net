@@ -68,7 +68,19 @@ Unsere Website verwendet Cookies. Cookies sind kleine Textdateien, die vom Brows
 * **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der nutzerfreundlichen Gestaltung und der technischen Bereitstellung der Kernfunktionen unserer Website). Technisch notwendige Cookies bedürfen gemäß der Orientierungshilfe der Datenschutzkonferenz (DSK) zu Cookies und Tracking keiner vorherigen Einwilligung.
 * Wir führen **kein Tracking** und keine Webanalyse mittels Cookies von Drittanbietern durch.
 
-#### b) Session-Cookie (Authentifizierung via Better Auth)
+#### b) Sprachpräferenz-Cookie (next_locale)
+Für die Speicherung der vom Nutzer ausgewählten Sprachversion unserer Website (z. B. Deutsch, Englisch, Spanisch) setzen wir einen technisch notwendigen Cookie ein. Dies ermöglicht es uns, dem Nutzer bei Folgebesuchen direkt die bevorzugte Sprache anzuzeigen.
+
+| Eigenschaft | Wert |
+|---|---|
+| Zweck | Speicherung der bevorzugten Sprachauswahl des Nutzers |
+| Maximale Speicherdauer | 1 Jahr |
+| Typ | Standard-Cookie (First-Party) |
+| Drittanbieter | Nein |
+
+* **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der nutzerfreundlichen Bereitstellung der Sprachauswahl und dem Erhalt der Nutzersitzungseinstellungen).
+
+#### c) Session-Cookie (Authentifizierung via Better Auth)
 Für die Verwaltung von Nutzersitzungen nach dem Login in den Kundenbereich setzen wir einen technisch notwendigen Sitzungs-Cookie ein, der durch das Authentifizierungssystem **Better Auth** gesetzt wird.
 
 | Eigenschaft | Wert |
@@ -81,14 +93,14 @@ Für die Verwaltung von Nutzersitzungen nach dem Login in den Kundenbereich setz
 Der Cookie wird bei aktiver Abmeldung sofort gelöscht. Eine Nutzung für Tracking oder Werbezwecke findet nicht statt.
 * **Rechtsgrundlage:** Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung des Kundenbereichs) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der sicheren Sitzungsverwaltung).
 
-#### c) Selbstgehostete Web-Analyse (OpenPanel)
+#### d) Selbstgehostete Web-Analyse (OpenPanel)
 Zur datenschutzkonformen Reichweitenmessung und Optimierung unserer Website setzen wir eine selbstgehostete Instanz des Analysetools **OpenPanel** ein. Das Analyse-Skript wird von unserem eigenen Server unter dem Endpunkt `analytics.buffinteractive.net` ausgeliefert und läuft ausschließlich auf eigener Infrastruktur bei netcup/Hetzner in Deutschland. Es findet **keine Datenübermittlung an Dritte** statt.
 
 Gemäß der Orientierungshilfe der Datenschutzkonferenz (DSK) zu Cookies und Tracking (aktualisierte Fassung) ist für Analysewerkzeuge, die cookielos betrieben werden und bei denen die IP-Adresse vor jeder weiteren Verarbeitung pseudonymisiert oder anonymisiert wird, eine vorherige Einwilligung nicht zwingend erforderlich, sofern die Verarbeitung ausschließlich zu statistischen Zwecken erfolgt und kein personenbezogenes Nutzerprofil erstellt wird. Unser Einsatz von OpenPanel entspricht diesen Anforderungen:
 * **Keine Cookies:** OpenPanel setzt keinerlei Cookies oder andere persistente Kenner auf Ihrem Endgerät.
 * **IP-Anonymisierung:** Die IP-Adresse wird unmittelbar bei der Erfassung serverseitig gekürzt und anonymisiert. Eine Re-Identifizierung oder Zusammenführung mit anderen Datenquellen ist technisch ausgeschlossen.
 * **Kein Fingerprinting:** Es werden keine Browser-Fingerprints oder gerätebezogenen Kenner erstellt.
-* **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der statistischen Analyse des Besucherverhaltens zur Optimierung unseres Webangebots). Ihnen steht ein jederzeitiges Widerspruchsrecht gegen diese Verarbeitung zu (vgl. Abschnitt 6).
+* **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der statistischen Analyse des Besucherverhaltens zur Optimierung unseres Webangebots). Ihnen steht ein jederzeitiges Widerspruchsrecht gegen diese Verarbeitung zu (vgl. Abschnitt 7).
 
 ---
 
@@ -154,7 +166,28 @@ Die Anbieter erfassen hierbei Ihre Zahlungsdaten (z. B. Bankverbindung, Kreditka
 
 ---
 
-### 6. Ihre Rechte als betroffene Person
+### 6. Einbindung von Inhalten und Diensten Dritter (Content Delivery Networks / CDNs)
+
+Zur ansprechenden, schnellen und einheitlichen Darstellung von visuellen Elementen (wie Flaggen, Icons und Logos) auf unserer Website nutzen wir externe Dienste und Ressourcen von Drittanbietern. Beim Aufruf einer Seite, die diese Elemente enthält, baut Ihr Browser eine direkte Verbindung zu den Servern des jeweiligen Anbieters auf. Hierbei wird Ihre IP-Adresse an den jeweiligen Anbieter übertragen.
+
+#### a) FlagCDN (flagcdn.com)
+Zur Darstellung von Länderflaggen für die Sprachauswahl binden wir Grafiken des Dienstes **FlagCDN** ein. Betreiber ist: *FlagCDN*, ein Open-Source-Projekt (https://flagcdn.com).
+* **Zweck:** Darstellung von Länderflaggen im Sprachwähler.
+* **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der nutzerfreundlichen Visualisierung der Sprachauswahl).
+
+#### b) Simple Icons CDN (simpleicons.org)
+Zur Anzeige von Marken- und Technologie-Icons in unseren Leistungs- und Technologie-Portfolios nutzen wir das CDN von **Simple Icons** (https://simpleicons.org).
+* **Zweck:** Bereitstellung einheitlicher Vektorgrafiken (SVGs) von Technologie-Logos.
+* **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer modernen, visuell ansprechenden und performanten Darstellung unserer genutzten Technologien).
+
+#### c) Wikimedia Commons (wikimedia.org)
+Zur Darstellung bestimmter Logos und Bilder laden wir Grafiken von den Servern von **Wikimedia Commons** (Betreiber: *Wikimedia Foundation Inc.*, 1 Montgomery Street, Suite 1600, San Francisco, CA 94104, USA; https://upload.wikimedia.org).
+* **Zweck:** Bereitstellung von Bilddateien und Logos.
+* **Rechtsgrundlage:** Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer visuell ansprechenden und korrekten Darstellung von Logos externer Partner oder Technologien).
+
+---
+
+### 7. Ihre Rechte als betroffene Person
 
 Werden personenbezogene Daten von Ihnen verarbeitet, sind Sie Betroffener im Sinne der DSGVO und es stehen Ihnen folgende Rechte gegenüber uns als Verantwortlichem zu:
 
@@ -169,7 +202,7 @@ Werden personenbezogene Daten von Ihnen verarbeitet, sind Sie Betroffener im Sin
 
 ---
 
-### 7. Datensicherheit
+### 8. Datensicherheit
 
 Wir verwenden innerhalb des Website-Besuchs das verbreitete SSL-Verfahren (Secure Socket Layer) in Verbindung mit der jeweils höchsten Verschlüsselungsstufe, die von Ihrem Browser unterstützt wird. Sie erkennen eine verschlüsselte Verbindung an dem Schloss-Symbol in der Adresszeile Ihres Browsers und an der Kennzeichnung `https://`.
 

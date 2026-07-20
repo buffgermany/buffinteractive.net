@@ -4,7 +4,7 @@
 
 **Stand: Juni 2026**
 
-Zwischen der **Buff Interactive - Felix Kinze & Leon Trepesch GbR**, vertreten durch die Gesellschafter Felix Kinze und Leon Trepesch, Eulitzstr. 1, 09112 Chemnitz (nachfolgend „Anbieter“) und den in § 1 Abs. 2 definierten Kunden (nachfolgend „Kunde“).
+Zwischen der **Felix Kinze & Leon Trepesch GbR**, vertreten durch die Gesellschafter Felix Kinze und Leon Trepesch, Eulitzstr. 1, 09112 Chemnitz (nachfolgend „Anbieter“) und den in § 1 Abs. 2 definierten Kunden (nachfolgend „Kunde“).
 
 ---
 

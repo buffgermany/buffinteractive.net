@@ -321,7 +321,7 @@ export function Header() {
 						<div onMouseEnter={() => handleMouseEnter("None")}>
 							<Magnetic>
 								<Link
-									href={`/${locale}/#about`}
+									href={`/${locale}/about`}
 									prefetch={true}
 									className="font-medium text-muted-foreground hover:text-foreground transition-colors"
 								>
@@ -459,7 +459,7 @@ export function Header() {
 							</h4>
 							{[
 								...(!isHome ? [{ label: t("nav_home"), href: `/${locale}` }] : []),
-								{ label: t("mobile_about"), href: `/${locale}/#about` },
+								{ label: t("mobile_about"), href: `/${locale}/about` },
 								{ label: t("mobile_contact"), href: `/${locale}/#contact` },
 								{
 									label: session ? t("nav_dashboard") : t("nav_login"),

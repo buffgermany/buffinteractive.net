@@ -3,7 +3,7 @@
 
 **Stand: Juni 2026**
 
-Zwischen der **Buff Interactive - Felix Kinze & Leon Trepesch GbR**, vertreten durch die Gesellschafter Felix Kinze und Leon Trepesch, Eulitzstr. 1, 09112 Chemnitz (nachfolgend **„Auftragsverarbeiter"**) und dem im zugehörigen WaaS-Vertrag benannten Kunden (nachfolgend **„Verantwortlicher"**).
+Zwischen der **Felix Kinze & Leon Trepesch GbR**, vertreten durch die Gesellschafter Felix Kinze und Leon Trepesch, Eulitzstr. 1, 09112 Chemnitz (nachfolgend **„Auftragsverarbeiter"**) und dem im zugehörigen WaaS-Vertrag benannten Kunden (nachfolgend **„Verantwortlicher"**).
 
 Diese Vereinbarung über die Auftragsverarbeitung (nachfolgend „AVV") ist Bestandteil des zwischen den Parteien geschlossenen Website-as-a-Service-Vertrages (nachfolgend „Hauptvertrag") und regelt ergänzend die datenschutzrechtlichen Pflichten beider Parteien im Zusammenhang mit der Verarbeitung personenbezogener Daten durch den Auftragsverarbeiter im Auftrag des Verantwortlichen.
 

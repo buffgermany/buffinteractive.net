@@ -46,13 +46,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default function HomePage() {
   return (
-      <main className="min-h-screen bg-transparent text-foreground font-sans">
-        <HeroSection />
-        <RealityCheckSection />
-        <ArsenalSection />
-        <AntiPortfolioSection />
-        <MadLibsFooter />
-        <FootnotesSection />
-      </main>
+    <main className="min-h-screen bg-transparent text-foreground font-sans">
+      <HeroSection />
+      <RealityCheckSection />
+      <ArsenalSection />
+      {/* <AntiPortfolioSection /> */}
+      <MadLibsFooter />
+      <FootnotesSection />
+    </main>
   );
 }
