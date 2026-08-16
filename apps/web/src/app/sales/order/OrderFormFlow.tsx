@@ -9,7 +9,8 @@ import { LegalScrollBox } from "@/components/shared/LegalScrollBox";
 import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/primitives";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { CheckCircle2, FileText, User, CreditCard, PenTool, ArrowLeft, ArrowRight, Heart } from "lucide-react";
+import { CheckCircle2, FileText, User, CreditCard, PenTool, ArrowLeft, ArrowRight, Heart, Tablet, Mail, Copy, Check, Send, Sparkles, ExternalLink } from "lucide-react";
+
 import { validateIBAN } from "@/lib/utils";
 import { PRICING_CONFIG } from "@/config/pricing";
 
@@ -204,6 +205,54 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
   const [agbRead, setAgbRead] = useState(false);
   const [avvRead, setAvvRead] = useState(false);
 
+  const [orderMode, setOrderMode] = useState<"in_person" | "remote">("in_person");
+  const [remoteCustomerEmail, setRemoteCustomerEmail] = useState("");
+  const [remoteCustomerName, setRemoteCustomerName] = useState("");
+  const [remoteCompanyName, setRemoteCompanyName] = useState("");
+  const [isSendingInvite, setIsSendingInvite] = useState(false);
+  const [inviteSentResult, setInviteSentResult] = useState<{ signingUrl: string; email: string } | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  const handleCreateInvite = async () => {
+    if (!remoteCustomerEmail || !remoteCustomerEmail.includes("@")) {
+      alert("Bitte gib eine gültige E-Mail-Adresse des Kunden ein.");
+      return;
+    }
+    setIsSendingInvite(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const res = await fetch(`${apiUrl}/v1/contracts/create-invite`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tarif: currentTarif,
+          zahlungsrhythmus: currentZahlungsrhythmus,
+          setupPreisBrutto: watch("setupPreisBrutto"),
+          laufendPreisBrutto: watch("laufendPreisBrutto"),
+          customerEmail: remoteCustomerEmail,
+          customerName: remoteCustomerName,
+          companyName: remoteCompanyName,
+          salesUserId
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setInviteSentResult({
+          signingUrl: data.signingUrl,
+          email: remoteCustomerEmail
+        });
+      } else {
+        alert(data.error || "Fehler beim Erstellen des Signatur-Links.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Netzwerkfehler beim Versenden des Signatur-Links.");
+    }
+    setIsSendingInvite(false);
+  };
+
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [step, success]);
@@ -391,6 +440,36 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
           {/* STEP 0: Sales Rep Selection */}
           {step === 0 && (
             <div className="space-y-6 animate-in fade-in duration-300">
+
+              {/* Mode Selector Header */}
+              <div className="bg-muted/60 p-1.5 rounded-xl border border-border flex flex-col sm:flex-row gap-2">
+                <button
+                  type="button"
+                  onClick={() => setOrderMode("in_person")}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${
+                    orderMode === "in_person"
+                      ? "bg-background text-foreground shadow-sm border border-border/50"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Tablet className="w-4 h-4 text-primary" />
+                  <span>1. Vor Ort (Tablet übergeben)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setOrderMode("remote")}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${
+                    orderMode === "remote"
+                      ? "bg-background text-foreground shadow-sm border border-border/50"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Mail className="w-4 h-4 text-primary" />
+                  <span>2. Digital per E-Mail (Online-Link)</span>
+                </button>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {["essential", "growth", "enterprise"].map((t) => {
                   let priceInfo = "";
@@ -454,16 +533,126 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                 </div>
               )}
 
-              <div className="mt-8 bg-primary/5 p-4 rounded-xl border border-primary/20 text-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-                <span className="text-muted-foreground text-center sm:text-left">
-                  Konfiguration abgeschlossen. Bitte übergib das Tablet nun an den Kunden.
-                </span>
-                <Button type="button" size="lg" className="w-full sm:w-auto shrink-0" onClick={nextStep}>
-                  Tablet an Kunden übergeben ➔
-                </Button>
-              </div>
+              {/* Action based on Order Mode */}
+              {orderMode === "in_person" ? (
+                <div className="mt-8 bg-primary/5 p-4 rounded-xl border border-primary/20 text-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <span className="text-muted-foreground text-center sm:text-left">
+                    Konfiguration abgeschlossen. Bitte übergib das Tablet nun an den Kunden.
+                  </span>
+                  <Button type="button" size="lg" className="w-full sm:w-auto shrink-0" onClick={nextStep}>
+                    Tablet an Kunden übergeben ➔
+                  </Button>
+                </div>
+              ) : (
+                <div className="mt-8 bg-card border-2 border-primary/30 p-6 rounded-xl space-y-5 shadow-md">
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-5 h-5 text-primary" />
+                    <h4 className="font-bold text-lg">Digitalen Signatur-Link per E-Mail versenden</h4>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Sende dem Kunden einen geschützten Online-Link, über den der Vertrag bequem von jedem Gerät (Smartphone, Tablet, PC) digital unterzeichnet werden kann.
+                  </p>
+
+                  {inviteSentResult ? (
+                    <div className="bg-emerald-500/10 border border-emerald-500/40 p-5 rounded-xl space-y-4 animate-in fade-in duration-300">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 className="w-6 h-6 text-emerald-400 shrink-0" />
+                        <div>
+                          <h5 className="font-bold text-emerald-400 text-sm">Signatur-Link erfolgreich versendet!</h5>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            E-Mail wurde an <strong className="text-foreground">{inviteSentResult.email}</strong> zugestellt.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 pt-2 border-t border-emerald-500/20">
+                        <Label className="text-xs font-semibold">Direkter Signatur-Link für den Kunden:</Label>
+                        <div className="flex gap-2">
+                          <Input readOnly value={inviteSentResult.signingUrl} className="font-mono text-xs bg-background/80" />
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            className="shrink-0"
+                            onClick={() => {
+                              navigator.clipboard.writeText(inviteSentResult.signingUrl);
+                              setCopiedLink(true);
+                              setTimeout(() => setCopiedLink(false), 3000);
+                            }}
+                          >
+                            {copiedLink ? <Check className="w-4 h-4 text-emerald-500 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                            {copiedLink ? "Kopiert!" : "Kopieren"}
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 flex justify-end">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setInviteSentResult(null);
+                            setRemoteCustomerEmail("");
+                            setRemoteCustomerName("");
+                            setRemoteCompanyName("");
+                          }}
+                        >
+                          Neues Angebot erstellen
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2 sm:col-span-2">
+                          <Label required>Kunden-E-Mail-Adresse</Label>
+                          <Input
+                            type="email"
+                            placeholder="kunde@firma.de"
+                            value={remoteCustomerEmail}
+                            onChange={(e) => setRemoteCustomerEmail(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Name des Ansprechpartners (Optional)</Label>
+                          <Input
+                            placeholder="Max Mustermann"
+                            value={remoteCustomerName}
+                            onChange={(e) => setRemoteCustomerName(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Firmenname (Optional)</Label>
+                          <Input
+                            placeholder="Muster GmbH"
+                            value={remoteCompanyName}
+                            onChange={(e) => setRemoteCompanyName(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border/40">
+                        <span className="text-xs text-muted-foreground">
+                          Der Link ist nach dem Versenden 14 Tage lang gültig.
+                        </span>
+                        <Button
+                          type="button"
+                          size="lg"
+                          className="w-full sm:w-auto px-8"
+                          disabled={isSendingInvite || !remoteCustomerEmail}
+                          onClick={handleCreateInvite}
+                        >
+                          <Send className="w-4 h-4 mr-2" />
+                          {isSendingInvite ? "Wird versendet..." : "Link generieren & per E-Mail senden ➔"}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
+
 
           {/* STEP 1: Customer Data */}
           {step === 1 && (

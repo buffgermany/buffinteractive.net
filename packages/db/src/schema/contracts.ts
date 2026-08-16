@@ -66,5 +66,47 @@ export const contracts = pgTable("contracts", {
 
 });
 
+
+export const contractSigningRequestStatusEnum = pgEnum("contract_signing_request_status", [
+  "pending",
+  "signed",
+  "expired",
+  "cancelled"
+]);
+
+export const contractSigningRequests = pgTable("contract_signing_requests", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+
+  token: text("token").notNull().unique(),
+
+  salesUserId: text("sales_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "restrict" }),
+
+  tarif: contractTarifEnum("tarif").notNull(),
+  zahlungsrhythmus: contractPaymentCycleEnum("zahlungsrhythmus").notNull(),
+
+  setupPreisBrutto: decimal("setup_preis_brutto", { precision: 10, scale: 2 }).notNull(),
+  laufendPreisBrutto: decimal("laufend_preis_brutto", { precision: 10, scale: 2 }).notNull(),
+
+  customerEmail: text("customer_email").notNull(),
+  customerName: text("customer_name"),
+  companyName: text("company_name"),
+
+  status: contractSigningRequestStatusEnum("status").notNull().default("pending"),
+
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+
+  contractId: text("contract_id").references(() => contracts.id, { onDelete: "set null" }),
+
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export type Contract = typeof contracts.$inferSelect;
 export type NewContract = typeof contracts.$inferInsert;
+export type ContractSigningRequest = typeof contractSigningRequests.$inferSelect;
+export type NewContractSigningRequest = typeof contractSigningRequests.$inferInsert;
+

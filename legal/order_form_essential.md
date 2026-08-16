@@ -34,12 +34,12 @@ Der Leistungsumfang umfasst: Individuelles High-End-Design, mobile Optimierung, 
 **Bitte gewünschten Zahlungsrhythmus ankreuzen:**
 
 [  ] **Monatliche Zahlweise**
-* Einmalige Setup-Gebühr: 359,99 € netto
-* Laufende Pauschale: 75,00 € netto / Monat
+* Einmalige Setup-Gebühr: 369,99 € netto
+* Laufende Pauschale: 65,00 € netto / Monat
 
 [  ] **Jährliche Zahlweise (5 % Rabatt auf die Laufzeit)**
-* Einmalige Setup-Gebühr: 359,99 € netto
-* Laufende Pauschale: 71,25 € netto / Monat (Abrechnung jährlich im Voraus: 855,00 € netto / Jahr)
+* Einmalige Setup-Gebühr: 369,99 € netto
+* Laufende Pauschale: 61,75 € netto / Monat (Abrechnung jährlich im Voraus: 741,00 € netto / Jahr)
 
 *Alle Preise verstehen sich zzgl. der gesetzlichen Umsatzsteuer.*
 
