@@ -103,7 +103,7 @@ const ServicesMenu = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 	const t = useTranslations("MegaMenu");
 	const locale = useLocale();
 	return (
-		<div className="w-full md:w-[720px] p-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+		<div className="w-full md:w-[880px] p-2 grid grid-cols-1 md:grid-cols-3 gap-2">
 			{/* Build Service */}
 			<motion.div
 				initial={{ opacity: 0, y: 10 }}
@@ -114,7 +114,7 @@ const ServicesMenu = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 					href={`/${locale}/build`}
 					prefetch={true}
 					onClick={onLinkClick}
-					className="group h-full flex flex-col gap-4 p-6 md:p-8 px-6 md:px-10 rounded-[2rem] md:rounded-[2.5rem] bg-white/5 md:bg-transparent hover:bg-[#00F0FF]/5 border border-white/5 md:border-transparent hover:border-[#00F0FF]/25 transition-all outline-none"
+					className="group h-full flex flex-col gap-4 p-6 md:p-8 px-6 md:px-8 rounded-[2rem] md:rounded-[2.5rem] bg-white/5 md:bg-transparent hover:bg-[#00F0FF]/5 border border-white/5 md:border-transparent hover:border-[#00F0FF]/25 transition-all outline-none"
 				>
 					<div className="flex items-center justify-between">
 						<div className="p-3 bg-[#00F0FF]/10 text-[#00F0FF] rounded-full group-hover:scale-110 group-hover:bg-[#00F0FF]/20 transition-all">
@@ -146,7 +146,7 @@ const ServicesMenu = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 					href={`/${locale}/growth`}
 					prefetch={true}
 					onClick={onLinkClick}
-					className="group h-full flex flex-col gap-4 p-6 md:p-8 px-6 md:px-10 rounded-[2rem] md:rounded-[2.5rem] bg-white/5 md:bg-transparent hover:bg-[#CCFF00]/5 border border-white/5 md:border-transparent hover:border-[#CCFF00]/25 transition-all outline-none"
+					className="group h-full flex flex-col gap-4 p-6 md:p-8 px-6 md:px-8 rounded-[2rem] md:rounded-[2.5rem] bg-white/5 md:bg-transparent hover:bg-[#CCFF00]/5 border border-white/5 md:border-transparent hover:border-[#CCFF00]/25 transition-all outline-none"
 				>
 					<div className="flex items-center justify-between">
 						<div className="p-3 bg-[#CCFF00]/10 text-[#CCFF00] rounded-full group-hover:scale-110 group-hover:bg-[#CCFF00]/20 transition-all">
@@ -168,12 +168,49 @@ const ServicesMenu = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 				</Link>
 			</motion.div>
 
-			{/* Analyze Needs (Audit) */}
+			{/* WaaS Product */}
 			<motion.div
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ delay: 0.15 }}
-				className="md:col-span-2"
+			>
+				<Link
+					href={`/${locale}/products/waas`}
+					prefetch={true}
+					onClick={onLinkClick}
+					className="group h-full flex flex-col gap-4 p-6 md:p-8 px-6 md:px-8 rounded-[2rem] md:rounded-[2.5rem] bg-white/5 md:bg-transparent hover:bg-[#A855F7]/5 border border-white/5 md:border-transparent hover:border-[#A855F7]/25 transition-all outline-none"
+				>
+					<div className="flex items-center justify-between">
+						<div className="p-3 bg-[#A855F7]/10 text-[#A855F7] rounded-full group-hover:scale-110 group-hover:bg-[#A855F7]/20 transition-all">
+							<Globe size={24} />
+						</div>
+						<ArrowUpRight
+							size={20}
+							className="text-white/20 md:text-muted-foreground group-hover:text-[#A855F7] group-hover:translate-x-1 md:group-hover:-translate-y-1 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 -translate-x-0 translate-y-0 md:-translate-x-2 md:translate-y-2"
+						/>
+					</div>
+					<div>
+						<div className="flex items-center gap-2 mt-2">
+							<h5 className="font-heading font-bold tracking-tight text-xl text-white group-hover:text-[#A855F7] transition-colors">
+								{t("waas_title")}
+							</h5>
+							<span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#A855F7]/15 text-[#A855F7] border border-[#A855F7]/30">
+								{t("waas_badge")}
+							</span>
+						</div>
+						<p className="text-sm text-white/50 md:text-muted-foreground mt-2 leading-relaxed">
+							{t("waas_text")}
+						</p>
+					</div>
+				</Link>
+			</motion.div>
+
+			{/* Analyze Needs (Audit) */}
+			<motion.div
+				initial={{ opacity: 0, y: 10 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ delay: 0.2 }}
+				className="md:col-span-3"
 			>
 				<Link
 					href={`/${locale}/audit`}
@@ -195,7 +232,7 @@ const ServicesMenu = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 						size={24}
 						className="text-white/20 group-hover:text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-all"
 					/>
-                    <div className="p-3 bg-[#CCFF00]/10 text-[#CCFF00] rounded-full group-hover:scale-110 group-hover:bg-[#CCFF00]/20 transition-all">
+					<div className="p-3 bg-[#CCFF00]/10 text-[#CCFF00] rounded-full group-hover:scale-110 group-hover:bg-[#CCFF00]/20 transition-all">
 						<Zap size={24} />
 					</div>
 				</Link>

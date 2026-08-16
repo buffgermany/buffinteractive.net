@@ -254,6 +254,9 @@
     "build_text": "Stop patching. Start engineering. Custom, scalable infrastructure designed for raw performance.",
     "growth_title": "Growth Ops",
     "growth_text": "Ruthless, mathematical approach to capturing market share and eliminating CAC bleed.",
+    "waas_title": "WaaS",
+    "waas_badge": "Product",
+    "waas_text": "Website-as-a-Service on autopilot. High-end design, hosting, and continuous updates for a flat monthly fee.",
     "audit_title": "Analyze Needs",
     "audit_text": "Not sure? Get a personalized recommendation within seconds."
   },
