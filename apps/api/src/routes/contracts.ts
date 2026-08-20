@@ -166,8 +166,8 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             { text: '2. Leistungsbeschreibung & Vergütung', style: 'subheader', margin: [0, 20, 0, 5] },
             { text: `Tarif: ${tarif.charAt(0).toUpperCase() + tarif.slice(1)}` },
             { text: `Zahlungsrhythmus: ${zahlungsrhythmus === 'jaehrlich' ? 'Jährlich' : 'Monatlich'}` },
-            { text: `Einmalgebühr: ${setupPreisBrutto} € inkl. MwSt.` },
-            { text: `Laufende Gebühr: ${laufendPreisBrutto} € inkl. MwSt. / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}` },
+            { text: `Einmalgebühr: ${setupPreisBrutto} € zzgl. MwSt.` },
+            { text: `Laufende Gebühr: ${laufendPreisBrutto} € zzgl. MwSt. / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}` },
 
             { text: '3. SEPA-Lastschriftmandat', style: 'subheader', margin: [0, 20, 0, 5] },
             { text: 'Gläubiger-Identifikationsnummer: DE15WEB00002924152' },
@@ -748,8 +748,8 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             { text: '2. Leistungsbeschreibung & Vergütung', style: 'subheader', margin: [0, 20, 0, 5] },
             { text: `Tarif: ${tarif.charAt(0).toUpperCase() + tarif.slice(1)}` },
             { text: `Zahlungsrhythmus: ${zahlungsrhythmus === 'jaehrlich' ? 'Jährlich' : 'Monatlich'}` },
-            { text: `Einmalgebühr: ${setupPreisBrutto} € inkl. MwSt.` },
-            { text: `Laufende Gebühr: ${laufendPreisBrutto} € inkl. MwSt. / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}` },
+            { text: `Einmalgebühr: ${setupPreisBrutto} € zzgl. MwSt.` },
+            { text: `Laufende Gebühr: ${laufendPreisBrutto} € zzgl. MwSt. / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}` },
 
             { text: '3. SEPA-Lastschriftmandat', style: 'subheader', margin: [0, 20, 0, 5] },
             { text: 'Gläubiger-Identifikationsnummer: DE15WEB00002924152' },

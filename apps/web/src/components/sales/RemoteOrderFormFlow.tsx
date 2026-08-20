@@ -689,12 +689,12 @@ export function RemoteOrderFormFlow({ invite, termsContent, avvContent, sepaCont
                     <div className="bg-background/40 p-4 rounded-lg border border-border">
                       <span className="text-xs text-muted-foreground block uppercase font-semibold">Einmalgebühr</span>
                       <span className="text-xl font-bold text-foreground">{formatPrice(setupPreis)}</span>
-                      <span className="text-[10px] text-muted-foreground block mt-1">Inkl. 19% MwSt.</span>
+                      <span className="text-[10px] text-muted-foreground block mt-1">Zzgl. 19% MwSt.</span>
                     </div>
                     <div className="bg-background/40 p-4 rounded-lg border border-border">
                       <span className="text-xs text-muted-foreground block uppercase font-semibold">Laufende Gebühr</span>
                       <span className="text-xl font-bold text-foreground">{formatPrice(laufendPreis)}</span>
-                      <span className="text-[10px] text-muted-foreground block mt-1">{(overrideZahlungsrhythmus || invite.zahlungsrhythmus) === "jaehrlich" ? "Jährlich" : "Monatlich"}, inkl. 19% MwSt.</span>
+                      <span className="text-[10px] text-muted-foreground block mt-1">{(overrideZahlungsrhythmus || invite.zahlungsrhythmus) === "jaehrlich" ? "Jährlich" : "Monatlich"}, zzgl. 19% MwSt.</span>
                     </div>
                   </div>
                 </div>

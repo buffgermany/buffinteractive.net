@@ -35,16 +35,16 @@ Der Leistungsumfang (inkl. Sonderfunktionen, Schnittstellen und spezifischem Sei
 **Individuell vereinbarte Vergütung:**
 
 **Einmaliges Projekt-Setup:** 
-___________________________ € inkl. MwSt.
+___________________________ € zzgl. MwSt.
 
 **Laufende Pauschale (Hosting, Wartung & Pflege):** 
-___________________________ € inkl. MwSt. pro Monat
+___________________________ € zzgl. MwSt. pro Monat
 
 **Zahlungsrhythmus der laufenden Pauschale:**
 [  ] Monatlich
 [  ] Jährlich (Abrechnung im Voraus)
 
-*Alle Preise verstehen sich inkl. der gesetzlichen Umsatzsteuer (brutto).*
+*Alle Preise verstehen sich zzgl. der gesetzlichen Umsatzsteuer.*
 
 ---
 

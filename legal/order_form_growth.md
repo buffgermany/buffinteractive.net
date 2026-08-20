@@ -34,14 +34,14 @@ Der Leistungsumfang umfasst: Alles aus dem Essential-Tarif plus erweiterter Seit
 **Bitte gewünschten Zahlungsrhythmus ankreuzen:**
 
 [  ] **Monatliche Zahlweise**
-* Einmalige Setup-Gebühr: 399,99 € inkl. MwSt.
-* Laufende Pauschale: 79,00 € inkl. MwSt. / Monat
+* Einmalige Setup-Gebühr: 399,99 € zzgl. MwSt.
+* Laufende Pauschale: 79,00 € zzgl. MwSt. / Monat
 
 [  ] **Jährliche Zahlweise (5 % Rabatt auf die Laufzeit)**
-* Einmalige Setup-Gebühr: 399,99 € inkl. MwSt.
-* Laufende Pauschale: 75,05 € inkl. MwSt. / Monat (Abrechnung jährlich im Voraus: 900,60 € inkl. MwSt. / Jahr)
+* Einmalige Setup-Gebühr: 399,99 € zzgl. MwSt.
+* Laufende Pauschale: 75,05 € zzgl. MwSt. / Monat (Abrechnung jährlich im Voraus: 900,60 € zzgl. MwSt. / Jahr)
 
-*Alle Preise verstehen sich inkl. der gesetzlichen Umsatzsteuer (brutto).*
+*Alle Preise verstehen sich zzgl. der gesetzlichen Umsatzsteuer.*
 
 ---
 

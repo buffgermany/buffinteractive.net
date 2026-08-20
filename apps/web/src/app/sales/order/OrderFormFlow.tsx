@@ -523,11 +523,11 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
               {currentTarif === "enterprise" && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-muted/50 p-6 rounded-xl mt-4 border border-border">
                   <div className="space-y-2">
-                    <Label required>Individuelle Einmalgebühr (inkl. MwSt., einmalig in €)</Label>
+                    <Label required>Individuelle Einmalgebühr (netto, einmalig in €)</Label>
                     <Input type="number" step="0.01" {...register("setupPreisBrutto", { valueAsNumber: true })} error={errors.setupPreisBrutto?.message} />
                   </div>
                   <div className="space-y-2">
-                    <Label required>Individuelle Laufende Gebühr (inkl. MwSt., laufend in €)</Label>
+                    <Label required>Individuelle Laufende Gebühr (netto, laufend in €)</Label>
                     <Input type="number" step="0.01" {...register("laufendPreisBrutto", { valueAsNumber: true })} error={errors.laufendPreisBrutto?.message} />
                   </div>
                 </div>
@@ -1008,16 +1008,16 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                   <div className="bg-background/40 p-4 rounded-lg border border-border">
                     <span className="text-xs text-muted-foreground block uppercase font-semibold">Einmalgebühr</span>
                     <span className="text-xl font-bold text-foreground">{formatPrice(watch("setupPreisBrutto"))}</span>
-                    <span className="text-[10px] text-muted-foreground block mt-1">Inkl. 19% MwSt.</span>
+                    <span className="text-[10px] text-muted-foreground block mt-1">Zzgl. 19% MwSt.</span>
                   </div>
                   <div className="bg-background/40 p-4 rounded-lg border border-border">
                     <span className="text-xs text-muted-foreground block uppercase font-semibold">Laufende Gebühr</span>
                     <span className="text-xl font-bold text-foreground">{formatPrice(watch("laufendPreisBrutto"))}</span>
-                    <span className="text-[10px] text-muted-foreground block mt-1">{currentZahlungsrhythmus === "jaehrlich" ? "Jährlich" : "Monatlich"}, inkl. 19% MwSt.</span>
+                    <span className="text-[10px] text-muted-foreground block mt-1">{currentZahlungsrhythmus === "jaehrlich" ? "Jährlich" : "Monatlich"}, zzgl. 19% MwSt.</span>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Alle Preise verstehen sich Brutto, also inkl. der gesetzlichen Umsatzsteuer (19%) und sind absetzbar.
+                  Alle Preise verstehen sich netto, zzgl. der gesetzlichen Umsatzsteuer (19%).
                 </p>
               </div>
 

@@ -119,7 +119,7 @@ function PricingCardContent({
               <div className="flex items-center gap-1 text-white/35 mt-1.5 font-normal">
                 <Percent className="w-3 h-3 shrink-0" />
                 <span className="text-[10px] md:text-[11px] font-sans">
-                  Alle Preise inkl. MwSt.
+                  Alle Preise zzgl. MwSt.
                 </span>
               </div>
             </div>
@@ -199,7 +199,7 @@ function PricingCardContent({
           <div className="flex items-center gap-1 text-white/35 mt-1.5 font-normal">
             <Percent className="w-3 h-3 shrink-0" />
             <span className="text-[10px] md:text-[11px] font-sans">
-              Alle Preise inkl. MwSt.
+              Alle Preise zzgl. MwSt.
             </span>
           </div>
         </div>
