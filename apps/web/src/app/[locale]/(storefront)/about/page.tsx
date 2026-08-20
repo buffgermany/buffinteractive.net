@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { AboutHero } from "@/components/buff/AboutHero";
 import { AboutManifesto } from "@/components/buff/AboutManifesto";
 import { AboutRoots } from "@/components/buff/AboutRoots";
-import { AboutTeam } from "@/components/buff/AboutTeam";
 import { AboutTimeline } from "@/components/buff/AboutTimeline";
 import { AboutEcosystem } from "@/components/buff/AboutEcosystem";
 import { MadLibsFooter } from "@/components/buff/MadLibsFooter";
@@ -51,7 +50,6 @@ export default function AboutPage() {
         <AboutHero />
         <AboutManifesto />
         <AboutRoots />
-        <AboutTeam />
         <AboutTimeline />
         <AboutEcosystem />
         <MadLibsFooter />
