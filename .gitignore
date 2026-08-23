@@ -9,6 +9,8 @@ dist/
 .next-dev/
 out/
 *.js.map
+*.tsbuildinfo
+apps/api/contracts/
 
 # Turbo
 .turbo/

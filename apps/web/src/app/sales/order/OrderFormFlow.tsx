@@ -205,59 +205,16 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
   const [agbRead, setAgbRead] = useState(false);
   const [avvRead, setAvvRead] = useState(false);
 
-  const [orderMode, setOrderMode] = useState<"in_person" | "remote">("in_person");
-  const [remoteCustomerEmail, setRemoteCustomerEmail] = useState("");
-  const [remoteCustomerName, setRemoteCustomerName] = useState("");
-  const [remoteCompanyName, setRemoteCompanyName] = useState("");
+  const [orderMode, setOrderMode] = useState<"remote" | "in_person">("remote");
   const [isSendingInvite, setIsSendingInvite] = useState(false);
   const [inviteSentResult, setInviteSentResult] = useState<{ signingUrl: string; email: string } | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
-
-  const handleCreateInvite = async () => {
-    if (!remoteCustomerEmail || !remoteCustomerEmail.includes("@")) {
-      alert("Bitte gib eine gültige E-Mail-Adresse des Kunden ein.");
-      return;
-    }
-    setIsSendingInvite(true);
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-      const res = await fetch(`${apiUrl}/v1/contracts/create-invite`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tarif: currentTarif,
-          zahlungsrhythmus: currentZahlungsrhythmus,
-          setupPreisBrutto: watch("setupPreisBrutto"),
-          laufendPreisBrutto: watch("laufendPreisBrutto"),
-          customerEmail: remoteCustomerEmail,
-          customerName: remoteCustomerName,
-          companyName: remoteCompanyName,
-          salesUserId
-        })
-      });
-
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setInviteSentResult({
-          signingUrl: data.signingUrl,
-          email: remoteCustomerEmail
-        });
-      } else {
-        alert(data.error || "Fehler beim Erstellen des Signatur-Links.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Netzwerkfehler beim Versenden des Signatur-Links.");
-    }
-    setIsSendingInvite(false);
-  };
-
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [step, success]);
 
-  const { register, handleSubmit, control, watch, setValue, trigger, formState: { errors } } = useForm<FormValues>({
+  const { register, handleSubmit, control, watch, setValue, trigger, getValues, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       tarif: "growth",
@@ -271,7 +228,12 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
       plz: "",
       ort: "",
       email: "",
+      telefon: "",
+      ustId: "",
       iban: "",
+      bic: "",
+      bank: "",
+      kontoinhaber: "",
       signatureSepaB64: "",
       signatureContractB64: "",
       consentB2b: false,
@@ -307,6 +269,66 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
       setValue("setupPreisBrutto", 0);
       setValue("laufendPreisBrutto", 0);
     }
+  };
+
+  const handleCreateInvite = async () => {
+    const email = watch("email")?.trim();
+    if (!email || !email.includes("@")) {
+      alert("Bitte gib mindestens eine gültige Kunden-E-Mail-Adresse ein.");
+      return;
+    }
+    setIsSendingInvite(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const clientOrigin = typeof window !== "undefined" ? window.location.origin : undefined;
+      const res = await fetch(`${apiUrl}/v1/contracts/create-invite`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientOrigin,
+          tarif: currentTarif,
+          zahlungsrhythmus: currentZahlungsrhythmus,
+          setupPreisBrutto: watch("setupPreisBrutto"),
+          laufendPreisBrutto: watch("laufendPreisBrutto"),
+          customerEmail: email,
+          customerName: watch("ansprechpartner") || undefined,
+          companyName: watch("firma") || undefined,
+          firma: watch("firma") || undefined,
+          rechtsform: watch("rechtsform") || undefined,
+          ansprechpartner: watch("ansprechpartner") || undefined,
+          strasse: watch("strasse") || undefined,
+          plz: watch("plz") || undefined,
+          ort: watch("ort") || undefined,
+          telefon: watch("telefon") || undefined,
+          ustId: watch("ustId") || undefined,
+          iban: watch("iban") ? watch("iban").replace(/\s/g, "") : undefined,
+          bic: watch("bic") || undefined,
+          bank: watch("bank") || undefined,
+          kontoinhaber: watch("kontoinhaber") || undefined,
+          salesUserId
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        let finalSigningUrl = data.signingUrl;
+        if (typeof window !== "undefined" && window.location.origin && !window.location.origin.includes("localhost")) {
+          if (finalSigningUrl.includes("localhost:3000") || finalSigningUrl.includes("localhost:3001")) {
+            finalSigningUrl = finalSigningUrl.replace(/https?:\/\/localhost:(3000|3001)/, window.location.origin);
+          }
+        }
+        setInviteSentResult({
+          signingUrl: finalSigningUrl,
+          email: email
+        });
+      } else {
+        alert(data.error || "Fehler beim Erstellen des Signatur-Links.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Netzwerkfehler beim Versenden des Signatur-Links.");
+    }
+    setIsSendingInvite(false);
   };
 
   const nextStep = async () => {
@@ -410,9 +432,10 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="text-xl flex items-center gap-2">
-                {step === 0 ? "Tarif-Konfiguration" : `Schritt ${step} von 6`}
+                {step === 0 ? "Vertrag & Angebot konfigurieren" : `Schritt ${step} von 6`}
               </CardTitle>
               <CardDescription className="mt-1 text-xs">
+                {step === 0 && "Tarif, Preise & Kundendaten vorab ausfüllen (Optional für 1-Klick-Abschluss)."}
                 {step === 1 && "Bitte trag Deine Firmendaten ein."}
                 {step === 2 && "Bitte lies und bestätige die AGB."}
                 {step === 3 && "Bitte lies und bestätige den AVV."}
@@ -439,213 +462,410 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
 
           {/* STEP 0: Sales Rep Selection */}
           {step === 0 && (
-            <div className="space-y-6 animate-in fade-in duration-300">
+            <div className="space-y-8 animate-in fade-in duration-300">
 
               {/* Mode Selector Header */}
               <div className="bg-muted/60 p-1.5 rounded-xl border border-border flex flex-col sm:flex-row gap-2">
                 <button
                   type="button"
-                  onClick={() => setOrderMode("in_person")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${
-                    orderMode === "in_person"
-                      ? "bg-background text-foreground shadow-sm border border-border/50"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <Tablet className="w-4 h-4 text-primary" />
-                  <span>1. Vor Ort (Tablet übergeben)</span>
-                </button>
-
-                <button
-                  type="button"
                   onClick={() => setOrderMode("remote")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-semibold transition-all ${
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                     orderMode === "remote"
-                      ? "bg-background text-foreground shadow-sm border border-border/50"
+                      ? "bg-background text-foreground shadow-sm border border-border/50 text-primary font-bold"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <Mail className="w-4 h-4 text-primary" />
-                  <span>2. Digital per E-Mail (Online-Link)</span>
+                  <span>1. Digitaler Signatur-Link (Remote 1-Klick)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setOrderMode("in_person")}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
+                    orderMode === "in_person"
+                      ? "bg-background text-foreground shadow-sm border border-border/50 text-primary font-bold"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Tablet className="w-4 h-4 text-primary" />
+                  <span>2. Vor Ort (Tablet übergeben)</span>
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {["essential", "growth", "enterprise"].map((t) => {
-                  let priceInfo = "";
-                  if (t === "essential") {
-                    priceInfo = `Einmalgebühr: ${formatPrice(PRICING_CONFIG.plans.essential.setupFee)} | Laufende Gebühr: ${formatPrice(PRICING_CONFIG.plans.essential.priceMonthly)} / Monat (oder ${formatPrice(PRICING_CONFIG.plans.essential.priceYearly)} / Monat bei jährlicher Zahlung)`;
-                  } else if (t === "growth") {
-                    priceInfo = `Einmalgebühr: ${formatPrice(PRICING_CONFIG.plans.growth.setupFee)} | Laufende Gebühr: ${formatPrice(PRICING_CONFIG.plans.growth.priceMonthly)} / Monat (oder ${formatPrice(PRICING_CONFIG.plans.growth.priceYearly)} / Monat bei jährlicher Zahlung)`;
-                  } else {
-                    priceInfo = "Einmalgebühr & Laufende Gebühr individuell verhandelbar";
-                  }
-                  return (
-                    <div
-                      key={t}
-                      className={`border-2 rounded-xl p-5 cursor-pointer transition-all flex flex-col justify-between ${currentTarif === t
-                        ? 'border-primary bg-primary/5 shadow-md'
-                        : 'border-border bg-card/50 hover:border-neutral-500 hover:bg-card'
-                        }`}
-                      onClick={() => handleTarifChange(t as any, currentZahlungsrhythmus)}
-                    >
-                      <div>
-                        <h3 className="font-bold text-lg capitalize">{t}</h3>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {t === "enterprise" ? "Individuelles High-End Paket" : "Standard WaaS-Paket"}
-                        </p>
+              {/* Section 1: Plan & Pricing */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                    1. Paket & Abrechnung
+                  </h3>
+                  <span className="text-xs text-primary font-medium">Konditionen für das Angebot</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {["essential", "growth", "enterprise"].map((t) => {
+                    let priceInfo = "";
+                    if (t === "essential") {
+                      priceInfo = `Einmalig: ${formatPrice(PRICING_CONFIG.plans.essential.setupFee)} | Laufend: ${formatPrice(PRICING_CONFIG.plans.essential.priceMonthly)}/mtl. (${formatPrice(PRICING_CONFIG.plans.essential.priceYearly)} bei Jährlich)`;
+                    } else if (t === "growth") {
+                      priceInfo = `Einmalig: ${formatPrice(PRICING_CONFIG.plans.growth.setupFee)} | Laufend: ${formatPrice(PRICING_CONFIG.plans.growth.priceMonthly)}/mtl. (${formatPrice(PRICING_CONFIG.plans.growth.priceYearly)} bei Jährlich)`;
+                    } else {
+                      priceInfo = "Individuelle Konditionen frei konfigurierbar";
+                    }
+                    return (
+                      <div
+                        key={t}
+                        className={`border-2 rounded-xl p-5 cursor-pointer transition-all flex flex-col justify-between ${currentTarif === t
+                          ? 'border-primary bg-primary/5 shadow-md ring-1 ring-primary/20'
+                          : 'border-border bg-card/50 hover:border-neutral-500 hover:bg-card'
+                          }`}
+                        onClick={() => handleTarifChange(t as any, currentZahlungsrhythmus)}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-bold text-lg capitalize">{t}</h3>
+                            {currentTarif === t && <span className="text-[10px] bg-primary text-black px-2 py-0.5 rounded-full font-bold uppercase">Aktiv</span>}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {t === "enterprise" ? "Individuelles High-End Projekt" : "Standard WaaS-Paket"}
+                          </p>
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-border/40 text-xs font-semibold text-primary">
+                          {priceInfo}
+                        </div>
                       </div>
-                      <div className="mt-6 pt-4 border-t border-border/40 text-xs font-semibold text-primary">
-                        {priceInfo}
+                    );
+                  })}
+                </div>
+
+                <div className="flex bg-muted p-1 rounded-lg w-full mt-2 border border-border">
+                  <button
+                    type="button"
+                    onClick={() => handleTarifChange(currentTarif, "monatlich")}
+                    className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${currentZahlungsrhythmus === "monatlich" ? 'bg-background shadow-sm text-foreground font-semibold' : 'text-muted-foreground hover:bg-muted-foreground/10'}`}
+                  >
+                    Monatliche Abrechnung
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleTarifChange(currentTarif, "jaehrlich")}
+                    className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${currentZahlungsrhythmus === "jaehrlich" ? 'bg-background shadow-sm text-foreground font-semibold' : 'text-muted-foreground hover:bg-muted-foreground/10'}`}
+                  >
+                    Jährliche Abrechnung (-5% Rabatt)
+                  </button>
+                </div>
+
+                {currentTarif === "enterprise" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/50 p-5 rounded-xl border border-border">
+                    <div className="space-y-1.5">
+                      <Label required className="text-xs">Individuelle Einmalgebühr (€ netto)</Label>
+                      <Input type="number" step="0.01" {...register("setupPreisBrutto", { valueAsNumber: true })} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label required className="text-xs">Individuelle Laufende Gebühr (€ netto)</Label>
+                      <Input type="number" step="0.01" {...register("laufendPreisBrutto", { valueAsNumber: true })} />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Section 2: Full Customer & Contract Prefill Section */}
+              <div className="space-y-5 pt-2">
+                <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                    2. Kundendaten vorab ausfüllen (Prefill)
+                  </h3>
+                  <span className="text-xs text-muted-foreground">
+                    Je mehr Du ausfüllst, desto schneller kann der Kunde mit 1 Klick abschließen!
+                  </span>
+                </div>
+
+                {/* Sub-grid for Organization & Contact */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                  {/* Block A: Company Details */}
+                  <div className="bg-card/70 border border-border p-5 rounded-xl space-y-4 shadow-sm">
+                    <div className="flex items-center gap-2 text-primary font-semibold text-sm">
+                      <User className="w-4 h-4" />
+                      <span>Unternehmensdaten</span>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Firma / Unternehmensname</Label>
+                        <Input
+                          {...register("firma")}
+                          placeholder="z.B. Schmidt & Partner GmbH"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-xs">Rechtsform</Label>
+                          <select
+                            {...register("rechtsform")}
+                            className="flex h-10 w-full rounded-lg border border-neutral-600 bg-background px-3 py-2 text-xs text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          >
+                            <option value="">Rechtsform wählen...</option>
+                            <option value="GmbH">GmbH</option>
+                            <option value="GbR">GbR</option>
+                            <option value="GmbH & Co. KG">GmbH & Co. KG</option>
+                            <option value="Einzelunternehmen">Einzelunternehmen</option>
+                            <option value="UG (haftungsbeschränkt)">UG (haftungsbeschränkt)</option>
+                            <option value="AG">AG</option>
+                            <option value="e.K.">e.K.</option>
+                            <option value="Freiberufler">Freiberufler / Praxis</option>
+                            <option value="Andere">Andere / Sonstige</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-1">
+                          <Label className="text-xs">USt-IdNr. (Optional)</Label>
+                          <Input
+                            {...register("ustId")}
+                            placeholder="DE123456789"
+                          />
+                        </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-
-              <div className="flex bg-muted p-1 rounded-lg w-full mt-4 border border-border">
-                <button
-                  type="button"
-                  onClick={() => handleTarifChange(currentTarif, "monatlich")}
-                  className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${currentZahlungsrhythmus === "monatlich" ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:bg-muted-foreground/10'}`}
-                >
-                  Monatlich
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleTarifChange(currentTarif, "jaehrlich")}
-                  className={`flex-1 text-sm font-medium py-2 rounded-md transition-colors ${currentZahlungsrhythmus === "jaehrlich" ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:bg-muted-foreground/10'}`}
-                >
-                  Jährlich (-5%)
-                </button>
-              </div>
-
-              {currentTarif === "enterprise" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-muted/50 p-6 rounded-xl mt-4 border border-border">
-                  <div className="space-y-2">
-                    <Label required>Individuelle Einmalgebühr (netto, einmalig in €)</Label>
-                    <Input type="number" step="0.01" {...register("setupPreisBrutto", { valueAsNumber: true })} error={errors.setupPreisBrutto?.message} />
                   </div>
-                  <div className="space-y-2">
-                    <Label required>Individuelle Laufende Gebühr (netto, laufend in €)</Label>
-                    <Input type="number" step="0.01" {...register("laufendPreisBrutto", { valueAsNumber: true })} error={errors.laufendPreisBrutto?.message} />
+
+                  {/* Block B: Contact Person */}
+                  <div className="bg-card/70 border border-border p-5 rounded-xl space-y-4 shadow-sm">
+                    <div className="flex items-center gap-2 text-primary font-semibold text-sm">
+                      <Mail className="w-4 h-4" />
+                      <span>Ansprechpartner & Kontakt</span>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <Label required className="text-xs">E-Mail-Adresse des Kunden (für Signatur & Vertrag)</Label>
+                        <Input
+                          type="email"
+                          {...register("email")}
+                          placeholder="kunde@firma.de"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-xs">Name des Ansprechpartners</Label>
+                          <Input
+                            {...register("ansprechpartner")}
+                            placeholder="Max Mustermann"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <Label className="text-xs">Telefonnummer (Optional)</Label>
+                          <Input
+                            {...register("telefon")}
+                            placeholder="+49 170 1234567"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Block C: Address */}
+                  <div className="bg-card/70 border border-border p-5 rounded-xl space-y-4 shadow-sm">
+                    <div className="flex items-center gap-2 text-primary font-semibold text-sm">
+                      <FileText className="w-4 h-4" />
+                      <span>Firmensitz / Rechnungsanschrift</span>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Straße & Hausnummer</Label>
+                        <Input
+                          {...register("strasse")}
+                          placeholder="Musterstraße 12"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="space-y-1 col-span-1">
+                          <Label className="text-xs">PLZ</Label>
+                          <Input
+                            {...register("plz")}
+                            placeholder="80331"
+                          />
+                        </div>
+                        <div className="space-y-1 col-span-2">
+                          <Label className="text-xs">Ort</Label>
+                          <Input
+                            {...register("ort")}
+                            placeholder="München"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Block D: SEPA / Bank Info */}
+                  <div className="bg-card/70 border border-border p-5 rounded-xl space-y-4 shadow-sm">
+                    <div className="flex items-center gap-2 text-primary font-semibold text-sm">
+                      <CreditCard className="w-4 h-4" />
+                      <span>Bankverbindung / SEPA (Optional vorab)</span>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs">IBAN (falls vom Kunden bereits bekannt)</Label>
+                        <Input
+                          {...register("iban", {
+                            onChange: (e) => {
+                              const raw = e.target.value.toUpperCase().replace(/\s/g, "");
+                              e.target.value = raw.replace(/(.{4})/g, "$1 ").trim();
+                            }
+                          })}
+                          placeholder="DE12 3456 7890 1234 5678 90"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <Label className="text-xs">Bankname / BIC (Optional)</Label>
+                          <Input
+                            {...register("bank")}
+                            placeholder="z.B. Deutsche Bank"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <Label className="text-xs">Kontoinhaber (falls abweichend)</Label>
+                          <Input
+                            {...register("kontoinhaber")}
+                            placeholder="Muster GmbH"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
-              )}
+              </div>
 
               {/* Action based on Order Mode */}
               {orderMode === "in_person" ? (
-                <div className="mt-8 bg-primary/5 p-4 rounded-xl border border-primary/20 text-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <span className="text-muted-foreground text-center sm:text-left">
-                    Konfiguration abgeschlossen. Bitte übergib das Tablet nun an den Kunden.
-                  </span>
-                  <Button type="button" size="lg" className="w-full sm:w-auto shrink-0" onClick={nextStep}>
+                <div className="mt-6 bg-primary/5 p-5 rounded-xl border border-primary/20 text-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div>
+                    <h4 className="font-bold text-foreground">Vor-Ort-Modus bereit</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Alle eingegebenen Daten werden direkt in die Signaturmaske übernommen.
+                    </p>
+                  </div>
+                  <Button type="button" size="lg" className="w-full sm:w-auto shrink-0 px-6 font-bold" onClick={nextStep}>
                     Tablet an Kunden übergeben ➔
                   </Button>
                 </div>
               ) : (
-                <div className="mt-8 bg-card border-2 border-primary/30 p-6 rounded-xl space-y-5 shadow-md">
+                <div className="mt-6 bg-card border-2 border-primary/30 p-6 rounded-xl space-y-5 shadow-md">
                   <div className="flex items-center gap-2">
                     <Mail className="w-5 h-5 text-primary" />
-                    <h4 className="font-bold text-lg">Digitalen Signatur-Link per E-Mail versenden</h4>
+                    <h4 className="font-bold text-lg">Digitalen Signatur-Link generieren</h4>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Sende dem Kunden einen geschützten Online-Link, über den der Vertrag bequem von jedem Gerät (Smartphone, Tablet, PC) digital unterzeichnet werden kann.
+                    Erstellt einen geschützten Signatur-Link mit allen vorab ausgefüllten Daten. Der Kunde kann den Vertrag von jedem Gerät in Sekunden mit 1 Klick abschließen.
                   </p>
 
                   {inviteSentResult ? (
-                    <div className="bg-emerald-500/10 border border-emerald-500/40 p-5 rounded-xl space-y-4 animate-in fade-in duration-300">
+                    <div className="bg-emerald-500/10 border border-emerald-500/40 p-6 rounded-xl space-y-6 animate-in fade-in duration-300">
                       <div className="flex items-center gap-3">
-                        <CheckCircle2 className="w-6 h-6 text-emerald-400 shrink-0" />
+                        <CheckCircle2 className="w-7 h-7 text-emerald-400 shrink-0" />
                         <div>
-                          <h5 className="font-bold text-emerald-400 text-sm">Signatur-Link erfolgreich versendet!</h5>
+                          <h5 className="font-bold text-emerald-400 text-base">Signatur-Link erfolgreich erstellt!</h5>
                           <p className="text-xs text-muted-foreground mt-0.5">
-                            E-Mail wurde an <strong className="text-foreground">{inviteSentResult.email}</strong> zugestellt.
+                            Einladung wurde per E-Mail an <strong className="text-foreground">{inviteSentResult.email}</strong> versendet.
                           </p>
                         </div>
                       </div>
 
+                      {/* URL Box & Actions */}
                       <div className="space-y-2 pt-2 border-t border-emerald-500/20">
                         <Label className="text-xs font-semibold">Direkter Signatur-Link für den Kunden:</Label>
-                        <div className="flex gap-2">
-                          <Input readOnly value={inviteSentResult.signingUrl} className="font-mono text-xs bg-background/80" />
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            className="shrink-0"
-                            onClick={() => {
-                              navigator.clipboard.writeText(inviteSentResult.signingUrl);
-                              setCopiedLink(true);
-                              setTimeout(() => setCopiedLink(false), 3000);
-                            }}
-                          >
-                            {copiedLink ? <Check className="w-4 h-4 text-emerald-500 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
-                            {copiedLink ? "Kopiert!" : "Kopieren"}
-                          </Button>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <Input readOnly value={inviteSentResult.signingUrl} className="font-mono text-xs bg-background/90 text-foreground" />
+                          <div className="flex gap-2 shrink-0">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              onClick={() => {
+                                navigator.clipboard.writeText(inviteSentResult.signingUrl);
+                                setCopiedLink(true);
+                                setTimeout(() => setCopiedLink(false), 3000);
+                              }}
+                            >
+                              {copiedLink ? <Check className="w-4 h-4 text-emerald-500 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
+                              {copiedLink ? "Kopiert!" : "Kopieren"}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => window.open(inviteSentResult.signingUrl, "_blank")}
+                            >
+                              <ExternalLink className="w-4 h-4 mr-1 text-primary" />
+                              Öffnen
+                            </Button>
+                          </div>
                         </div>
                       </div>
 
-                      <div className="pt-2 flex justify-end">
+                      {/* Live QR Code Display */}
+                      <div className="flex flex-col sm:flex-row items-center gap-5 p-4 rounded-xl bg-background/70 border border-emerald-500/20">
+                        <div className="bg-neutral-900 p-2.5 rounded-lg border border-neutral-700 shrink-0 shadow-inner">
+                          <img
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(inviteSentResult.signingUrl)}&bgcolor=17-17-17&color=204-255-0&margin=2`}
+                            alt="QR-Code zum Scannen"
+                            className="w-28 h-28 rounded"
+                          />
+                        </div>
+                        <div className="space-y-1 text-center sm:text-left">
+                          <h6 className="font-bold text-sm text-foreground">Direkt per Smartphone-Kamera scannen</h6>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Dein Kunde kann diesen QR-Code direkt von Deinem Bildschirm mit der Handykamera scannen und das Angebot auf seinem eigenen Smartphone öffnen.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 flex justify-between items-center">
+                        <span className="text-[11px] text-muted-foreground">Gültig für 14 Tage</span>
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
                           onClick={() => {
                             setInviteSentResult(null);
-                            setRemoteCustomerEmail("");
-                            setRemoteCustomerName("");
-                            setRemoteCompanyName("");
+                            setValue("email", "");
+                            setValue("ansprechpartner", "");
+                            setValue("firma", "");
+                            setValue("strasse", "");
+                            setValue("plz", "");
+                            setValue("ort", "");
+                            setValue("telefon", "");
+                            setValue("ustId", "");
+                            setValue("iban", "");
                           }}
                         >
-                          Neues Angebot erstellen
+                          Weiteres Angebot erstellen
                         </Button>
                       </div>
                     </div>
                   ) : (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-2 sm:col-span-2">
-                          <Label required>Kunden-E-Mail-Adresse</Label>
-                          <Input
-                            type="email"
-                            placeholder="kunde@firma.de"
-                            value={remoteCustomerEmail}
-                            onChange={(e) => setRemoteCustomerEmail(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Name des Ansprechpartners (Optional)</Label>
-                          <Input
-                            placeholder="Max Mustermann"
-                            value={remoteCustomerName}
-                            onChange={(e) => setRemoteCustomerName(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Firmenname (Optional)</Label>
-                          <Input
-                            placeholder="Muster GmbH"
-                            value={remoteCompanyName}
-                            onChange={(e) => setRemoteCompanyName(e.target.value)}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border/40">
-                        <span className="text-xs text-muted-foreground">
-                          Der Link ist nach dem Versenden 14 Tage lang gültig.
-                        </span>
-                        <Button
-                          type="button"
-                          size="lg"
-                          className="w-full sm:w-auto px-8"
-                          disabled={isSendingInvite || !remoteCustomerEmail}
-                          onClick={handleCreateInvite}
-                        >
-                          <Send className="w-4 h-4 mr-2" />
-                          {isSendingInvite ? "Wird versendet..." : "Link generieren & per E-Mail senden ➔"}
-                        </Button>
-                      </div>
+                    <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border/40">
+                      <span className="text-xs text-muted-foreground">
+                        Der Link ist nach dem Generieren 14 Tage lang gültig.
+                      </span>
+                      <Button
+                        type="button"
+                        size="lg"
+                        className="w-full sm:w-auto px-8 font-bold text-black bg-primary hover:bg-[#b8e600]"
+                        disabled={isSendingInvite || !watch("email")}
+                        onClick={handleCreateInvite}
+                      >
+                        <Send className="w-4 h-4 mr-2" />
+                        {isSendingInvite ? "Wird generiert..." : "Signatur-Link generieren & senden ➔"}
+                      </Button>
                     </div>
                   )}
                 </div>

@@ -4,11 +4,20 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { LegalScrollBox } from "@/components/shared/LegalScrollBox";
-import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/primitives";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { CheckCircle2, FileText, User, CreditCard, ArrowLeft, ArrowRight, ShieldCheck, Lock } from "lucide-react";
+import { Button, Input, Label } from "@/components/ui/primitives";
+import {
+  CheckCircle2,
+  FileText,
+  User,
+  CreditCard,
+  ArrowLeft,
+  ArrowRight,
+  Lock,
+  Edit3,
+  Building2,
+  MapPin,
+  ExternalLink,
+} from "lucide-react";
 import { validateIBAN } from "@/lib/utils";
 import { PRICING_CONFIG } from "@/config/pricing";
 
@@ -29,12 +38,12 @@ const formSchema = z.object({
   bic: z.string().optional(),
   bank: z.string().optional(),
   kontoinhaber: z.string().optional(),
-  consentSepa: z.boolean().refine(v => v === true, "Erteilung des SEPA-Lastschriftmandats ist erforderlich"),
+  consentSepa: z.boolean().refine((v) => v === true, "Erteilung des SEPA-Lastschriftmandats ist erforderlich"),
 
-  consentB2b: z.boolean().refine(v => v === true, "B2B-Bestätigung ist erforderlich"),
-  consentAgb: z.boolean().refine(v => v === true, "AGB-Zustimmung ist erforderlich"),
-  consentAvv: z.boolean().refine(v => v === true, "AVV-Zustimmung ist erforderlich"),
-  consentDatenschutz: z.boolean().refine(v => v === true, "Datenschutz-Kenntnisnahme ist erforderlich"),
+  consentB2b: z.boolean().refine((v) => v === true, "B2B-Bestätigung ist erforderlich"),
+  consentAgb: z.boolean().refine((v) => v === true, "AGB-Zustimmung ist erforderlich"),
+  consentAvv: z.boolean().refine((v) => v === true, "AVV-Zustimmung ist erforderlich"),
+  consentDatenschutz: z.boolean().refine((v) => v === true, "Datenschutz-Kenntnisnahme ist erforderlich"),
   consentMarketing: z.boolean(),
 });
 
@@ -49,6 +58,16 @@ export interface RemoteInviteData {
   customerEmail: string;
   customerName?: string | null;
   companyName?: string | null;
+  rechtsform?: string | null;
+  strasse?: string | null;
+  plz?: string | null;
+  ort?: string | null;
+  telefon?: string | null;
+  ustId?: string | null;
+  iban?: string | null;
+  bic?: string | null;
+  bank?: string | null;
+  kontoinhaber?: string | null;
   salesUserId: string;
   expiresAt: string;
 }
@@ -60,6 +79,7 @@ interface RemoteOrderFormFlowProps {
   sepaContent: string;
   overrideTarif?: string;
   overrideZahlungsrhythmus?: string;
+  onBackToOverview?: () => void;
 }
 
 function SparkleCelebration() {
@@ -121,59 +141,95 @@ function SparkleCelebration() {
   );
 }
 
-export function RemoteOrderFormFlow({ invite, termsContent, avvContent, sepaContent, overrideTarif, overrideZahlungsrhythmus }: RemoteOrderFormFlowProps) {
+export function RemoteOrderFormFlow({
+  invite,
+  termsContent,
+  avvContent,
+  sepaContent,
+  overrideTarif,
+  overrideZahlungsrhythmus,
+  onBackToOverview,
+}: RemoteOrderFormFlowProps) {
+  const hasCorePrefill = Boolean(
+    invite.companyName &&
+    invite.customerName &&
+    invite.strasse &&
+    invite.plz &&
+    invite.ort &&
+    invite.customerEmail
+  );
+
+  const [viewMode, setViewMode] = useState<"express" | "step_by_step">(
+    hasCorePrefill ? "express" : "step_by_step"
+  );
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // Edit toggles
+  const [isEditingCompany, setIsEditingCompany] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
 
   const [agbRead, setAgbRead] = useState(false);
   const [avvRead, setAvvRead] = useState(false);
 
   const getEffectivePrices = () => {
     if (overrideTarif && overrideZahlungsrhythmus) {
-      const selectedPlan = PRICING_CONFIG.plans[overrideTarif as keyof typeof PRICING_CONFIG.plans];
+      const selectedPlan =
+        PRICING_CONFIG.plans[overrideTarif as keyof typeof PRICING_CONFIG.plans];
       if (selectedPlan) {
         return {
           setupPreis: selectedPlan.setupFee,
-          laufendPreis: overrideZahlungsrhythmus === "monatlich" ? selectedPlan.priceMonthly : selectedPlan.priceYearly
+          laufendPreis:
+            overrideZahlungsrhythmus === "monatlich"
+              ? selectedPlan.priceMonthly
+              : selectedPlan.priceYearly,
         };
       }
     }
     return {
       setupPreis: invite.setupPreisBrutto,
-      laufendPreis: invite.laufendPreisBrutto
+      laufendPreis: invite.laufendPreisBrutto,
     };
   };
 
   const { setupPreis, laufendPreis } = getEffectivePrices();
+  const currentTarif = overrideTarif || invite.tarif;
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [step, success]);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [step, success, viewMode]);
 
-  const { register, handleSubmit, watch, setValue, trigger, formState: { errors } } = useForm<FormValues>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    trigger,
+    formState: { errors },
+  } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       firma: invite.companyName || "",
-      rechtsform: "",
+      rechtsform: invite.rechtsform || "",
       ansprechpartner: invite.customerName || "",
-      strasse: "",
-      plz: "",
-      ort: "",
+      strasse: invite.strasse || "",
+      plz: invite.plz || "",
+      ort: invite.ort || "",
       email: invite.customerEmail || "",
-      telefon: "",
-      ustId: "",
-      iban: "",
-      bic: "",
-      bank: "",
-      kontoinhaber: "",
+      telefon: invite.telefon || "",
+      ustId: invite.ustId || "",
+      iban: invite.iban || "",
+      bic: invite.bic || "",
+      bank: invite.bank || "",
+      kontoinhaber: invite.kontoinhaber || invite.customerName || "",
       consentSepa: false,
       consentB2b: false,
       consentAgb: false,
       consentAvv: false,
-      consentDatenschutz: false,
+      consentDatenschutz: true,
       consentMarketing: false,
-    }
+    },
   });
 
   const formatPrice = (price: number) => {
@@ -184,10 +240,28 @@ export function RemoteOrderFormFlow({ invite, termsContent, avvContent, sepaCont
     }).format(price);
   };
 
+  const handleAcceptAllConsents = () => {
+    setValue("consentB2b", true, { shouldValidate: true });
+    setValue("consentAgb", true, { shouldValidate: true });
+    setValue("consentAvv", true, { shouldValidate: true });
+    setValue("consentSepa", true, { shouldValidate: true });
+    setValue("consentDatenschutz", true, { shouldValidate: true });
+    setAgbRead(true);
+    setAvvRead(true);
+  };
+
   const nextStep = async () => {
     let fieldsToValidate: (keyof FormValues)[] = [];
     if (step === 1) {
-      fieldsToValidate = ["firma", "rechtsform", "ansprechpartner", "strasse", "plz", "ort", "email"];
+      fieldsToValidate = [
+        "firma",
+        "rechtsform",
+        "ansprechpartner",
+        "strasse",
+        "plz",
+        "ort",
+        "email",
+      ];
     } else if (step === 4) {
       fieldsToValidate = ["iban", "consentSepa"];
     }
@@ -197,7 +271,7 @@ export function RemoteOrderFormFlow({ invite, termsContent, avvContent, sepaCont
       if (!isValid) return;
     }
 
-    setStep(s => s + 1);
+    setStep((s) => s + 1);
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -214,8 +288,8 @@ export function RemoteOrderFormFlow({ invite, termsContent, avvContent, sepaCont
           signatureSepaB64: "DIGITAL_SEPA_CONSENT",
           signatureContractB64: "DIGITAL_EES_CONSENT",
           overrideTarif,
-          overrideZahlungsrhythmus
-        })
+          overrideZahlungsrhythmus,
+        }),
       });
 
       if (res.ok) {
@@ -237,119 +311,576 @@ export function RemoteOrderFormFlow({ invite, termsContent, avvContent, sepaCont
 
   if (success) {
     return (
-      <Card className="w-full text-center py-16 relative overflow-hidden bg-card border-2 border-emerald-500/40 shadow-2xl animate-in zoom-in-95 duration-500">
+      <div className="w-full text-center py-16 relative overflow-hidden bg-[#0D0D0E] border border-white/10 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-500 p-8">
         <SparkleCelebration />
 
-        <CardHeader className="relative z-10 space-y-6">
-          <div className="relative flex justify-center items-center py-4">
-            <div className="w-24 h-24 rounded-full bg-emerald-500/10 border-4 border-emerald-500 flex items-center justify-center">
-              <CheckCircle2 className="w-12 h-12 text-emerald-400 fill-emerald-950/20" />
+        <div className="relative z-10 space-y-6">
+          <div className="relative flex justify-center items-center py-2">
+            <div className="w-20 h-20 rounded-full bg-[#CCFF00]/10 border-2 border-[#CCFF00] flex items-center justify-center">
+              <CheckCircle2 className="w-10 h-10 text-[#CCFF00]" />
             </div>
           </div>
 
-          <CardTitle className="text-3xl sm:text-5xl font-extrabold text-foreground tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-heading font-extrabold text-white tracking-tight">
             Vielen Dank!
-          </CardTitle>
+          </h1>
 
-          <CardDescription className="text-lg sm:text-2xl mt-4 font-medium text-foreground max-w-2xl mx-auto leading-relaxed">
-            Dein Vertrag wurde erfolgreich & rechtswirksam online abgeschlossen.
-            Wir freuen uns auf die Zusammenarbeit mit <span className="text-primary font-bold">{watch("firma")}</span>!
-          </CardDescription>
-        </CardHeader>
+          <p className="text-base sm:text-lg font-sans text-neutral-300 max-w-xl mx-auto leading-relaxed">
+            Dein Vertrag wurde erfolgreich abgeschlossen. Wir freuen uns auf die Zusammenarbeit mit{" "}
+            <span className="text-[#CCFF00] font-bold">{watch("firma")}</span>.
+          </p>
 
-        <CardContent className="mt-6 relative z-10 max-w-xl mx-auto">
-          <div className="bg-background/80 border border-primary/20 p-6 rounded-2xl text-sm text-muted-foreground shadow-lg backdrop-blur-sm">
-            <p className="text-foreground text-center leading-relaxed">
-              Die vollständigen Vertragsunterlagen inkl. SEPA-Mandat als PDF wurden soeben an <br />
-              <span className="font-bold text-primary">{watch("email")}</span> gesendet.
-            </p>
+          <div className="bg-[#141416] border border-white/10 p-5 rounded-xl text-xs text-neutral-400 max-w-md mx-auto">
+            Die Vertragsdokumente inkl. SEPA-Mandat wurden an{" "}
+            <span className="font-semibold text-white">{watch("email")}</span> gesendet.
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {onBackToOverview && (
+        <button
+          type="button"
+          onClick={onBackToOverview}
+          className="mb-5 inline-flex items-center gap-2 text-xs font-medium text-neutral-400 hover:text-white transition-colors cursor-pointer group mb-1"
+        >
+          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+          <span>Zurück zur Übersicht</span>
+        </button>
+      )}
 
-      {/* Package Header Banner */}
-      <div className="bg-card border-2 border-primary/30 p-5 sm:p-6 rounded-2xl shadow-lg relative overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-primary" />
-              <span className="text-xs font-bold uppercase tracking-wider text-primary">Offizielles Angebot von Buff Interactive</span>
-            </div>
-            <h2 className="text-2xl font-extrabold capitalize text-foreground">
-              Tarif: {overrideTarif || invite.tarif}
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Zahlungsrhythmus: <span className="font-semibold text-foreground">{(overrideZahlungsrhythmus || invite.zahlungsrhythmus) === "jaehrlich" ? "Jährlich (-5%)" : "Monatlich"}</span>
-            </p>
+      {/* 1. Top Tariff & Price Summary (Minimalistic & High-Contrast) */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-[#0D0D0E] border border-white/10 shadow-lg">
+        <div>
+          <span className="font-heading font-extrabold text-2xl sm:text-3xl text-white tracking-tight capitalize">
+            {currentTarif}-Tarif
+          </span>
+        </div>
+
+        <div className="flex items-baseline gap-4 sm:gap-6">
+          <div>
+            <span className="font-heading font-extrabold text-2xl sm:text-3xl text-[#CCFF00] tracking-tight">
+              {formatPrice(laufendPreis)}
+            </span>
+            <span className="text-xs font-sans text-neutral-400 ml-1.5">
+              / Monat
+            </span>
           </div>
 
-          <div className="flex gap-4 border-t sm:border-t-0 sm:border-l border-border/60 pt-3 sm:pt-0 sm:pl-6 text-right sm:text-left">
-            <div>
-              <span className="text-[11px] text-muted-foreground uppercase font-semibold block">Einmalgebühr</span>
-              <span className="text-lg font-bold text-foreground">{formatPrice(setupPreis)}</span>
-            </div>
-            <div>
-              <span className="text-[11px] text-muted-foreground uppercase font-semibold block">Laufende Gebühr</span>
-              <span className="text-lg font-bold text-primary">{formatPrice(laufendPreis)}</span>
-            </div>
+          <div>
+            <span className="font-heading font-bold text-lg sm:text-xl text-neutral-300 tracking-tight">
+              {formatPrice(setupPreis)}
+            </span>
+            <span className="text-xs font-sans text-neutral-400 ml-1.5">
+              einmalig
+            </span>
           </div>
         </div>
       </div>
 
-      <Card className="w-full shadow-lg border border-border">
-        <CardHeader className="border-b border-border bg-muted/30">
-          <div className="flex flex-col space-y-2">
+      {/* ========================================================================= */}
+      {/* 1-KLICK EXPRESS MODE */}
+      {/* ========================================================================= */}
+      {viewMode === "express" ? (
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 animate-in fade-in duration-300">
+          <div className="w-full rounded-2xl border border-white/10 bg-[#0D0D0E] p-6 sm:p-8 space-y-6 shadow-2xl">
+            {/* Header: Clear Title & Subtext */}
+            <div className="border-b border-white/10 pb-5">
+              <h1 className="text-xl sm:text-2xl font-bold font-heading text-white tracking-tight">
+                Angaben prüfen
+              </h1>
+              <p className="text-xs sm:text-sm text-neutral-400 mt-1 font-sans">
+                Bitte kontrolliere deine Daten und schließe die Bestellung direkt ab.
+              </p>
+            </div>
+
+            {/* Bento Grid: High-Contrast Data Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* 1. Company & Contact Card */}
+              <div className="bg-[#141416] border border-white/10 rounded-xl p-5 space-y-3 shadow-sm hover:border-white/20 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-[#CCFF00] font-bold text-xs uppercase tracking-wider font-sans">
+                    <Building2 className="w-4 h-4" />
+                    <span>Unternehmensdaten</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingCompany(!isEditingCompany)}
+                    className="text-xs font-medium text-neutral-400 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>{isEditingCompany ? "Fertig" : "Bearbeiten"}</span>
+                  </button>
+                </div>
+
+                {isEditingCompany ? (
+                  <div className="space-y-3 pt-2 animate-in fade-in duration-200">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-neutral-300">Firma</Label>
+                      <Input
+                        {...register("firma")}
+                        placeholder="Muster GmbH"
+                        error={errors.firma?.message}
+                        className="bg-[#1A1A1E] border-white/15 text-white text-xs"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <Label className="text-xs text-neutral-300">Rechtsform</Label>
+                        <select
+                          {...register("rechtsform")}
+                          className="flex h-10 w-full rounded-lg border border-white/15 bg-[#1A1A1E] px-3 py-2 text-xs text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CCFF00]"
+                        >
+                          <option value="">Bitte wählen...</option>
+                          <option value="GmbH">GmbH</option>
+                          <option value="GbR">GbR</option>
+                          <option value="GmbH & Co. KG">GmbH & Co. KG</option>
+                          <option value="Einzelunternehmen">Einzelunternehmen</option>
+                          <option value="UG (haftungsbeschränkt)">UG (haftungsbeschränkt)</option>
+                          <option value="AG">AG</option>
+                          <option value="e.K.">e.K.</option>
+                          <option value="Andere">Andere / Sonstige</option>
+                        </select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-neutral-300">USt-IdNr.</Label>
+                        <Input
+                          {...register("ustId")}
+                          placeholder="DE123456789"
+                          className="bg-[#1A1A1E] border-white/15 text-white text-xs"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-neutral-300">Ansprechpartner</Label>
+                      <Input
+                        {...register("ansprechpartner")}
+                        placeholder="Max Mustermann"
+                        error={errors.ansprechpartner?.message}
+                        className="bg-[#1A1A1E] border-white/15 text-white text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-neutral-300">E-Mail</Label>
+                      <Input
+                        type="email"
+                        {...register("email")}
+                        placeholder="name@firma.de"
+                        error={errors.email?.message}
+                        className="bg-[#1A1A1E] border-white/15 text-white text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-neutral-300">Telefon</Label>
+                      <Input
+                        {...register("telefon")}
+                        placeholder="+49 170 1234567"
+                        className="bg-[#1A1A1E] border-white/15 text-white text-xs"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2 text-xs font-sans pt-1">
+                    <div className="flex justify-between border-b border-white/5 pb-2">
+                      <span className="text-neutral-400">Firma:</span>
+                      <span className="font-semibold text-white">{watch("firma") || "–"}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-white/5 pb-2">
+                      <span className="text-neutral-400">Rechtsform:</span>
+                      <span className="font-semibold text-white">{watch("rechtsform") || "–"}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-white/5 pb-2">
+                      <span className="text-neutral-400">Ansprechpartner:</span>
+                      <span className="font-semibold text-white">{watch("ansprechpartner") || "–"}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-white/5 pb-2">
+                      <span className="text-neutral-400">E-Mail:</span>
+                      <span className="font-semibold text-white">{watch("email") || "–"}</span>
+                    </div>
+                    {watch("telefon") && (
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-neutral-400">Telefon:</span>
+                        <span className="font-semibold text-white">{watch("telefon")}</span>
+                      </div>
+                    )}
+                    {watch("ustId") && (
+                      <div className="flex justify-between">
+                        <span className="text-neutral-400">USt-IdNr.:</span>
+                        <span className="font-semibold text-white">{watch("ustId")}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* 2. Address Card */}
+              <div className="bg-[#141416] border border-white/10 rounded-xl p-5 space-y-3 shadow-sm hover:border-white/20 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-[#CCFF00] font-bold text-xs uppercase tracking-wider font-sans">
+                    <MapPin className="w-4 h-4" />
+                    <span>Rechnungsadresse</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingAddress(!isEditingAddress)}
+                    className="text-xs font-medium text-neutral-400 hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>{isEditingAddress ? "Fertig" : "Bearbeiten"}</span>
+                  </button>
+                </div>
+
+                {isEditingAddress ? (
+                  <div className="space-y-3 pt-2 animate-in fade-in duration-200">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-neutral-300">Straße & Hausnummer</Label>
+                      <Input
+                        {...register("strasse")}
+                        placeholder="Musterstraße 12"
+                        error={errors.strasse?.message}
+                        className="bg-[#1A1A1E] border-white/15 text-white text-xs"
+                      />
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="space-y-1 col-span-1">
+                        <Label className="text-xs text-neutral-300">PLZ</Label>
+                        <Input
+                          {...register("plz")}
+                          placeholder="80331"
+                          error={errors.plz?.message}
+                          className="bg-[#1A1A1E] border-white/15 text-white text-xs"
+                        />
+                      </div>
+                      <div className="space-y-1 col-span-2">
+                        <Label className="text-xs text-neutral-300">Ort</Label>
+                        <Input
+                          {...register("ort")}
+                          placeholder="München"
+                          error={errors.ort?.message}
+                          className="bg-[#1A1A1E] border-white/15 text-white text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2 text-xs font-sans pt-1">
+                    <div className="flex justify-between border-b border-white/5 pb-2">
+                      <span className="text-neutral-400">Straße & Nr.:</span>
+                      <span className="font-semibold text-white">{watch("strasse") || "–"}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-white/5 pb-2">
+                      <span className="text-neutral-400">PLZ & Ort:</span>
+                      <span className="font-semibold text-white">
+                        {watch("plz")} {watch("ort")}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral-400">Land:</span>
+                      <span className="font-semibold text-white">Deutschland</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 3. Payment / SEPA Card */}
+              <div className="md:col-span-2 bg-[#141416] border border-white/10 rounded-xl p-5 space-y-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-[#CCFF00] font-bold text-xs uppercase tracking-wider font-sans">
+                    <CreditCard className="w-4 h-4" />
+                    <span>Zahlungsdaten & SEPA-Mandat</span>
+                  </div>
+                  <a
+                    href="/de/sepa-mandat"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-[#CCFF00] hover:underline cursor-pointer font-medium inline-flex items-center gap-1"
+                  >
+                    <span>Mandatstext ansehen</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2 space-y-1">
+                    <Label required className="text-xs text-neutral-300">
+                      IBAN für den Lastschrifteinzug
+                    </Label>
+                    <Input
+                      {...register("iban", {
+                        onChange: (e) => {
+                          const raw = e.target.value.toUpperCase().replace(/\s/g, "");
+                          e.target.value = raw.replace(/(.{4})/g, "$1 ").trim();
+                        },
+                      })}
+                      placeholder="DE12 3456 7890 1234 5678 90"
+                      error={errors.iban?.message}
+                      className="font-mono text-sm bg-[#1A1A1E] border-white/15 text-white focus:border-[#CCFF00]"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-neutral-300">Kontoinhaber</Label>
+                    <Input
+                      {...register("kontoinhaber")}
+                      placeholder={watch("firma") || watch("ansprechpartner") || "Name des Kontoinhabers"}
+                      className="text-xs bg-[#1A1A1E] border-white/15 text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Legal Documents Overview */}
+            <div className="space-y-3 pt-3 border-t border-white/10">
+              <div>
+                <span className="font-semibold text-xs text-neutral-400 uppercase tracking-wider font-sans">
+                  Vertragsdokumente
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* AGB Card */}
+                <div className="border border-white/10 rounded-xl bg-[#141416] p-4 flex items-center justify-between hover:border-white/20 transition-colors">
+                  <div className="flex items-center gap-2.5">
+                    <FileText className="w-4 h-4 text-[#CCFF00] shrink-0" />
+                    <div>
+                      <div className="text-xs font-semibold text-white">Allgemeine Geschäftsbedingungen (AGB)</div>
+                      <div className="text-[11px] text-neutral-400">Rechtliche Vertragsgrundlage</div>
+                    </div>
+                  </div>
+                  <a
+                    href="/de/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-medium border border-white/10 transition-colors"
+                  >
+                    <span>Öffnen</span>
+                    <ExternalLink className="w-3 h-3 text-[#CCFF00]" />
+                  </a>
+                </div>
+
+                {/* AVV Card */}
+                <div className="border border-white/10 rounded-xl bg-[#141416] p-4 flex items-center justify-between hover:border-white/20 transition-colors">
+                  <div className="flex items-center gap-2.5">
+                    <FileText className="w-4 h-4 text-[#CCFF00] shrink-0" />
+                    <div>
+                      <div className="text-xs font-semibold text-white">Auftragsverarbeitung (AVV)</div>
+                      <div className="text-[11px] text-neutral-400">DSGVO-Datenschutzvereinbarung</div>
+                    </div>
+                  </div>
+                  <a
+                    href="/de/avv"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-medium border border-white/10 transition-colors"
+                  >
+                    <span>Öffnen</span>
+                    <ExternalLink className="w-3 h-3 text-[#CCFF00]" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Mandatory Consents */}
+            <div className="space-y-2.5 pt-1">
+              {/* 1. B2B */}
+              <div
+                onClick={() => setValue("consentB2b", !watch("consentB2b"), { shouldValidate: true })}
+                className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${watch("consentB2b")
+                  ? "border-[#CCFF00]/40 bg-[#CCFF00]/5"
+                  : "border-white/10 bg-[#141416] hover:border-white/20"
+                  }`}
+              >
+                <input
+                  type="checkbox"
+                  {...register("consentB2b")}
+                  checked={watch("consentB2b")}
+                  readOnly
+                  className="mt-0.5 h-4 w-4 rounded border-neutral-600 accent-[#CCFF00] pointer-events-none shrink-0"
+                />
+                <div className="flex-1 text-xs text-neutral-200 leading-relaxed font-normal">
+                  <span>Ich bestätige, dass ich ausschließlich als Unternehmer / Gewerbetreibender (B2B) handle. *</span>
+                  {errors.consentB2b && <p className="text-xs text-red-400 mt-1">{errors.consentB2b.message}</p>}
+                </div>
+              </div>
+
+              {/* 2. AGB & AVV */}
+              <div
+                onClick={() => {
+                  const nextVal = !(watch("consentAgb") && watch("consentAvv"));
+                  setValue("consentAgb", nextVal, { shouldValidate: true });
+                  setValue("consentAvv", nextVal, { shouldValidate: true });
+                }}
+                className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${watch("consentAgb") && watch("consentAvv")
+                  ? "border-[#CCFF00]/40 bg-[#CCFF00]/5"
+                  : "border-white/10 bg-[#141416] hover:border-white/20"
+                  }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={watch("consentAgb") && watch("consentAvv")}
+                  readOnly
+                  className="mt-0.5 h-4 w-4 rounded border-neutral-600 accent-[#CCFF00] pointer-events-none shrink-0"
+                />
+                <div className="flex-1 text-xs text-neutral-200 leading-relaxed font-normal">
+                  <span>
+                    Ich habe die{" "}
+                    <a
+                      href="/de/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-[#CCFF00] underline underline-offset-2 hover:text-[#b8e600] font-semibold"
+                    >
+                      AGB
+                    </a>{" "}
+                    und den{" "}
+                    <a
+                      href="/de/avv"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-[#CCFF00] underline underline-offset-2 hover:text-[#b8e600] font-semibold"
+                    >
+                      Auftragsverarbeitungsvertrag (AVV)
+                    </a>{" "}
+                    gelesen und akzeptiere diese. *
+                  </span>
+                  {(errors.consentAgb || errors.consentAvv) && (
+                    <p className="text-xs text-red-400 mt-1">Zustimmung zu AGB & AVV ist erforderlich.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* 3. SEPA Mandate */}
+              <div
+                onClick={() => setValue("consentSepa", !watch("consentSepa"), { shouldValidate: true })}
+                className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${watch("consentSepa")
+                  ? "border-[#CCFF00]/40 bg-[#CCFF00]/5"
+                  : "border-white/10 bg-[#141416] hover:border-white/20"
+                  }`}
+              >
+                <input
+                  type="checkbox"
+                  {...register("consentSepa")}
+                  checked={watch("consentSepa")}
+                  readOnly
+                  className="mt-0.5 h-4 w-4 rounded border-neutral-600 accent-[#CCFF00] pointer-events-none shrink-0"
+                />
+                <div className="flex-1 text-xs text-neutral-200 leading-relaxed font-normal">
+                  <span>
+                    Ich ermächtige die Felix Kinze & Leon Trepesch GbR, Zahlungen von meinem Konto mittels Lastschrift einzuziehen, und weise mein Kreditinstitut an, die gezogenen Lastschriften einzulösen (
+                    <a
+                      href="/de/sepa-mandat"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-[#CCFF00] underline underline-offset-2 hover:text-[#b8e600] font-semibold"
+                    >
+                      Details zum SEPA-Mandat
+                    </a>
+                    ). *
+                  </span>
+                  {errors.consentSepa && <p className="text-xs text-red-400 mt-1">{errors.consentSepa.message}</p>}
+                </div>
+              </div>
+            </div>
+
+            {/* High-Converting 1-Click Order Button */}
+            <div className="pt-3 border-t border-white/10 space-y-3">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-4 rounded-xl bg-[#CCFF00] hover:bg-[#b8e600] text-black font-heading font-bold text-base tracking-wide transition-all shadow-[0_0_25px_rgba(204,255,0,0.25)] hover:shadow-[0_0_35px_rgba(204,255,0,0.4)] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2"
+              >
+                <Lock className="w-4 h-4" />
+                <span>{isSubmitting ? "Vertrag wird abgeschlossen..." : "Kostenpflichtig bestellen"}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <p className="text-[11px] text-neutral-500 text-center">
+                Alle Unterlagen erhältst Du sofort per E-Mail als PDF.
+              </p>
+            </div>
+          </div>
+
+          {/* Moved switch to Schritt-für-Schritt to the bottom */}
+          <div className="text-center pt-2">
+            <button
+              type="button"
+              onClick={() => setViewMode("step_by_step")}
+              className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors cursor-pointer"
+            >
+              Zu den Einzelschritten wechseln →
+            </button>
+          </div>
+        </form>
+      ) : (
+        /* ========================================================================= */
+        /* STEP-BY-STEP WIZARD MODE */
+        /* ========================================================================= */
+        <div className="w-full rounded-2xl border border-white/10 bg-[#0D0D0E] p-6 sm:p-8 space-y-6 shadow-2xl">
+          <div className="border-b border-white/10 pb-5 space-y-3">
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle className="text-xl flex items-center gap-2">
-                  Digitaler Vertragsabschluss (Schritt {step} von 6)
-                </CardTitle>
-                <CardDescription className="mt-1 text-xs">
+                <h1 className="text-xl font-bold font-heading text-white tracking-tight">
+                  Schritt {step} von 6
+                </h1>
+                <p className="text-xs text-neutral-400 mt-0.5">
                   {step === 1 && "Bitte trage Deine Firmendaten ein."}
                   {step === 2 && "Bitte lies und bestätige die AGB."}
                   {step === 3 && "Bitte lies und bestätige den AVV."}
                   {step === 4 && "Bitte erteile das SEPA-Lastschriftmandat."}
                   {step === 5 && "Bitte prüfe Deine Angaben auf Richtigkeit."}
                   {step === 6 && "Bitte bestätige Deine Zustimmung und schließe die Bestellung ab."}
-                </CardDescription>
+                </p>
               </div>
+              {hasCorePrefill && (
+                <button
+                  type="button"
+                  className="text-xs font-medium text-[#CCFF00] hover:underline cursor-pointer"
+                  onClick={() => setViewMode("express")}
+                >
+                  Zur 1-Klick Übersicht →
+                </button>
+              )}
             </div>
 
-            <div className="flex items-center w-full gap-2 pt-2">
+            <div className="flex items-center w-full gap-1.5 pt-1">
               {[1, 2, 3, 4, 5, 6].map((s) => (
-                <div key={s} className="flex-1 h-2 rounded-full overflow-hidden bg-muted border border-border/50">
-                  <div className={`h-full transition-all duration-500 ${step >= s ? 'bg-primary' : 'bg-transparent'}`} />
+                <div
+                  key={s}
+                  className="flex-1 h-1.5 rounded-full overflow-hidden bg-white/10"
+                >
+                  <div
+                    className={`h-full transition-all duration-300 ${step >= s ? "bg-[#CCFF00]" : "bg-transparent"
+                      }`}
+                  />
                 </div>
               ))}
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="pt-6 px-4 sm:px-8">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* STEP 1: Customer Data */}
             {step === 1 && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                <div className="flex items-center gap-2 border-b pb-2">
-                  <User className="w-5 h-5 text-primary" />
-                  <h3 className="text-xl font-medium">1. Deine Unternehmensdaten</h3>
+              <div className="space-y-5 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2 text-[#CCFF00] font-bold text-xs uppercase tracking-wider">
+                  <User className="w-4 h-4" />
+                  <span>1. Deine Unternehmensdaten</span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  <div className="space-y-2 sm:col-span-2">
-                    <Label required>Firma / Unternehmensname</Label>
-                    <Input {...register("firma")} placeholder="Muster GmbH" error={errors.firma?.message} />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label required className="text-xs text-neutral-300">Firma / Unternehmensname</Label>
+                    <Input {...register("firma")} placeholder="Muster GmbH" error={errors.firma?.message} className="bg-[#1A1A1E] border-white/15 text-white text-xs" />
                   </div>
-                  <div className="space-y-2 sm:col-span-1">
-                    <Label required>Rechtsform</Label>
+                  <div className="space-y-1.5 sm:col-span-1">
+                    <Label required className="text-xs text-neutral-300">Rechtsform</Label>
                     <select
                       {...register("rechtsform")}
-                      className="flex h-10 w-full rounded-lg border border-neutral-600 bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      className="flex h-10 w-full rounded-lg border border-white/15 bg-[#1A1A1E] px-3 py-2 text-xs text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#CCFF00]"
                     >
                       <option value="" disabled>Bitte wählen...</option>
                       <option value="GmbH">GmbH</option>
@@ -361,50 +892,49 @@ export function RemoteOrderFormFlow({ invite, termsContent, avvContent, sepaCont
                       <option value="e.K.">e.K.</option>
                       <option value="Andere">Andere / Sonstige</option>
                     </select>
-                    {errors.rechtsform && <p className="mt-1 text-xs text-destructive">{errors.rechtsform.message}</p>}
+                    {errors.rechtsform && <p className="mt-1 text-xs text-red-400">{errors.rechtsform.message}</p>}
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label required>Ansprechpartner (Vor- & Nachname)</Label>
-                  <Input {...register("ansprechpartner")} placeholder="Max Mustermann" error={errors.ansprechpartner?.message} />
+                <div className="space-y-1.5">
+                  <Label required className="text-xs text-neutral-300">Ansprechpartner (Vor- & Nachname)</Label>
+                  <Input {...register("ansprechpartner")} placeholder="Max Mustermann" error={errors.ansprechpartner?.message} className="bg-[#1A1A1E] border-white/15 text-white text-xs" />
                 </div>
 
-                <div className="space-y-2">
-                  <Label required>Straße & Hausnummer</Label>
-                  <Input {...register("strasse")} placeholder="Hauptstraße 12" error={errors.strasse?.message} />
+                <div className="space-y-1.5">
+                  <Label required className="text-xs text-neutral-300">Straße & Hausnummer</Label>
+                  <Input {...register("strasse")} placeholder="Hauptstraße 12" error={errors.strasse?.message} className="bg-[#1A1A1E] border-white/15 text-white text-xs" />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  <div className="space-y-2 sm:col-span-1">
-                    <Label required>PLZ</Label>
-                    <Input {...register("plz")} placeholder="12345" error={errors.plz?.message} />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-1.5 sm:col-span-1">
+                    <Label required className="text-xs text-neutral-300">PLZ</Label>
+                    <Input {...register("plz")} placeholder="12345" error={errors.plz?.message} className="bg-[#1A1A1E] border-white/15 text-white text-xs" />
                   </div>
-                  <div className="space-y-2 sm:col-span-2">
-                    <Label required>Ort</Label>
-                    <Input {...register("ort")} placeholder="Musterstadt" error={errors.ort?.message} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label required>E-Mail-Adresse</Label>
-                    <Input type="email" {...register("email")} placeholder="name@firma.de" error={errors.email?.message} />
-                    <p className="text-[11px] text-muted-foreground">An diese Adresse senden wir die finalen Vertragsunterlagen.</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Telefonnummer (Optional)</Label>
-                    <Input {...register("telefon")} placeholder="+49 170 1234567" />
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label required className="text-xs text-neutral-300">Ort</Label>
+                    <Input {...register("ort")} placeholder="Musterstadt" error={errors.ort?.message} className="bg-[#1A1A1E] border-white/15 text-white text-xs" />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>USt-IdNr. (Optional)</Label>
-                  <Input {...register("ustId")} placeholder="DE123456789" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label required className="text-xs text-neutral-300">E-Mail-Adresse</Label>
+                    <Input type="email" {...register("email")} placeholder="name@firma.de" error={errors.email?.message} className="bg-[#1A1A1E] border-white/15 text-white text-xs" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-neutral-300">Telefonnummer (Optional)</Label>
+                    <Input {...register("telefon")} placeholder="+49 170 1234567" className="bg-[#1A1A1E] border-white/15 text-white text-xs" />
+                  </div>
                 </div>
 
-                <div className="flex justify-end pt-4 border-t border-border/40">
-                  <Button type="button" size="lg" className="w-full sm:w-auto px-8" onClick={nextStep}>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-neutral-300">USt-IdNr. (Optional)</Label>
+                  <Input {...register("ustId")} placeholder="DE123456789" className="bg-[#1A1A1E] border-white/15 text-white text-xs" />
+                </div>
+
+                <div className="flex justify-end pt-4 border-t border-white/10">
+                  <Button type="button" size="lg" className="w-full sm:w-auto px-8 bg-[#CCFF00] hover:bg-[#b8e600] text-black font-semibold text-xs" onClick={nextStep}>
                     Weiter zu den AGB
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
@@ -414,27 +944,61 @@ export function RemoteOrderFormFlow({ invite, termsContent, avvContent, sepaCont
 
             {/* STEP 2: AGB */}
             {step === 2 && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                <div className="flex items-center gap-2 border-b pb-2">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <h3 className="text-xl font-medium">2. Allgemeine Geschäftsbedingungen (AGB)</h3>
+              <div className="space-y-5 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2 text-[#CCFF00] font-bold text-xs uppercase tracking-wider">
+                  <FileText className="w-4 h-4" />
+                  <span>2. Allgemeine Geschäftsbedingungen (AGB)</span>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Bitte scroll bis zum Ende des Dokuments, um die AGB freizuschalten.
+                <p className="text-xs text-neutral-400">
+                  Die AGB bilden die rechtliche Grundlage unserer Zusammenarbeit.
                 </p>
 
-                <LegalScrollBox
-                  title="Allgemeine Geschäftsbedingungen (AGB)"
-                  content={termsContent}
-                  onRead={() => setAgbRead(true)}
-                />
+                <div className="border border-white/10 rounded-xl bg-[#141416] p-5 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/5">
+                    <div>
+                      <h3 className="text-sm font-bold text-white">Allgemeine Geschäftsbedingungen</h3>
+                      <p className="text-xs text-neutral-400">Felix Kinze & Leon Trepesch GbR (Buff Interactive)</p>
+                    </div>
+                    <a
+                      href="/de/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-[#CCFF00]/10 hover:bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/30 font-semibold text-xs transition-colors cursor-pointer self-start sm:self-auto"
+                    >
+                      <span>AGB in neuem Tab öffnen</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
 
-                <div className="flex flex-row justify-between items-center gap-4 pt-4 border-t border-border/40">
-                  <Button type="button" variant="ghost" size="lg" onClick={() => setStep(1)}>
+                  <div
+                    onClick={() => {
+                      const next = !watch("consentAgb");
+                      setValue("consentAgb", next, { shouldValidate: true });
+                      setAgbRead(next);
+                    }}
+                    className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${watch("consentAgb")
+                      ? "border-[#CCFF00]/40 bg-[#CCFF00]/5"
+                      : "border-white/10 bg-[#1A1A1E] hover:border-white/20"
+                      }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={watch("consentAgb")}
+                      readOnly
+                      className="mt-0.5 h-4 w-4 rounded border-neutral-600 accent-[#CCFF00] pointer-events-none shrink-0"
+                    />
+                    <div className="flex-1 text-xs text-neutral-200 leading-relaxed font-normal">
+                      <span>Ich habe die AGB gelesen und erkläre mich damit einverstanden. *</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-row justify-between items-center gap-4 pt-4 border-t border-white/10">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setStep(1)} className="text-neutral-400 hover:text-white text-xs">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Zurück
                   </Button>
-                  <Button type="button" size="lg" onClick={nextStep} disabled={!agbRead}>
+                  <Button type="button" size="sm" onClick={nextStep} disabled={!watch("consentAgb")} className="bg-[#CCFF00] hover:bg-[#b8e600] text-black font-semibold text-xs">
                     Weiter zum AVV
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
@@ -444,27 +1008,61 @@ export function RemoteOrderFormFlow({ invite, termsContent, avvContent, sepaCont
 
             {/* STEP 3: AVV */}
             {step === 3 && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                <div className="flex items-center gap-2 border-b pb-2">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <h3 className="text-xl font-medium">3. Vertrag zur Auftragsverarbeitung (AVV)</h3>
+              <div className="space-y-5 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2 text-[#CCFF00] font-bold text-xs uppercase tracking-wider">
+                  <FileText className="w-4 h-4" />
+                  <span>3. Vertrag zur Auftragsverarbeitung (AVV)</span>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Bitte scroll bis zum Ende des Dokuments, um den AVV freizuschalten.
+                <p className="text-xs text-neutral-400">
+                  Der AVV regelt den datenschutzkonformen Umgang mit personenbezogenen Daten gemäß Art. 28 DSGVO.
                 </p>
 
-                <LegalScrollBox
-                  title="Vertrag zur Auftragsverarbeitung (AVV)"
-                  content={avvContent}
-                  onRead={() => setAvvRead(true)}
-                />
+                <div className="border border-white/10 rounded-xl bg-[#141416] p-5 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/5">
+                    <div>
+                      <h3 className="text-sm font-bold text-white">Auftragsverarbeitungsvertrag (AVV)</h3>
+                      <p className="text-xs text-neutral-400">Gemäß Art. 28 Abs. 3 Datenschutz-Grundverordnung (DSGVO)</p>
+                    </div>
+                    <a
+                      href="/de/avv"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-[#CCFF00]/10 hover:bg-[#CCFF00]/20 text-[#CCFF00] border border-[#CCFF00]/30 font-semibold text-xs transition-colors cursor-pointer self-start sm:self-auto"
+                    >
+                      <span>AVV in neuem Tab öffnen</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
 
-                <div className="flex flex-row justify-between items-center gap-4 pt-4 border-t border-border/40">
-                  <Button type="button" variant="ghost" size="lg" onClick={() => setStep(2)}>
+                  <div
+                    onClick={() => {
+                      const next = !watch("consentAvv");
+                      setValue("consentAvv", next, { shouldValidate: true });
+                      setAvvRead(next);
+                    }}
+                    className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${watch("consentAvv")
+                      ? "border-[#CCFF00]/40 bg-[#CCFF00]/5"
+                      : "border-white/10 bg-[#1A1A1E] hover:border-white/20"
+                      }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={watch("consentAvv")}
+                      readOnly
+                      className="mt-0.5 h-4 w-4 rounded border-neutral-600 accent-[#CCFF00] pointer-events-none shrink-0"
+                    />
+                    <div className="flex-1 text-xs text-neutral-200 leading-relaxed font-normal">
+                      <span>Ich habe den AVV zur Kenntnis genommen und schließe diesen hiermit ab. *</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-row justify-between items-center gap-4 pt-4 border-t border-white/10">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setStep(2)} className="text-neutral-400 hover:text-white text-xs">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Zurück
                   </Button>
-                  <Button type="button" size="lg" onClick={nextStep} disabled={!avvRead}>
+                  <Button type="button" size="sm" onClick={nextStep} disabled={!watch("consentAvv")} className="bg-[#CCFF00] hover:bg-[#b8e600] text-black font-semibold text-xs">
                     Weiter zum SEPA-Mandat
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
@@ -474,84 +1072,89 @@ export function RemoteOrderFormFlow({ invite, termsContent, avvContent, sepaCont
 
             {/* STEP 4: SEPA */}
             {step === 4 && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                <div className="flex items-center gap-2 border-b pb-2">
-                  <CreditCard className="w-5 h-5 text-primary" />
-                  <h3 className="text-xl font-medium">4. SEPA-Lastschriftmandat</h3>
+              <div className="space-y-5 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2 text-[#CCFF00] font-bold text-xs uppercase tracking-wider">
+                  <CreditCard className="w-4 h-4" />
+                  <span>4. SEPA-Lastschriftmandat</span>
                 </div>
 
-                <div className="bg-primary/5 border border-primary/20 p-5 rounded-xl text-sm relative overflow-hidden">
-                  <div className="absolute top-0 right-0 bg-primary/20 text-foreground text-[10px] font-bold px-3 py-1 rounded-bl-lg border-l border-b border-primary/30 uppercase tracking-wider">
-                    B2B Mandat
+                <div className="bg-[#141416] border border-white/10 p-5 rounded-xl text-xs space-y-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <p className="font-mono font-bold text-[#CCFF00]">Gläubiger-ID: DE15WEB00002924152</p>
+                    <a
+                      href="/de/sepa-mandat"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#CCFF00] hover:underline inline-flex items-center gap-1 font-medium"
+                    >
+                      <span>Vollständigen Mandatstext ansehen</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
                   </div>
-                  <p className="text-primary font-bold mb-2">Gläubiger-ID: DE15WEB00002924152</p>
-                  <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground mt-4 leading-relaxed">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{sepaContent}</ReactMarkdown>
-                  </div>
+                  <p className="text-neutral-300 leading-relaxed text-xs">
+                    Ich ermächtige die Felix Kinze & Leon Trepesch GbR, Zahlungen von meinem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die gezogenen Lastschriften einzulösen.
+                  </p>
                 </div>
 
-                <div className="space-y-4 mt-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label>Kontoinhaber (falls abweichend)</Label>
-                      <Input {...register("kontoinhaber")} placeholder="Max Mustermann" />
+                <div className="space-y-3 mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-neutral-300">Kontoinhaber (falls abweichend)</Label>
+                      <Input {...register("kontoinhaber")} placeholder="Max Mustermann" className="bg-[#1A1A1E] border-white/15 text-white text-xs" />
                     </div>
-                    <div className="space-y-2">
-                      <Label>Kreditinstitut / Bank (Optional)</Label>
-                      <Input {...register("bank")} placeholder="Musterbank" />
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-neutral-300">Kreditinstitut / Bank (Optional)</Label>
+                      <Input {...register("bank")} placeholder="Musterbank" className="bg-[#1A1A1E] border-white/15 text-white text-xs" />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div className="space-y-2 sm:col-span-2">
-                      <Label required>IBAN</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <Label required className="text-xs text-neutral-300">IBAN</Label>
                       <Input
                         {...register("iban", {
                           onChange: (e) => {
                             const raw = e.target.value.toUpperCase().replace(/\s/g, "");
                             e.target.value = raw.replace(/(.{4})/g, "$1 ").trim();
-                          }
+                          },
                         })}
                         placeholder="DE12 3456 7890 ..."
                         error={errors.iban?.message}
+                        className="font-mono text-sm bg-[#1A1A1E] border-white/15 text-white"
                       />
                     </div>
-                    <div className="space-y-2 sm:col-span-1">
-                      <Label>BIC (Optional)</Label>
-                      <Input {...register("bic")} placeholder="GENODEM1MUB" />
+                    <div className="space-y-1.5 sm:col-span-1">
+                      <Label className="text-xs text-neutral-300">BIC (Optional)</Label>
+                      <Input {...register("bic")} placeholder="GENODEM1MUB" className="bg-[#1A1A1E] border-white/15 text-white text-xs" />
                     </div>
                   </div>
 
-                  {/* SEPA Electronic Authorization Checkbox */}
                   <div
                     onClick={() => setValue("consentSepa", !watch("consentSepa"), { shouldValidate: true })}
-                    className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer mt-6 ${watch("consentSepa")
-                      ? 'border-emerald-500/40 bg-emerald-500/5'
-                      : 'border-border bg-card/40 hover:bg-card/80'
+                    className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer mt-4 ${watch("consentSepa")
+                      ? "border-[#CCFF00]/40 bg-[#CCFF00]/5"
+                      : "border-white/10 bg-[#141416] hover:border-white/20"
                       }`}
                   >
                     <input
                       type="checkbox"
-                      id="sepaConsent"
                       {...register("consentSepa")}
                       checked={watch("consentSepa")}
                       readOnly
-                      className="mt-1 h-5 w-5 rounded border-neutral-600 accent-primary pointer-events-none"
+                      className="mt-0.5 h-4 w-4 rounded border-neutral-600 accent-[#CCFF00] pointer-events-none shrink-0"
                     />
-                    <div className="space-y-1 leading-none flex-1">
-                      <Label className="cursor-pointer font-medium block">
-                        Ich ermächtige die Felix Kinze & Leon Trepesch GbR, Zahlungen von meinem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein Kreditinstitut an, die gezogenen Lastschriften einzulösen. *
-                      </Label>
-                      {errors.consentSepa && <p className="text-xs text-red-500 mt-1">{errors.consentSepa.message}</p>}
+                    <div className="flex-1 text-xs text-neutral-200 leading-relaxed font-normal">
+                      <span>Ich ermächtige die Felix Kinze & Leon Trepesch GbR, Zahlungen von meinem Konto mittels Lastschrift einzuziehen. *</span>
+                      {errors.consentSepa && <p className="text-xs text-red-400 mt-1">{errors.consentSepa.message}</p>}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-row justify-between items-center gap-4 pt-4 border-t border-border/40">
-                  <Button type="button" variant="secondary" size="lg" onClick={() => setStep(3)}>
+                <div className="flex flex-row justify-between items-center gap-4 pt-4 border-t border-white/10">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setStep(3)} className="text-neutral-400 hover:text-white text-xs">
                     ← Zurück
                   </Button>
-                  <Button type="button" size="lg" onClick={nextStep} disabled={!watch("consentSepa")}>
+                  <Button type="button" size="sm" onClick={nextStep} disabled={!watch("consentSepa")} className="bg-[#CCFF00] hover:bg-[#b8e600] text-black font-semibold text-xs">
                     Weiter zur Zusammenfassung
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
@@ -559,112 +1162,59 @@ export function RemoteOrderFormFlow({ invite, termsContent, avvContent, sepaCont
               </div>
             )}
 
-            {/* STEP 5: Zusammenfassung */}
+            {/* STEP 5: Summary */}
             {step === 5 && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                <div className="flex items-center gap-2 border-b pb-2">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <h3 className="text-xl font-bold">5. Zusammenfassung & Prüfung</h3>
+              <div className="space-y-5 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2 text-[#CCFF00] font-bold text-xs uppercase tracking-wider">
+                  <FileText className="w-4 h-4" />
+                  <span>5. Zusammenfassung & Prüfung</span>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Bitte überprüfe alle Angaben sorgfältig auf Richtigkeit.
-                </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Tarif & Konditionen */}
-                  <div className="border border-border rounded-xl p-5 bg-muted/20 space-y-3 shadow-sm">
-                    <h4 className="font-bold text-primary text-sm uppercase tracking-wider">Tarif & Konditionen</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Gewählter Tarif:</span>
-                        <span className="font-medium capitalize">{overrideTarif || invite.tarif}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="border border-white/10 rounded-xl p-5 bg-[#141416] space-y-3">
+                    <span className="font-bold text-[#CCFF00] text-xs uppercase tracking-wider block">Tarif & Konditionen</span>
+                    <div className="space-y-2 text-xs font-sans">
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-neutral-400">Tarif:</span>
+                        <span className="font-semibold text-white capitalize">{currentTarif}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-neutral-400">Einmalgebühr:</span>
+                        <span className="font-semibold text-white">{formatPrice(setupPreis)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Zahlungsrhythmus:</span>
-                        <span className="font-medium">{(overrideZahlungsrhythmus || invite.zahlungsrhythmus) === "jaehrlich" ? "Jährlich" : "Monatlich"}</span>
-                      </div>
-                      <div className="flex justify-between border-t border-border/40 pt-2">
-                        <span className="text-muted-foreground">Einmalgebühr:</span>
-                        <span className="font-semibold text-foreground">{formatPrice(setupPreis)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Laufende Gebühr:</span>
-                        <span className="font-semibold text-foreground">{formatPrice(laufendPreis)}</span>
+                        <span className="text-neutral-400">Laufende Gebühr:</span>
+                        <span className="font-semibold text-[#CCFF00]">{formatPrice(laufendPreis)} / Monat</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Firmendaten */}
-                  <div className="border border-border rounded-xl p-5 bg-muted/20 space-y-3 shadow-sm">
-                    <h4 className="font-bold text-primary text-sm uppercase tracking-wider">Firmendaten</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Firma:</span>
-                        <span className="font-medium text-foreground">{watch("firma")}</span>
+                  <div className="border border-white/10 rounded-xl p-5 bg-[#141416] space-y-3">
+                    <span className="font-bold text-[#CCFF00] text-xs uppercase tracking-wider block">Firmendaten</span>
+                    <div className="space-y-2 text-xs font-sans">
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-neutral-400">Firma:</span>
+                        <span className="font-semibold text-white">{watch("firma")}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Rechtsform:</span>
-                        <span className="font-medium text-foreground">{watch("rechtsform")}</span>
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-neutral-400">Rechtsform:</span>
+                        <span className="font-semibold text-white">{watch("rechtsform")}</span>
                       </div>
                       {watch("ustId") && (
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">USt-IdNr.:</span>
-                          <span className="font-medium text-foreground">{watch("ustId")}</span>
+                          <span className="text-neutral-400">USt-IdNr.:</span>
+                          <span className="font-semibold text-white">{watch("ustId")}</span>
                         </div>
                       )}
-                    </div>
-                  </div>
-
-                  {/* Ansprechpartner & Adresse */}
-                  <div className="border border-border rounded-xl p-5 bg-muted/20 space-y-3 shadow-sm">
-                    <h4 className="font-bold text-primary text-sm uppercase tracking-wider">Ansprechpartner & Adresse</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Name:</span>
-                        <span className="font-medium text-foreground">{watch("ansprechpartner")}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Straße & Hausnummer:</span>
-                        <span className="font-medium text-foreground">{watch("strasse")}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">PLZ & Ort:</span>
-                        <span className="font-medium text-foreground">{watch("plz")} {watch("ort")}</span>
-                      </div>
-                      <div className="flex justify-between border-t border-border/40 pt-2">
-                        <span className="text-muted-foreground">E-Mail:</span>
-                        <span className="font-medium text-foreground">{watch("email")}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Zahlungsdaten */}
-                  <div className="border border-border rounded-xl p-5 bg-muted/20 space-y-3 shadow-sm">
-                    <h4 className="font-bold text-primary text-sm uppercase tracking-wider">Zahlungsdaten</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">IBAN:</span>
-                        <span className="font-medium font-mono text-foreground">{watch("iban")}</span>
-                      </div>
-                      {watch("bank") && (
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Bank:</span>
-                          <span className="font-medium text-foreground">{watch("bank")}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between border-t border-border/40 pt-2">
-                        <span className="text-muted-foreground">Kontoinhaber:</span>
-                        <span className="font-medium text-foreground">{watch("kontoinhaber") || watch("ansprechpartner")}</span>
-                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-row justify-between items-center gap-4 pt-6 border-t border-border/40">
-                  <Button type="button" variant="secondary" size="lg" onClick={() => setStep(4)}>
+                <div className="flex flex-row justify-between items-center gap-4 pt-4 border-t border-white/10">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setStep(4)} className="text-neutral-400 hover:text-white text-xs">
                     ← Zurück
                   </Button>
-                  <Button type="button" size="lg" onClick={nextStep}>
+                  <Button type="button" size="sm" onClick={nextStep} className="bg-[#CCFF00] hover:bg-[#b8e600] text-black font-semibold text-xs">
                     Angaben prüfen & Weiter
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
@@ -672,151 +1222,119 @@ export function RemoteOrderFormFlow({ invite, termsContent, avvContent, sepaCont
               </div>
             )}
 
-            {/* STEP 6: Final (Vertragsabschluss Button-Lösung § 312j BGB) */}
+            {/* STEP 6: Final Abschluss */}
             {step === 6 && (
-              <div className="space-y-8 animate-in fade-in duration-300">
-                <div className="flex items-center gap-2 border-b pb-2">
-                  <Lock className="w-5 h-5 text-primary" />
-                  <h3 className="text-xl font-medium">6. Rechtsverbindlicher Vertragsabschluss</h3>
+              <div className="space-y-6 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2 text-[#CCFF00] font-bold text-xs uppercase tracking-wider">
+                  <Lock className="w-4 h-4" />
+                  <span>6. Rechtsverbindlicher Vertragsabschluss</span>
                 </div>
 
-                <div className="bg-primary/5 p-6 rounded-xl border-2 border-primary/20 space-y-4 shadow-sm">
-                  <h4 className="font-bold text-primary flex items-center gap-2 text-lg">
-                    <CheckCircle2 className="w-5 h-5" />
-                    Zusammenfassung Ihres Tarifs
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-sm">
-                    <div className="bg-background/40 p-4 rounded-lg border border-border">
-                      <span className="text-xs text-muted-foreground block uppercase font-semibold">Einmalgebühr</span>
-                      <span className="text-xl font-bold text-foreground">{formatPrice(setupPreis)}</span>
-                      <span className="text-[10px] text-muted-foreground block mt-1">Zzgl. 19% MwSt.</span>
-                    </div>
-                    <div className="bg-background/40 p-4 rounded-lg border border-border">
-                      <span className="text-xs text-muted-foreground block uppercase font-semibold">Laufende Gebühr</span>
-                      <span className="text-xl font-bold text-foreground">{formatPrice(laufendPreis)}</span>
-                      <span className="text-[10px] text-muted-foreground block mt-1">{(overrideZahlungsrhythmus || invite.zahlungsrhythmus) === "jaehrlich" ? "Jährlich" : "Monatlich"}, zzgl. 19% MwSt.</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {/* Checkbox 1: B2B */}
+                <div className="space-y-2.5">
                   <div
                     onClick={() => setValue("consentB2b", !watch("consentB2b"), { shouldValidate: true })}
-                    className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${watch("consentB2b")
-                      ? 'border-emerald-500/40 bg-emerald-500/5'
-                      : 'border-border bg-card/40 hover:bg-card/80'
+                    className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${watch("consentB2b")
+                      ? "border-[#CCFF00]/40 bg-[#CCFF00]/5"
+                      : "border-white/10 bg-[#141416] hover:border-white/20"
                       }`}
                   >
                     <input
                       type="checkbox"
-                      id="b2b"
                       {...register("consentB2b")}
                       checked={watch("consentB2b")}
                       readOnly
-                      className="mt-1 h-5 w-5 rounded border-neutral-600 accent-primary pointer-events-none"
+                      className="mt-0.5 h-4 w-4 rounded border-neutral-600 accent-[#CCFF00] pointer-events-none shrink-0"
                     />
-                    <div className="space-y-1 leading-none flex-1">
-                      <Label className="cursor-pointer font-medium block">
-                        Ich bestätige, dass ich ausschließlich gewerblich/selbstständig handle (B2B). *
-                      </Label>
-                      <p className="text-xs text-muted-foreground mt-1">Dieser Vertrag gilt ausschließlich für Geschäftskunden.</p>
-                      {errors.consentB2b && <p className="text-xs text-red-500 mt-1">{errors.consentB2b.message}</p>}
+                    <div className="flex-1 text-xs text-neutral-200 leading-relaxed font-normal">
+                      <span>Ich bestätige, dass ich ausschließlich gewerblich/selbstständig handle (B2B). *</span>
+                      {errors.consentB2b && <p className="text-xs text-red-400 mt-1">{errors.consentB2b.message}</p>}
                     </div>
                   </div>
 
-                  {/* Checkbox 2: AGB */}
                   <div
                     onClick={() => setValue("consentAgb", !watch("consentAgb"), { shouldValidate: true })}
-                    className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${watch("consentAgb")
-                      ? 'border-emerald-500/40 bg-emerald-500/5'
-                      : 'border-border bg-card/40 hover:bg-card/80'
+                    className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${watch("consentAgb")
+                      ? "border-[#CCFF00]/40 bg-[#CCFF00]/5"
+                      : "border-white/10 bg-[#141416] hover:border-white/20"
                       }`}
                   >
                     <input
                       type="checkbox"
-                      id="agb"
                       {...register("consentAgb")}
                       checked={watch("consentAgb")}
                       readOnly
-                      className="mt-1 h-5 w-5 rounded border-neutral-600 accent-primary pointer-events-none"
+                      className="mt-0.5 h-4 w-4 rounded border-neutral-600 accent-[#CCFF00] pointer-events-none shrink-0"
                     />
-                    <div className="space-y-1 leading-none flex-1">
-                      <Label className="cursor-pointer font-medium block">
-                        Ich habe die Allgemeinen Geschäftsbedingungen (AGB) zur Kenntnis genommen und akzeptiere diese. *
-                      </Label>
-                      {errors.consentAgb && <p className="text-xs text-red-500 mt-1">{errors.consentAgb.message}</p>}
+                    <div className="flex-1 text-xs text-neutral-200 leading-relaxed font-normal">
+                      <span>
+                        Ich habe die{" "}
+                        <a
+                          href="/de/terms"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[#CCFF00] underline underline-offset-2 hover:text-[#b8e600] font-semibold"
+                        >
+                          AGB
+                        </a>{" "}
+                        gelesen und erkläre mich damit einverstanden. *
+                      </span>
+                      {errors.consentAgb && <p className="text-xs text-red-400 mt-1">{errors.consentAgb.message}</p>}
                     </div>
                   </div>
 
-                  {/* Checkbox 3: AVV */}
                   <div
                     onClick={() => setValue("consentAvv", !watch("consentAvv"), { shouldValidate: true })}
-                    className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${watch("consentAvv")
-                      ? 'border-emerald-500/40 bg-emerald-500/5'
-                      : 'border-border bg-card/40 hover:bg-card/80'
+                    className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${watch("consentAvv")
+                      ? "border-[#CCFF00]/40 bg-[#CCFF00]/5"
+                      : "border-white/10 bg-[#141416] hover:border-white/20"
                       }`}
                   >
                     <input
                       type="checkbox"
-                      id="avv"
                       {...register("consentAvv")}
                       checked={watch("consentAvv")}
                       readOnly
-                      className="mt-1 h-5 w-5 rounded border-neutral-600 accent-primary pointer-events-none"
+                      className="mt-0.5 h-4 w-4 rounded border-neutral-600 accent-[#CCFF00] pointer-events-none shrink-0"
                     />
-                    <div className="space-y-1 leading-none flex-1">
-                      <Label className="cursor-pointer font-medium block">
-                        Ich schließe den Vertrag zur Auftragsverarbeitung (AVV) ab. *
-                      </Label>
-                      {errors.consentAvv && <p className="text-xs text-red-500 mt-1">{errors.consentAvv.message}</p>}
-                    </div>
-                  </div>
-
-                  {/* Checkbox 4: Datenschutz */}
-                  <div
-                    onClick={() => setValue("consentDatenschutz", !watch("consentDatenschutz"), { shouldValidate: true })}
-                    className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer ${watch("consentDatenschutz")
-                      ? 'border-emerald-500/40 bg-emerald-500/5'
-                      : 'border-border bg-card/40 hover:bg-card/80'
-                      }`}
-                  >
-                    <input
-                      type="checkbox"
-                      id="datenschutz"
-                      {...register("consentDatenschutz")}
-                      checked={watch("consentDatenschutz")}
-                      readOnly
-                      className="mt-1 h-5 w-5 rounded border-neutral-600 accent-primary pointer-events-none"
-                    />
-                    <div className="space-y-1 leading-none flex-1">
-                      <Label className="cursor-pointer font-medium block">
-                        Ich habe die Datenschutzerklärung zur Kenntnis genommen. *
-                      </Label>
-                      {errors.consentDatenschutz && <p className="text-xs text-red-500 mt-1">{errors.consentDatenschutz.message}</p>}
+                    <div className="flex-1 text-xs text-neutral-200 leading-relaxed font-normal">
+                      <span>
+                        Ich schließe den{" "}
+                        <a
+                          href="/de/avv"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[#CCFF00] underline underline-offset-2 hover:text-[#b8e600] font-semibold"
+                        >
+                          Vertrag zur Auftragsverarbeitung (AVV)
+                        </a>{" "}
+                        ab. *
+                      </span>
+                      {errors.consentAvv && <p className="text-xs text-red-400 mt-1">{errors.consentAvv.message}</p>}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8 border-t border-border/40">
-                  <Button type="button" variant="secondary" size="lg" onClick={() => setStep(5)} className="w-full sm:w-auto">
-                    ← Zurück
+                <div className="flex flex-row justify-between items-center gap-4 pt-4 border-t border-white/10">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setStep(5)} className="text-neutral-400 hover:text-white text-xs">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Zurück
                   </Button>
-                  <Button
+                  <button
                     type="submit"
-                    size="lg"
-                    disabled={isSubmitting || !watch("consentB2b") || !watch("consentAgb") || !watch("consentAvv") || !watch("consentDatenschutz")}
-                    className="w-full sm:w-auto px-12 py-6 text-base shadow-lg shadow-primary/20 hover:shadow-primary/30"
+                    disabled={isSubmitting}
+                    className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-heading font-bold text-sm text-black bg-[#CCFF00] hover:bg-[#b8e600] shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
-                    {isSubmitting ? "Wird verarbeitet..." : "Zahlungspflichtig bestellen"}
-                  </Button>
+                    <Lock className="w-4 h-4" />
+                    <span>{isSubmitting ? "Wird abgeschlossen..." : "Kostenpflichtig bestellen"}</span>
+                  </button>
                 </div>
               </div>
             )}
-
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </div>
   );
 }

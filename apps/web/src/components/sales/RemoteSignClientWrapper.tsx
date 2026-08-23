@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { RemoteOrderFormFlow, RemoteInviteData } from "./RemoteOrderFormFlow";
-import { GrowthParadigmCheckout } from "./GrowthParadigmCheckout";
+import { RemoteSignDealOverview } from "./RemoteSignDealOverview";
 import { FaqSection } from "@/components/products/waas/FaqSection";
 import { FootnotesSection } from "@/components/buff/FootnotesSection";
 import { HeaderCheckout } from "@/components/buff/HeaderCheckout";
@@ -22,39 +22,49 @@ export function RemoteSignClientWrapper({
   sepaContent,
 }: RemoteSignClientWrapperProps) {
   const [showForm, setShowForm] = useState(false);
-  const [selectedTarif, setSelectedTarif] = useState(inviteData.tarif);
-  const [selectedZahlungsrhythmus, setSelectedZahlungsrhythmus] = useState(inviteData.zahlungsrhythmus);
+  const [selectedTarif] = useState(inviteData.tarif);
+  const [selectedZahlungsrhythmus] = useState(inviteData.zahlungsrhythmus);
 
-  const handleSelectPlan = (tarif: string, zahlungsrhythmus: string) => {
-    setSelectedTarif(tarif);
-    setSelectedZahlungsrhythmus(zahlungsrhythmus);
+  const handleStartSign = () => {
     setShowForm(true);
-    // Scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleBackToOverview = () => {
+    setShowForm(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   if (showForm) {
     return (
-      <div className="w-full max-w-4xl mx-auto py-12 px-4 relative z-10">
-        <RemoteOrderFormFlow
-          invite={inviteData}
-          termsContent={termsContent}
-          avvContent={avvContent}
-          sepaContent={sepaContent}
-          overrideTarif={selectedTarif}
-          overrideZahlungsrhythmus={selectedZahlungsrhythmus}
-        />
-      </div>
+      <>
+        <HeaderCheckout />
+        <div className="pt-24 pb-20 px-4 min-h-screen bg-[#050505] text-foreground">
+          <div className="w-full max-w-4xl mx-auto relative z-10">
+            <RemoteOrderFormFlow
+              invite={inviteData}
+              termsContent={termsContent}
+              avvContent={avvContent}
+              sepaContent={sepaContent}
+              overrideTarif={selectedTarif}
+              overrideZahlungsrhythmus={selectedZahlungsrhythmus}
+              onBackToOverview={handleBackToOverview}
+            />
+          </div>
+        </div>
+        <FootnotesSection />
+        <Footer />
+      </>
     );
   }
 
   return (
     <>
       <HeaderCheckout />
-      <div className="pt-16">
-        <GrowthParadigmCheckout 
-          inviteTarif={inviteData.tarif} 
-          onSelectPlan={handleSelectPlan} 
+      <div className="pt-20 bg-[#050505] min-h-screen">
+        <RemoteSignDealOverview
+          invite={inviteData}
+          onStartSign={handleStartSign}
         />
         <FaqSection />
         <FootnotesSection />
@@ -63,3 +73,4 @@ export function RemoteSignClientWrapper({
     </>
   );
 }
+

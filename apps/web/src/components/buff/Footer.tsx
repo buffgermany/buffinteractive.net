@@ -118,6 +118,7 @@ export function Footer() {
                 <Link href={`/${currentLocale}/imprint`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_imprint')}</Link>
                 <Link href={`/${currentLocale}/privacy`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_privacy')}</Link>
                 <Link href={`/${currentLocale}/terms`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_terms')}</Link>
+                <Link href={`/${currentLocale}/avv`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">AVV</Link>
                 <Link href={`/${currentLocale}/status`} prefetch={true} className="text-sm text-muted-foreground hover:text-white transition-colors">{t('legal_status')}</Link>
                 
                 <div className="mt-4 pt-4 border-t border-white/5 relative">

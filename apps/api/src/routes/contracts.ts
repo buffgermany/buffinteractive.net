@@ -61,6 +61,57 @@ function getBrandingPath(filename: string): string {
   return path.join(process.cwd(), "branding", filename);
 }
 
+function getWebBaseUrl(headers?: Record<string, string | undefined>, bodyOrigin?: string): string {
+  // 1. Explicit bodyOrigin sent from frontend client if valid
+  if (bodyOrigin && typeof bodyOrigin === "string" && bodyOrigin.startsWith("http")) {
+    return bodyOrigin.replace(/\/+$/, "");
+  }
+
+  // 2. Request Origin header
+  const origin = headers?.["origin"];
+  if (origin && typeof origin === "string" && origin.startsWith("http")) {
+    return origin.replace(/\/+$/, "");
+  }
+
+  // 3. Request Referer header (parse origin)
+  const referer = headers?.["referer"];
+  if (referer && typeof referer === "string" && referer.startsWith("http")) {
+    try {
+      const parsed = new URL(referer);
+      return parsed.origin;
+    } catch {
+      // ignore
+    }
+  }
+
+  // 4. X-Forwarded-Host + X-Forwarded-Proto header
+  const forwardedHost = headers?.["x-forwarded-host"] || headers?.["host"];
+  if (forwardedHost && !forwardedHost.includes("localhost") && !forwardedHost.includes("127.0.0.1") && !forwardedHost.includes("api")) {
+    const proto = headers?.["x-forwarded-proto"] || "https";
+    return `${proto}://${forwardedHost}`.replace(/\/+$/, "");
+  }
+
+  // 5. Environment variables
+  const envUrl =
+    process.env["NEXT_PUBLIC_WEB_URL"] ||
+    process.env["WEB_URL"] ||
+    process.env["NEXT_PUBLIC_APP_URL"] ||
+    process.env["APP_URL"] ||
+    process.env["BETTER_AUTH_URL"];
+
+  if (envUrl && envUrl.startsWith("http")) {
+    return envUrl.replace(/\/+$/, "");
+  }
+
+  // 6. In production environment, default to canonical production domain
+  if (process.env.NODE_ENV === "production") {
+    return "https://buffinteractive.net";
+  }
+
+  // 7. Development fallback
+  return "http://localhost:3000";
+}
+
 export const contractsRoutes = new Elysia({ prefix: "/v1" })
   .use(dbPlugin)
   .post(
@@ -434,7 +485,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
   )
   .post(
     "/contracts/create-invite",
-    async ({ db, body, set }) => {
+    async ({ db, body, headers, set }) => {
       try {
         const {
           tarif,
@@ -444,7 +495,20 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           customerEmail,
           customerName,
           companyName,
-          salesUserId
+          firma,
+          rechtsform,
+          ansprechpartner,
+          strasse,
+          plz,
+          ort,
+          telefon,
+          ustId,
+          iban,
+          bic,
+          bank,
+          kontoinhaber,
+          salesUserId,
+          clientOrigin
         } = body;
 
         let finalSalesUserId = salesUserId;
@@ -471,6 +535,9 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
         const token = crypto.randomBytes(32).toString("hex");
         const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000); // 14 days
 
+        const finalCompanyName = companyName || firma || null;
+        const finalCustomerName = customerName || ansprechpartner || null;
+
         const [newInvite] = await db
           .insert(contractSigningRequests)
           .values({
@@ -481,14 +548,24 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             setupPreisBrutto: String(setupPreisBrutto),
             laufendPreisBrutto: String(laufendPreisBrutto),
             customerEmail,
-            customerName: customerName || null,
-            companyName: companyName || null,
+            customerName: finalCustomerName,
+            companyName: finalCompanyName,
+            rechtsform: rechtsform || null,
+            strasse: strasse || null,
+            plz: plz || null,
+            ort: ort || null,
+            telefon: telefon || null,
+            ustId: ustId || null,
+            iban: iban || null,
+            bic: bic || null,
+            bank: bank || null,
+            kontoinhaber: kontoinhaber || null,
             status: "pending",
             expiresAt
           })
           .returning();
 
-        const webUrl = process.env["NEXT_PUBLIC_WEB_URL"] || process.env["WEB_URL"] || "http://localhost:3000";
+        const webUrl = getWebBaseUrl(headers as Record<string, string | undefined>, clientOrigin);
         const signingUrl = `${webUrl}/sales/order/sign/${token}`;
 
         // Send email via Resend if configured
@@ -524,10 +601,10 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
                       Dein Angebot ist bereit!
                     </h1>
                     <p style="font-size: 16px; line-height: 1.6; color: #A1A1A6; margin: 0 0 8px 0;">
-                      Hallo ${customerName || customerEmail},
+                      Hallo ${finalCustomerName || customerEmail},
                     </p>
                     <p style="font-size: 16px; line-height: 1.6; color: #A1A1A6; margin: 0 0 32px 0;">
-                      Dein digitales Angebot von Buff Interactive liegt für Dich bereit. Über den folgenden Button kannst Du das Angebot in wenigen Minuten bequem online einsehen und rechtsverbindlich unterzeichnen.
+                      Dein digitales Angebot von Buff Interactive liegt für Dich bereit. Über den folgenden Button kannst Du Dein Angebot in wenigen Minuten bequem online einsehen und unterzeichnen.
                     </p>
 
                     <div style="background-color: #111111; border-radius: 16px; padding: 24px; margin-bottom: 32px;">
@@ -594,7 +671,20 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
         customerEmail: t.String(),
         customerName: t.Optional(t.String()),
         companyName: t.Optional(t.String()),
-        salesUserId: t.String()
+        firma: t.Optional(t.String()),
+        rechtsform: t.Optional(t.String()),
+        ansprechpartner: t.Optional(t.String()),
+        strasse: t.Optional(t.String()),
+        plz: t.Optional(t.String()),
+        ort: t.Optional(t.String()),
+        telefon: t.Optional(t.String()),
+        ustId: t.Optional(t.String()),
+        iban: t.Optional(t.String()),
+        bic: t.Optional(t.String()),
+        bank: t.Optional(t.String()),
+        kontoinhaber: t.Optional(t.String()),
+        salesUserId: t.String(),
+        clientOrigin: t.Optional(t.String())
       })
     }
   )
@@ -630,6 +720,16 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           customerEmail: invite.customerEmail,
           customerName: invite.customerName,
           companyName: invite.companyName,
+          rechtsform: invite.rechtsform,
+          strasse: invite.strasse,
+          plz: invite.plz,
+          ort: invite.ort,
+          telefon: invite.telefon,
+          ustId: invite.ustId,
+          iban: invite.iban,
+          bic: invite.bic,
+          bank: invite.bank,
+          kontoinhaber: invite.kontoinhaber,
           salesUserId: invite.salesUserId,
           expiresAt: invite.expiresAt
         }
@@ -663,18 +763,28 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           return { success: false, error: "Der Signatur-Link ist ungültig oder abgelaufen." };
         }
 
-        let tarif = invite.tarif;
-        let zahlungsrhythmus = invite.zahlungsrhythmus;
-        let setupPreisBrutto = invite.setupPreisBrutto;
-        let laufendPreisBrutto = invite.laufendPreisBrutto;
-        const salesUserId = invite.salesUserId;
+        let tarif: string = invite.tarif;
+        let zahlungsrhythmus: string = invite.zahlungsrhythmus;
+        let setupPreisBrutto: string | number = invite.setupPreisBrutto;
+        let laufendPreisBrutto: string | number = invite.laufendPreisBrutto;
+        
+        let finalSalesUserId = invite.salesUserId;
+        const userExists = await db.query.users.findFirst({
+          where: (usersTable, { eq }) => eq(usersTable.id, invite.salesUserId)
+        });
+        if (!userExists) {
+          const firstUser = await db.query.users.findFirst();
+          if (firstUser) {
+            finalSalesUserId = firstUser.id;
+          }
+        }
 
         // Apply and validate override logic
         if (overrideTarif && overrideZahlungsrhythmus) {
           const configKeys = Object.keys(PRICING_CONFIG.plans) as Array<keyof typeof PRICING_CONFIG.plans>;
           const originalIndex = configKeys.indexOf(invite.tarif as any);
-          const overrideIndex = configKeys.indexOf(overrideTarif);
-          
+          const overrideIndex = configKeys.indexOf(overrideTarif as any);
+
           if (overrideIndex >= 0 && overrideIndex >= originalIndex) {
             tarif = overrideTarif;
             zahlungsrhythmus = overrideZahlungsrhythmus;
@@ -806,7 +916,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             { text: `Signatur-Token: ${token}`, fontSize: 8, color: 'gray' },
             { text: `IP-Adresse: ${derivedClientIp}`, fontSize: 8, color: 'gray' },
             { text: `User-Agent: ${derivedUserAgent}`, fontSize: 8, color: 'gray' },
-            { text: `Sales User ID: ${salesUserId}`, fontSize: 8, color: 'gray' },
+            { text: `Sales User ID: ${finalSalesUserId}`, fontSize: 8, color: 'gray' },
             { text: `Gezeichnet am: ${signedAt.toUTCString()}`, fontSize: 8, color: 'gray' },
 
             { text: 'Anhang 1: Allgemeine Geschäftsbedingungen (AGB)', style: 'subheader', pageBreak: 'before', margin: [0, 15, 0, 10] },
@@ -850,9 +960,13 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             bic: bic || null,
             bank: bank || null,
             kontoinhaber: kontoinhaber || null,
-            consentB2b, consentAgb, consentAvv, consentMarketing,
-            signatureSepaB64, signatureContractB64,
-            salesUserId,
+            consentB2b,
+            consentAgb,
+            consentAvv,
+            consentMarketing: Boolean(consentMarketing),
+            signatureSepaB64,
+            signatureContractB64,
+            salesUserId: finalSalesUserId,
             clientIp: derivedClientIp || null,
             userAgent: derivedUserAgent || null,
             signedAt,
@@ -966,12 +1080,12 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           success: true,
           contractId: newContract?.id
         };
-      } catch (globalError) {
+      } catch (globalError: any) {
         console.error("[contracts] Error in /sign-remote:", globalError);
         set.status = 500;
         return {
           success: false,
-          error: "Ein Fehler ist bei der digitalen Unterzeichnung aufgetreten."
+          error: globalError?.message || "Ein Fehler ist bei der digitalen Unterzeichnung aufgetreten."
         };
       }
     },
@@ -994,9 +1108,11 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
         consentB2b: t.Boolean(),
         consentAgb: t.Boolean(),
         consentAvv: t.Boolean(),
-        consentMarketing: t.Boolean(),
+        consentMarketing: t.Optional(t.Boolean()),
         signatureSepaB64: t.String(),
         signatureContractB64: t.String(),
+        overrideTarif: t.Optional(t.String()),
+        overrideZahlungsrhythmus: t.Optional(t.String()),
         clientIp: t.Optional(t.String()),
         userAgent: t.Optional(t.String())
       })

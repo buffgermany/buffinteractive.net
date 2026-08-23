@@ -94,6 +94,16 @@ export const contractSigningRequests = pgTable("contract_signing_requests", {
   customerEmail: text("customer_email").notNull(),
   customerName: text("customer_name"),
   companyName: text("company_name"),
+  rechtsform: text("rechtsform"),
+  strasse: text("strasse"),
+  plz: text("plz"),
+  ort: text("ort"),
+  telefon: text("telefon"),
+  ustId: text("ust_id"),
+  iban: text("iban"),
+  bic: text("bic"),
+  bank: text("bank"),
+  kontoinhaber: text("kontoinhaber"),
 
   status: contractSigningRequestStatusEnum("status").notNull().default("pending"),
 
