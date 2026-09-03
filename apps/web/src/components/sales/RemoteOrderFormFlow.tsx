@@ -68,6 +68,10 @@ export interface RemoteInviteData {
   bic?: string | null;
   bank?: string | null;
   kontoinhaber?: string | null;
+  leistungsbeschreibung?: string | null;
+  mindestlaufzeitMonate?: number | null;
+  stundensatz?: number | null;
+  werbebudgetRichtwert?: number | null;
   salesUserId: string;
   expiresAt: string;
 }
@@ -173,8 +177,11 @@ export function RemoteOrderFormFlow({
   const [agbRead, setAgbRead] = useState(false);
   const [avvRead, setAvvRead] = useState(false);
 
+  const isMarketing = invite.tarif === "marketing";
+
   const getEffectivePrices = () => {
-    if (overrideTarif && overrideZahlungsrhythmus) {
+    // marketing prices are individual; never look them up in PRICING_CONFIG
+    if (!isMarketing && overrideTarif && overrideZahlungsrhythmus) {
       const selectedPlan =
         PRICING_CONFIG.plans[overrideTarif as keyof typeof PRICING_CONFIG.plans];
       if (selectedPlan) {
@@ -194,7 +201,8 @@ export function RemoteOrderFormFlow({
   };
 
   const { setupPreis, laufendPreis } = getEffectivePrices();
-  const currentTarif = overrideTarif || invite.tarif;
+  const currentTarif = isMarketing ? "Marketing" : overrideTarif || invite.tarif;
+  const agbTeile = isMarketing ? "(Teil A und Teil C)" : "(Teil A und Teil B)";
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -366,7 +374,7 @@ export function RemoteOrderFormFlow({
               {formatPrice(laufendPreis)}
             </span>
             <span className="text-xs font-sans text-neutral-400 ml-1.5">
-              / Monat
+              {isMarketing ? "/ Monat (Monatliche Pauschale)" : "/ Monat"}
             </span>
           </div>
 
@@ -375,11 +383,44 @@ export function RemoteOrderFormFlow({
               {formatPrice(setupPreis)}
             </span>
             <span className="text-xs font-sans text-neutral-400 ml-1.5">
-              einmalig
+              {isMarketing ? "Onboarding-Gebühr (einmalig)" : "einmalig"}
             </span>
           </div>
         </div>
       </div>
+
+      {/* Marketing: Leistungsschein (shown in express and step-by-step mode) */}
+      {isMarketing && (
+        <div className="p-5 sm:p-6 rounded-2xl bg-[#0D0D0E] border border-white/10 shadow-lg space-y-3 text-xs font-sans">
+          <span className="font-bold text-[#CCFF00] uppercase tracking-wider block">Leistungsschein</span>
+          {invite.leistungsbeschreibung && (
+            <div className="text-neutral-200 whitespace-pre-line leading-relaxed border-b border-white/5 pb-3">
+              {invite.leistungsbeschreibung}
+            </div>
+          )}
+          <div className="flex justify-between border-b border-white/5 pb-2">
+            <span className="text-neutral-400">Mindestlaufzeit:</span>
+            <span className="font-semibold text-white text-right">
+              {invite.mindestlaufzeitMonate ?? 6} Monate ab Kick-off, danach unbestimmte Laufzeit mit 1 Monat Frist zum Monatsende (§ 28 AGB Teil C)
+            </span>
+          </div>
+          <div className={`flex justify-between ${invite.werbebudgetRichtwert != null ? "border-b border-white/5 pb-2" : ""}`}>
+            <span className="text-neutral-400">Stundensatz für Mehrleistungen:</span>
+            <span className="font-semibold text-white">{formatPrice(invite.stundensatz ?? 95)} / Std. netto</span>
+          </div>
+          {invite.werbebudgetRichtwert != null && (
+            <div className="space-y-1">
+              <div className="flex justify-between">
+                <span className="text-neutral-400">Werbebudget-Richtwert:</span>
+                <span className="font-semibold text-white">{formatPrice(invite.werbebudgetRichtwert)} / Monat netto</span>
+              </div>
+              <p className="text-[11px] text-neutral-500 leading-relaxed">
+                Das Werbebudget ist nicht Teil der Vergütung; Werbekonten laufen auf den Kunden, der das Budget direkt an die Plattform zahlt (§ 22 AGB Teil C).
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 1-KLICK EXPRESS MODE */}
@@ -736,7 +777,7 @@ export function RemoteOrderFormFlow({
                     >
                       AGB
                     </a>{" "}
-                    und den{" "}
+                    {agbTeile} und den{" "}
                     <a
                       href="/de/avv"
                       target="_blank"
@@ -988,7 +1029,7 @@ export function RemoteOrderFormFlow({
                       className="mt-0.5 h-4 w-4 rounded border-neutral-600 accent-[#CCFF00] pointer-events-none shrink-0"
                     />
                     <div className="flex-1 text-xs text-neutral-200 leading-relaxed font-normal">
-                      <span>Ich habe die AGB gelesen und erkläre mich damit einverstanden. *</span>
+                      <span>Ich habe die AGB {agbTeile} gelesen und erkläre mich damit einverstanden. *</span>
                     </div>
                   </div>
                 </div>
@@ -1179,11 +1220,11 @@ export function RemoteOrderFormFlow({
                         <span className="font-semibold text-white capitalize">{currentTarif}</span>
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
-                        <span className="text-neutral-400">Einmalgebühr:</span>
+                        <span className="text-neutral-400">{isMarketing ? "Onboarding-Gebühr:" : "Einmalgebühr:"}</span>
                         <span className="font-semibold text-white">{formatPrice(setupPreis)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-neutral-400">Laufende Gebühr:</span>
+                        <span className="text-neutral-400">{isMarketing ? "Monatliche Pauschale:" : "Laufende Gebühr:"}</span>
                         <span className="font-semibold text-[#CCFF00]">{formatPrice(laufendPreis)} / Monat</span>
                       </div>
                     </div>
@@ -1277,7 +1318,7 @@ export function RemoteOrderFormFlow({
                         >
                           AGB
                         </a>{" "}
-                        gelesen und erkläre mich damit einverstanden. *
+                        {agbTeile} gelesen und erkläre mich damit einverstanden. *
                       </span>
                       {errors.consentAgb && <p className="text-xs text-red-400 mt-1">{errors.consentAgb.message}</p>}
                     </div>

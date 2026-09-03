@@ -112,6 +112,59 @@ function getWebBaseUrl(headers?: Record<string, string | undefined>, bodyOrigin?
   return "http://localhost:3000";
 }
 
+function tarifLabel(tarif: string): string {
+  return tarif === "marketing" ? "Marketing" : tarif.charAt(0).toUpperCase() + tarif.slice(1);
+}
+
+function docLabels(tarif: string) {
+  const m = tarif === "marketing";
+  return {
+    title: m ? "Marketing-Leistungsschein" : "WaaS Bestellformular",
+    docName: m ? "Marketing-Leistungsschein" : "Bestellformular",
+    fileName: m ? "Marketing-Leistungsschein_Buff_Interactive.pdf" : "Vertrag_Buff_Interactive.pdf",
+    setupLabel: m ? "Onboarding-Gebühr" : "Einmalgebühr",
+    laufendLabel: m ? "Monatliche Pauschale" : "Laufende Gebühr",
+    agbTeile: m ? "Teil A und Teil C" : "Teil A und Teil B",
+  };
+}
+
+type LeistungsFelder = {
+  tarif: string;
+  zahlungsrhythmus: string;
+  setupPreisBrutto: string | number;
+  laufendPreisBrutto: string | number;
+  leistungsbeschreibung?: string | null;
+  mindestlaufzeitMonate?: number | null;
+  stundensatz?: string | number | null;
+  werbebudgetRichtwert?: string | number | null;
+};
+
+// Abschnitt 2 des PDFs, tarif-abhängig (WaaS-Bestellformular vs. Marketing-Leistungsschein)
+function buildLeistungsBlock(f: LeistungsFelder): any[] {
+  if (f.tarif !== "marketing") {
+    return [
+      { text: '2. Leistungsbeschreibung & Vergütung', style: 'subheader', margin: [0, 20, 0, 5] },
+      { text: `Tarif: ${tarifLabel(f.tarif)}` },
+      { text: `Zahlungsrhythmus: ${f.zahlungsrhythmus === 'jaehrlich' ? 'Jährlich' : 'Monatlich'}` },
+      { text: `Einmalgebühr: ${f.setupPreisBrutto} € zzgl. MwSt.` },
+      { text: `Laufende Gebühr: ${f.laufendPreisBrutto} € zzgl. MwSt. / ${f.zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}` },
+    ];
+  }
+  return [
+    { text: '2. Leistungsschein', style: 'subheader', margin: [0, 20, 0, 5] },
+    { text: 'Leistungsbeschreibung:', bold: true, margin: [0, 0, 0, 2] },
+    ...String(f.leistungsbeschreibung || '-').split('\n').map((line) => ({ text: line || ' ' })),
+    { text: `Onboarding-Gebühr (einmalig): ${f.setupPreisBrutto} € zzgl. MwSt.`, margin: [0, 8, 0, 0] },
+    { text: `Monatliche Pauschale: ${f.laufendPreisBrutto} € zzgl. MwSt. / Monat` },
+    { text: `Stundensatz für Mehrleistungen: ${f.stundensatz ?? 95} € zzgl. MwSt. / Std.` },
+    ...(Number(f.werbebudgetRichtwert) > 0 ? [
+      { text: `Werbebudget-Richtwert: ${f.werbebudgetRichtwert} € netto / Monat` },
+      { text: 'Das Werbebudget ist nicht Teil der Vergütung; Werbekonten laufen auf den Kunden, der das Budget direkt an die Plattform zahlt (§ 22 AGB Teil C).', fontSize: 9, color: '#333333', margin: [0, 2, 0, 0] },
+    ] : []),
+    { text: `Mindestlaufzeit: ${f.mindestlaufzeitMonate ?? 6} Monate ab Kick-off, danach unbestimmte Laufzeit mit 1 Monat Frist zum Monatsende (§ 28 AGB Teil C)`, margin: [0, 4, 0, 0] },
+  ];
+}
+
 export const contractsRoutes = new Elysia({ prefix: "/v1" })
   .use(dbPlugin)
   .post(
@@ -119,13 +172,20 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
     async ({ db, body, headers, request, set }) => {
       try {
         const {
-          tarif, zahlungsrhythmus, setupPreisBrutto, laufendPreisBrutto,
+          tarif, setupPreisBrutto, laufendPreisBrutto,
+          leistungsbeschreibung, mindestlaufzeitMonate, stundensatz, werbebudgetRichtwert,
           firma, rechtsform, ansprechpartner, strasse, plz, ort, email, telefon, ustId,
           iban, bic, bank, kontoinhaber,
           consentB2b, consentAgb, consentAvv, consentMarketing,
           signatureSepaB64, signatureContractB64,
           salesUserId, clientIp, userAgent
         } = body;
+        const zahlungsrhythmus = tarif === "marketing" ? "monatlich" : body.zahlungsrhythmus;
+        const labels = docLabels(tarif);
+        if (tarif === "marketing" && (!leistungsbeschreibung?.trim() || ![3, 6, 12].includes(Number(mindestlaufzeitMonate)))) {
+          set.status = 400;
+          return { success: false, error: "Leistungsbeschreibung und Mindestlaufzeit (3/6/12 Monate) sind für Marketing erforderlich." };
+        }
 
         let finalSalesUserId = salesUserId;
         const userExists = await db.query.users.findFirst({
@@ -195,7 +255,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
               fillColor: '#0A0A0A',
               margin: [-40, -40, -40, 20]
             } : undefined,
-            { text: 'WaaS Bestellformular', style: 'header', alignment: 'center', margin: [0, 10, 0, 20] },
+            { text: labels.title, style: 'header', alignment: 'center', margin: [0, 10, 0, 20] },
 
             { text: '1. Kundendaten', style: 'subheader', margin: [0, 10, 0, 5] },
             {
@@ -214,11 +274,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
               }
             },
 
-            { text: '2. Leistungsbeschreibung & Vergütung', style: 'subheader', margin: [0, 20, 0, 5] },
-            { text: `Tarif: ${tarif.charAt(0).toUpperCase() + tarif.slice(1)}` },
-            { text: `Zahlungsrhythmus: ${zahlungsrhythmus === 'jaehrlich' ? 'Jährlich' : 'Monatlich'}` },
-            { text: `Einmalgebühr: ${setupPreisBrutto} € zzgl. MwSt.` },
-            { text: `Laufende Gebühr: ${laufendPreisBrutto} € zzgl. MwSt. / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}` },
+            ...buildLeistungsBlock({ tarif, zahlungsrhythmus, setupPreisBrutto, laufendPreisBrutto, leistungsbeschreibung, mindestlaufzeitMonate, stundensatz, werbebudgetRichtwert }),
 
             { text: '3. SEPA-Lastschriftmandat', style: 'subheader', margin: [0, 20, 0, 5] },
             { text: 'Gläubiger-Identifikationsnummer: DE15WEB00002924152' },
@@ -241,7 +297,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
 
             { text: '4. Vertragsabschluss & Einverständniserklärungen', style: 'subheader', margin: [0, 20, 0, 5] },
             { text: `[${consentB2b ? 'X' : ' '}] B2B-Bestätigung` },
-            { text: `[${consentAgb ? 'X' : ' '}] AGB akzeptiert` },
+            { text: `[${consentAgb ? 'X' : ' '}] AGB akzeptiert (${labels.agbTeile})` },
             { text: `[${consentAvv ? 'X' : ' '}] AVV abgeschlossen` },
             { text: `[${consentMarketing ? 'X' : ' '}] Marketing-Einwilligung` },
 
@@ -290,6 +346,10 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             zahlungsrhythmus: zahlungsrhythmus as any,
             setupPreisBrutto: String(setupPreisBrutto),
             laufendPreisBrutto: String(laufendPreisBrutto),
+            leistungsbeschreibung: leistungsbeschreibung || null,
+            mindestlaufzeitMonate: mindestlaufzeitMonate ?? null,
+            stundensatz: stundensatz != null ? String(stundensatz) : null,
+            werbebudgetRichtwert: werbebudgetRichtwert != null ? String(werbebudgetRichtwert) : null,
             firma,
             rechtsform,
             ansprechpartner,
@@ -332,7 +392,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           const pdfBuffer = fs.readFileSync(pdfPath);
           const emailAttachments: any[] = [
             {
-              filename: 'Vertrag_Buff_Interactive.pdf',
+              filename: labels.fileName,
               content: pdfBuffer,
             }
           ];
@@ -368,7 +428,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
                       Hallo ${ansprechpartner},
                     </p>
                     <p style="font-size: 16px; line-height: 1.6; color: #A1A1A6; margin: 0 0 32px 0;">
-                      vielen Dank für Dein Vertrauen. Wir freuen uns sehr auf die Zusammenarbeit mit <strong style="color: #F5F5F7; font-weight: 600;">${firma}</strong>. Anbei erhältst Du Dein rechtskräftig unterzeichnetes Bestellformular und alle Vertragsdokumente als PDF.
+                      vielen Dank für Dein Vertrauen. Wir freuen uns sehr auf die Zusammenarbeit mit <strong style="color: #F5F5F7; font-weight: 600;">${firma}</strong>. Anbei erhältst Du Dein rechtskräftig unterzeichnetes ${labels.docName} und alle Vertragsdokumente als PDF.
                     </p>
                 
                     <div style="background-color: #111111; border-radius: 16px; padding: 24px; margin-bottom: 40px;">
@@ -377,14 +437,14 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
                       <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                           <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #A1A1A6;">Tarif</td>
-                          <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #F5F5F7; text-align: right; font-weight: 500;">${tarif.charAt(0).toUpperCase() + tarif.slice(1)} (${zahlungsrhythmus === 'jaehrlich' ? 'Jährlich' : 'Monatlich'})</td>
+                          <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #F5F5F7; text-align: right; font-weight: 500;">${tarifLabel(tarif)} (${zahlungsrhythmus === 'jaehrlich' ? 'Jährlich' : 'Monatlich'})</td>
                         </tr>
                         <tr>
-                          <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #A1A1A6;">Einmalgebühr</td>
+                          <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #A1A1A6;">${labels.setupLabel}</td>
                           <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #F5F5F7; text-align: right; font-weight: 500;">${setupPreisBrutto} €</td>
                         </tr>
                         <tr>
-                          <td style="padding: 12px 0; font-size: 15px; color: #A1A1A6;">Laufende Gebühr</td>
+                          <td style="padding: 12px 0; font-size: 15px; color: #A1A1A6;">${labels.laufendLabel}</td>
                           <td style="padding: 12px 0; font-size: 15px; color: #CCFF00; text-align: right; font-weight: 600;">${laufendPreisBrutto} € / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}</td>
                         </tr>
                       </table>
@@ -458,6 +518,10 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
         zahlungsrhythmus: t.String(),
         setupPreisBrutto: t.Numeric(),
         laufendPreisBrutto: t.Numeric(),
+        leistungsbeschreibung: t.Optional(t.String()),
+        mindestlaufzeitMonate: t.Optional(t.Numeric()),
+        stundensatz: t.Optional(t.Numeric()),
+        werbebudgetRichtwert: t.Optional(t.Numeric()),
         firma: t.String(),
         rechtsform: t.String(),
         ansprechpartner: t.String(),
@@ -489,9 +553,12 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
       try {
         const {
           tarif,
-          zahlungsrhythmus,
           setupPreisBrutto,
           laufendPreisBrutto,
+          leistungsbeschreibung,
+          mindestlaufzeitMonate,
+          stundensatz,
+          werbebudgetRichtwert,
           customerEmail,
           customerName,
           companyName,
@@ -510,6 +577,12 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           salesUserId,
           clientOrigin
         } = body;
+        const zahlungsrhythmus = tarif === "marketing" ? "monatlich" : body.zahlungsrhythmus;
+        const labels = docLabels(tarif);
+        if (tarif === "marketing" && (!leistungsbeschreibung?.trim() || ![3, 6, 12].includes(Number(mindestlaufzeitMonate)))) {
+          set.status = 400;
+          return { success: false, error: "Leistungsbeschreibung und Mindestlaufzeit (3/6/12 Monate) sind für Marketing erforderlich." };
+        }
 
         let finalSalesUserId = salesUserId;
         const userExists = await db.query.users.findFirst({
@@ -547,6 +620,10 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             zahlungsrhythmus: zahlungsrhythmus as any,
             setupPreisBrutto: String(setupPreisBrutto),
             laufendPreisBrutto: String(laufendPreisBrutto),
+            leistungsbeschreibung: leistungsbeschreibung || null,
+            mindestlaufzeitMonate: mindestlaufzeitMonate ?? null,
+            stundensatz: stundensatz != null ? String(stundensatz) : null,
+            werbebudgetRichtwert: werbebudgetRichtwert != null ? String(werbebudgetRichtwert) : null,
             customerEmail,
             customerName: finalCustomerName,
             companyName: finalCompanyName,
@@ -613,14 +690,14 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
                       <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                           <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #A1A1A6;">Tarif</td>
-                          <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #F5F5F7; text-align: right; font-weight: 500;">${tarif.charAt(0).toUpperCase() + tarif.slice(1)} (${zahlungsrhythmus === 'jaehrlich' ? 'Jährlich' : 'Monatlich'})</td>
+                          <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #F5F5F7; text-align: right; font-weight: 500;">${tarifLabel(tarif)} (${zahlungsrhythmus === 'jaehrlich' ? 'Jährlich' : 'Monatlich'})</td>
                         </tr>
                         <tr>
-                          <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #A1A1A6;">Einmalgebühr</td>
+                          <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #A1A1A6;">${labels.setupLabel}</td>
                           <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #F5F5F7; text-align: right; font-weight: 500;">${setupPreisBrutto} €</td>
                         </tr>
                         <tr>
-                          <td style="padding: 12px 0; font-size: 15px; color: #A1A1A6;">Laufende Gebühr</td>
+                          <td style="padding: 12px 0; font-size: 15px; color: #A1A1A6;">${labels.laufendLabel}</td>
                           <td style="padding: 12px 0; font-size: 15px; color: #CCFF00; text-align: right; font-weight: 600;">${laufendPreisBrutto} € / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}</td>
                         </tr>
                       </table>
@@ -668,6 +745,10 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
         zahlungsrhythmus: t.String(),
         setupPreisBrutto: t.Numeric(),
         laufendPreisBrutto: t.Numeric(),
+        leistungsbeschreibung: t.Optional(t.String()),
+        mindestlaufzeitMonate: t.Optional(t.Numeric()),
+        stundensatz: t.Optional(t.Numeric()),
+        werbebudgetRichtwert: t.Optional(t.Numeric()),
         customerEmail: t.String(),
         customerName: t.Optional(t.String()),
         companyName: t.Optional(t.String()),
@@ -717,6 +798,10 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           zahlungsrhythmus: invite.zahlungsrhythmus,
           setupPreisBrutto: Number(invite.setupPreisBrutto),
           laufendPreisBrutto: Number(invite.laufendPreisBrutto),
+          leistungsbeschreibung: invite.leistungsbeschreibung,
+          mindestlaufzeitMonate: invite.mindestlaufzeitMonate,
+          stundensatz: invite.stundensatz != null ? Number(invite.stundensatz) : null,
+          werbebudgetRichtwert: invite.werbebudgetRichtwert != null ? Number(invite.werbebudgetRichtwert) : null,
           customerEmail: invite.customerEmail,
           customerName: invite.customerName,
           companyName: invite.companyName,
@@ -767,7 +852,8 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
         let zahlungsrhythmus: string = invite.zahlungsrhythmus;
         let setupPreisBrutto: string | number = invite.setupPreisBrutto;
         let laufendPreisBrutto: string | number = invite.laufendPreisBrutto;
-        
+        const { leistungsbeschreibung, mindestlaufzeitMonate, stundensatz, werbebudgetRichtwert } = invite;
+
         let finalSalesUserId = invite.salesUserId;
         const userExists = await db.query.users.findFirst({
           where: (usersTable, { eq }) => eq(usersTable.id, invite.salesUserId)
@@ -779,8 +865,8 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           }
         }
 
-        // Apply and validate override logic
-        if (overrideTarif && overrideZahlungsrhythmus) {
+        // Apply and validate override logic (nicht für marketing: individuelle Preise, kein Upgrade-Pfad)
+        if (invite.tarif !== "marketing" && overrideTarif && overrideZahlungsrhythmus) {
           const configKeys = Object.keys(PRICING_CONFIG.plans) as Array<keyof typeof PRICING_CONFIG.plans>;
           const originalIndex = configKeys.indexOf(invite.tarif as any);
           const overrideIndex = configKeys.indexOf(overrideTarif as any);
@@ -794,6 +880,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           }
         }
 
+        const labels = docLabels(tarif);
         const derivedUserAgent = userAgent || headers["user-agent"] || "Unbekannt";
         const derivedClientIp = clientIp || headers["x-forwarded-for"] || "Unbekannt";
 
@@ -836,7 +923,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
               fillColor: '#0A0A0A',
               margin: [-40, -40, -40, 20]
             } : undefined,
-            { text: 'WaaS Bestellformular (Digitaler Online-Fernabschluss)', style: 'header', alignment: 'center', margin: [0, 10, 0, 20] },
+            { text: `${labels.title} (Digitaler Online-Fernabschluss)`, style: 'header', alignment: 'center', margin: [0, 10, 0, 20] },
 
             { text: '1. Kundendaten', style: 'subheader', margin: [0, 10, 0, 5] },
             {
@@ -855,11 +942,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
               }
             },
 
-            { text: '2. Leistungsbeschreibung & Vergütung', style: 'subheader', margin: [0, 20, 0, 5] },
-            { text: `Tarif: ${tarif.charAt(0).toUpperCase() + tarif.slice(1)}` },
-            { text: `Zahlungsrhythmus: ${zahlungsrhythmus === 'jaehrlich' ? 'Jährlich' : 'Monatlich'}` },
-            { text: `Einmalgebühr: ${setupPreisBrutto} € zzgl. MwSt.` },
-            { text: `Laufende Gebühr: ${laufendPreisBrutto} € zzgl. MwSt. / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}` },
+            ...buildLeistungsBlock({ tarif, zahlungsrhythmus, setupPreisBrutto, laufendPreisBrutto, leistungsbeschreibung, mindestlaufzeitMonate, stundensatz, werbebudgetRichtwert }),
 
             { text: '3. SEPA-Lastschriftmandat', style: 'subheader', margin: [0, 20, 0, 5] },
             { text: 'Gläubiger-Identifikationsnummer: DE15WEB00002924152' },
@@ -882,7 +965,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
 
             { text: '4. Vertragsabschluss & Einverständniserklärungen', style: 'subheader', margin: [0, 20, 0, 5] },
             { text: `[${consentB2b ? 'X' : ' '}] B2B-Bestätigung` },
-            { text: `[${consentAgb ? 'X' : ' '}] AGB akzeptiert` },
+            { text: `[${consentAgb ? 'X' : ' '}] AGB akzeptiert (${labels.agbTeile})` },
             { text: `[${consentAvv ? 'X' : ' '}] AVV abgeschlossen` },
             { text: `[${consentMarketing ? 'X' : ' '}] Marketing-Einwilligung` },
 
@@ -947,6 +1030,10 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             zahlungsrhythmus: zahlungsrhythmus as any,
             setupPreisBrutto: String(setupPreisBrutto),
             laufendPreisBrutto: String(laufendPreisBrutto),
+            leistungsbeschreibung,
+            mindestlaufzeitMonate,
+            stundensatz,
+            werbebudgetRichtwert,
             firma,
             rechtsform,
             ansprechpartner,
@@ -991,7 +1078,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             const pdfBuffer = fs.readFileSync(pdfPath);
             const emailAttachments: any[] = [
               {
-                filename: 'Vertrag_Buff_Interactive.pdf',
+                filename: labels.fileName,
                 content: pdfBuffer,
               }
             ];
@@ -1027,7 +1114,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
                       Hallo ${ansprechpartner},
                     </p>
                     <p style="font-size: 16px; line-height: 1.6; color: #A1A1A6; margin: 0 0 32px 0;">
-                      vielen Dank für die digitale Unterzeichnung Deines Vertrags. Wir freuen uns sehr auf die Zusammenarbeit mit <strong style="color: #F5F5F7; font-weight: 600;">${firma}</strong>. Anbei erhältst Du Dein rechtskräftig unterzeichnetes Bestellformular und alle Vertragsdokumente als PDF.
+                      vielen Dank für die digitale Unterzeichnung Deines Vertrags. Wir freuen uns sehr auf die Zusammenarbeit mit <strong style="color: #F5F5F7; font-weight: 600;">${firma}</strong>. Anbei erhältst Du Dein rechtskräftig unterzeichnetes ${labels.docName} und alle Vertragsdokumente als PDF.
                     </p>
 
                     <div style="background-color: #111111; border-radius: 16px; padding: 24px; margin-bottom: 40px;">
@@ -1036,14 +1123,14 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
                       <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                           <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #A1A1A6;">Tarif</td>
-                          <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #F5F5F7; text-align: right; font-weight: 500;">${tarif.charAt(0).toUpperCase() + tarif.slice(1)} (${zahlungsrhythmus === 'jaehrlich' ? 'Jährlich' : 'Monatlich'})</td>
+                          <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #F5F5F7; text-align: right; font-weight: 500;">${tarifLabel(tarif)} (${zahlungsrhythmus === 'jaehrlich' ? 'Jährlich' : 'Monatlich'})</td>
                         </tr>
                         <tr>
-                          <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #A1A1A6;">Einmalgebühr</td>
+                          <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #A1A1A6;">${labels.setupLabel}</td>
                           <td style="padding: 12px 0; border-bottom: 1px solid #222222; font-size: 15px; color: #F5F5F7; text-align: right; font-weight: 500;">${setupPreisBrutto} €</td>
                         </tr>
                         <tr>
-                          <td style="padding: 12px 0; font-size: 15px; color: #A1A1A6;">Laufende Gebühr</td>
+                          <td style="padding: 12px 0; font-size: 15px; color: #A1A1A6;">${labels.laufendLabel}</td>
                           <td style="padding: 12px 0; font-size: 15px; color: #CCFF00; text-align: right; font-weight: 600;">${laufendPreisBrutto} € / ${zahlungsrhythmus === 'monatlich' ? 'Monat' : 'Jahr'}</td>
                         </tr>
                       </table>

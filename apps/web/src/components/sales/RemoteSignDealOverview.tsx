@@ -104,15 +104,20 @@ export function RemoteSignDealOverview({
   onStartSign,
 }: RemoteSignDealOverviewProps) {
   const planKey = invite.tarif?.toLowerCase() || "growth";
-  const planInfo =
-    PRICING_CONFIG.plans[planKey as keyof typeof PRICING_CONFIG.plans] ||
-    PRICING_CONFIG.plans.growth;
+  const isMarketing = planKey === "marketing";
+  // marketing prices are individual: no PRICING_CONFIG lookup, no growth fallback
+  const planInfo = isMarketing
+    ? null
+    : PRICING_CONFIG.plans[planKey as keyof typeof PRICING_CONFIG.plans] ||
+      PRICING_CONFIG.plans.growth;
+  const planName = planInfo?.name ?? "Marketing";
 
   const isYearly = invite.zahlungsrhythmus === "jaehrlich";
-  const setupPrice = invite.setupPreisBrutto ?? planInfo.setupFee;
+  const setupPrice = invite.setupPreisBrutto ?? planInfo?.setupFee ?? 0;
   const laufendPrice =
     invite.laufendPreisBrutto ??
-    (isYearly ? planInfo.priceYearly : planInfo.priceMonthly);
+    (isYearly ? planInfo?.priceYearly : planInfo?.priceMonthly) ??
+    0;
 
   const formatEuro = (val: number) => {
     return new Intl.NumberFormat("de-DE", {
@@ -170,8 +175,23 @@ export function RemoteSignDealOverview({
     ],
   };
 
-  const currentFeatures: string[] =
-    planKey in planDeliverables
+  const marketingFeatures: string[] = [
+    ...(invite.leistungsbeschreibung ?? "")
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean),
+    `Mindestlaufzeit: ${invite.mindestlaufzeitMonate ?? 6} Monate ab Kick-off, danach unbestimmte Laufzeit mit 1 Monat Frist zum Monatsende (§ 28 AGB Teil C)`,
+    `Stundensatz für Mehrleistungen: ${formatEuro(invite.stundensatz ?? 95)} / Std. netto`,
+    ...(invite.werbebudgetRichtwert != null
+      ? [
+          `Werbebudget-Richtwert: ${formatEuro(invite.werbebudgetRichtwert)} / Monat netto – Das Werbebudget ist nicht Teil der Vergütung; Werbekonten laufen auf den Kunden, der das Budget direkt an die Plattform zahlt (§ 22 AGB Teil C).`,
+        ]
+      : []),
+  ];
+
+  const currentFeatures: string[] = isMarketing
+    ? marketingFeatures
+    : planKey in planDeliverables
       ? planDeliverables[planKey as keyof typeof planDeliverables]
       : planDeliverables.growth;
 
@@ -214,7 +234,7 @@ export function RemoteSignDealOverview({
         <div className="flex flex-wrap items-center justify-between gap-3 pb-5 border-b border-white/10">
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="px-3 py-1 rounded-full bg-[#CCFF00] text-black font-heading font-black text-xs uppercase tracking-wider">
-              Tarif {planInfo.name}
+              Tarif {planName}
             </span>
             {isYearly && (
               <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-neutral-300 text-xs font-sans font-medium">
@@ -233,7 +253,9 @@ export function RemoteSignDealOverview({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 py-6 border-b border-white/10">
           <div>
             <span className="text-xs text-neutral-400 block mb-1 font-sans">
-              Laufende Gebühr ({isYearly ? "jährlich abgerechnet" : "monatlich"})
+              {isMarketing
+                ? "Monatliche Pauschale"
+                : `Laufende Gebühr (${isYearly ? "jährlich abgerechnet" : "monatlich"})`}
             </span>
             <div className="text-2xl sm:text-3xl font-heading font-extrabold text-white tracking-tight">
               {formatEuro(laufendPrice)}
@@ -248,7 +270,7 @@ export function RemoteSignDealOverview({
 
           <div>
             <span className="text-xs text-neutral-400 block mb-1 font-sans">
-              Einmalige Bereitstellung
+              {isMarketing ? "Onboarding-Gebühr" : "Einmalige Bereitstellung"}
             </span>
             <div className="text-2xl sm:text-3xl font-heading font-extrabold text-white tracking-tight">
               {formatEuro(setupPrice)}
@@ -262,7 +284,7 @@ export function RemoteSignDealOverview({
         {/* Inclusions checklist */}
         <div className="pt-6">
           <h2 className="text-sm font-semibold text-white mb-3.5 font-sans">
-            Leistungsumfang:
+            {isMarketing ? "Leistungsschein:" : "Leistungsumfang:"}
           </h2>
           <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {currentFeatures.map((feature, idx) => (

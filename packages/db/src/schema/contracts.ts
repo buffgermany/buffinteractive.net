@@ -4,12 +4,13 @@ import {
   timestamp,
   pgEnum,
   boolean,
-  decimal
+  decimal,
+  integer
 } from "drizzle-orm/pg-core";
 import { createId } from "@paralleldrive/cuid2";
 import { users } from "./users";
 
-export const contractTarifEnum = pgEnum("contract_tarif", ["essential", "growth", "enterprise"]);
+export const contractTarifEnum = pgEnum("contract_tarif", ["essential", "growth", "enterprise", "marketing"]);
 export const contractPaymentCycleEnum = pgEnum("contract_payment_cycle", ["monatlich", "jaehrlich"]);
 
 export const contracts = pgTable("contracts", {
@@ -23,6 +24,12 @@ export const contracts = pgTable("contracts", {
   // Using string for decimals to avoid precision loss, but decimal type works too
   setupPreisBrutto: decimal("setup_preis_brutto", { precision: 10, scale: 2 }).notNull(),
   laufendPreisBrutto: decimal("laufend_preis_brutto", { precision: 10, scale: 2 }).notNull(),
+
+  // Marketing-Tarif (nur bei tarif === "marketing")
+  leistungsbeschreibung: text("leistungsbeschreibung"),
+  mindestlaufzeitMonate: integer("mindestlaufzeit_monate"),
+  stundensatz: decimal("stundensatz", { precision: 10, scale: 2 }),
+  werbebudgetRichtwert: decimal("werbebudget_richtwert", { precision: 10, scale: 2 }),
 
   // Kundendaten
   firma: text("firma").notNull(),
@@ -90,6 +97,12 @@ export const contractSigningRequests = pgTable("contract_signing_requests", {
 
   setupPreisBrutto: decimal("setup_preis_brutto", { precision: 10, scale: 2 }).notNull(),
   laufendPreisBrutto: decimal("laufend_preis_brutto", { precision: 10, scale: 2 }).notNull(),
+
+  // Marketing-Tarif (nur bei tarif === "marketing")
+  leistungsbeschreibung: text("leistungsbeschreibung"),
+  mindestlaufzeitMonate: integer("mindestlaufzeit_monate"),
+  stundensatz: decimal("stundensatz", { precision: 10, scale: 2 }),
+  werbebudgetRichtwert: decimal("werbebudget_richtwert", { precision: 10, scale: 2 }),
 
   customerEmail: text("customer_email").notNull(),
   customerName: text("customer_name"),

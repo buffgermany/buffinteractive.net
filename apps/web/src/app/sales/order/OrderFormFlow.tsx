@@ -15,10 +15,14 @@ import { validateIBAN } from "@/lib/utils";
 import { PRICING_CONFIG } from "@/config/pricing";
 
 const formSchema = z.object({
-  tarif: z.enum(["essential", "growth", "enterprise"]),
+  tarif: z.enum(["essential", "growth", "enterprise", "marketing"]),
   zahlungsrhythmus: z.enum(["monatlich", "jaehrlich"]),
   setupPreisBrutto: z.number().min(0, "Setup-Preis muss mindestens 0 sein"),
   laufendPreisBrutto: z.number().min(0, "Laufende Gebühr muss mindestens 0 sein"),
+  leistungsbeschreibung: z.string().optional(),
+  mindestlaufzeitMonate: z.number().optional(),
+  stundensatz: z.number().min(0).optional(),
+  werbebudgetRichtwert: z.number().min(0).optional(),
 
   firma: z.string().min(2, "Firma ist erforderlich"),
   rechtsform: z.string().min(1, "Rechtsform ist erforderlich"),
@@ -45,6 +49,14 @@ const formSchema = z.object({
 
   signatureSepaB64: z.string().min(10, "SEPA-Unterschrift ist erforderlich"),
   signatureContractB64: z.string().min(10, "Vertragsunterschrift ist erforderlich"),
+}).superRefine((v, ctx) => {
+  if (v.tarif !== "marketing") return;
+  if (!v.leistungsbeschreibung || v.leistungsbeschreibung.trim().length < 10) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["leistungsbeschreibung"], message: "Leistungsbeschreibung ist erforderlich (mind. 10 Zeichen)" });
+  }
+  if (![3, 6, 12].includes(v.mindestlaufzeitMonate as number)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["mindestlaufzeitMonate"], message: "Mindestlaufzeit (3, 6 oder 12 Monate) ist erforderlich" });
+  }
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -221,6 +233,9 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
       zahlungsrhythmus: "monatlich",
       setupPreisBrutto: PRICING_CONFIG.plans.growth.setupFee,
       laufendPreisBrutto: PRICING_CONFIG.plans.growth.priceMonthly,
+      leistungsbeschreibung: "",
+      mindestlaufzeitMonate: 6,
+      stundensatz: 95,
       firma: "",
       rechtsform: "",
       ansprechpartner: "",
@@ -255,9 +270,9 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
     }).format(price);
   };
 
-  const handleTarifChange = (t: "essential" | "growth" | "enterprise", z: "monatlich" | "jaehrlich") => {
+  const handleTarifChange = (t: FormValues["tarif"], z: "monatlich" | "jaehrlich") => {
     setValue("tarif", t);
-    setValue("zahlungsrhythmus", z);
+    setValue("zahlungsrhythmus", t === "marketing" ? "monatlich" : z);
 
     if (t === "essential") {
       setValue("setupPreisBrutto", PRICING_CONFIG.plans.essential.setupFee);
@@ -270,6 +285,15 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
       setValue("laufendPreisBrutto", 0);
     }
   };
+
+  const marketingFields = () => currentTarif === "marketing"
+    ? {
+      leistungsbeschreibung: watch("leistungsbeschreibung"),
+      mindestlaufzeitMonate: watch("mindestlaufzeitMonate"),
+      stundensatz: watch("stundensatz"),
+      werbebudgetRichtwert: watch("werbebudgetRichtwert"),
+    }
+    : { leistungsbeschreibung: undefined, mindestlaufzeitMonate: undefined, stundensatz: undefined, werbebudgetRichtwert: undefined };
 
   const handleCreateInvite = async () => {
     const email = watch("email")?.trim();
@@ -290,6 +314,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
           zahlungsrhythmus: currentZahlungsrhythmus,
           setupPreisBrutto: watch("setupPreisBrutto"),
           laufendPreisBrutto: watch("laufendPreisBrutto"),
+          ...marketingFields(),
           customerEmail: email,
           customerName: watch("ansprechpartner") || undefined,
           companyName: watch("firma") || undefined,
@@ -334,7 +359,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
   const nextStep = async () => {
     let fieldsToValidate: (keyof FormValues)[] = [];
     if (step === 0) {
-      fieldsToValidate = ["tarif", "zahlungsrhythmus", "setupPreisBrutto", "laufendPreisBrutto"];
+      fieldsToValidate = ["tarif", "zahlungsrhythmus", "setupPreisBrutto", "laufendPreisBrutto", "leistungsbeschreibung", "mindestlaufzeitMonate", "stundensatz", "werbebudgetRichtwert"];
     } else if (step === 1) {
       fieldsToValidate = ["firma", "rechtsform", "ansprechpartner", "strasse", "plz", "ort", "email"];
     } else if (step === 4) {
@@ -358,6 +383,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
+          ...marketingFields(),
           iban: data.iban.replace(/\s/g, ""),
           salesUserId
         })
@@ -502,13 +528,15 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                   <span className="text-xs text-primary font-medium">Konditionen für das Angebot</span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {["essential", "growth", "enterprise"].map((t) => {
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {(["essential", "growth", "enterprise", "marketing"] as const).map((t) => {
                     let priceInfo = "";
                     if (t === "essential") {
                       priceInfo = `Einmalig: ${formatPrice(PRICING_CONFIG.plans.essential.setupFee)} | Laufend: ${formatPrice(PRICING_CONFIG.plans.essential.priceMonthly)}/mtl. (${formatPrice(PRICING_CONFIG.plans.essential.priceYearly)} bei Jährlich)`;
                     } else if (t === "growth") {
                       priceInfo = `Einmalig: ${formatPrice(PRICING_CONFIG.plans.growth.setupFee)} | Laufend: ${formatPrice(PRICING_CONFIG.plans.growth.priceMonthly)}/mtl. (${formatPrice(PRICING_CONFIG.plans.growth.priceYearly)} bei Jährlich)`;
+                    } else if (t === "marketing") {
+                      priceInfo = "Individuelle Pauschale, Onboarding & Kontingent laut Leistungsschein";
                     } else {
                       priceInfo = "Individuelle Konditionen frei konfigurierbar";
                     }
@@ -519,7 +547,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                           ? 'border-primary bg-primary/5 shadow-md ring-1 ring-primary/20'
                           : 'border-border bg-card/50 hover:border-neutral-500 hover:bg-card'
                           }`}
-                        onClick={() => handleTarifChange(t as any, currentZahlungsrhythmus)}
+                        onClick={() => handleTarifChange(t, currentZahlungsrhythmus)}
                       >
                         <div>
                           <div className="flex items-center justify-between">
@@ -527,7 +555,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                             {currentTarif === t && <span className="text-[10px] bg-primary text-black px-2 py-0.5 rounded-full font-bold uppercase">Aktiv</span>}
                           </div>
                           <p className="text-xs text-muted-foreground mt-1">
-                            {t === "enterprise" ? "Individuelles High-End Projekt" : "Standard WaaS-Paket"}
+                            {t === "enterprise" ? "Individuelles High-End Projekt" : t === "marketing" ? "Marketing-Leistungsschein (individuell)" : "Standard WaaS-Paket"}
                           </p>
                         </div>
                         <div className="mt-4 pt-3 border-t border-border/40 text-xs font-semibold text-primary">
@@ -538,6 +566,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                   })}
                 </div>
 
+                {currentTarif !== "marketing" && (
                 <div className="flex bg-muted p-1 rounded-lg w-full mt-2 border border-border">
                   <button
                     type="button"
@@ -554,6 +583,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                     Jährliche Abrechnung (-5% Rabatt)
                   </button>
                 </div>
+                )}
 
                 {currentTarif === "enterprise" && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/50 p-5 rounded-xl border border-border">
@@ -564,6 +594,49 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                     <div className="space-y-1.5">
                       <Label required className="text-xs">Individuelle Laufende Gebühr (€ netto)</Label>
                       <Input type="number" step="0.01" {...register("laufendPreisBrutto", { valueAsNumber: true })} />
+                    </div>
+                  </div>
+                )}
+
+                {currentTarif === "marketing" && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/50 p-5 rounded-xl border border-border">
+                    <div className="space-y-1.5">
+                      <Label required className="text-xs">Onboarding-Gebühr einmalig (€ netto)</Label>
+                      <Input type="number" step="0.01" {...register("setupPreisBrutto", { valueAsNumber: true })} error={errors.setupPreisBrutto?.message} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label required className="text-xs">Monatliche Pauschale (€ netto)</Label>
+                      <Input type="number" step="0.01" {...register("laufendPreisBrutto", { valueAsNumber: true })} error={errors.laufendPreisBrutto?.message} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Stundensatz Mehrleistungen (€ netto/Std.)</Label>
+                      <Input type="number" step="0.01" {...register("stundensatz", { setValueAs: (v) => v === "" || v === null ? undefined : Number(v) })} error={errors.stundensatz?.message} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Werbebudget-Richtwert/Monat (€ netto, optional)</Label>
+                      <Input type="number" step="0.01" placeholder="z.B. 1500" {...register("werbebudgetRichtwert", { setValueAs: (v) => v === "" || v === null ? undefined : Number(v) })} error={errors.werbebudgetRichtwert?.message} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label required className="text-xs">Mindestlaufzeit</Label>
+                      <select
+                        {...register("mindestlaufzeitMonate", { valueAsNumber: true })}
+                        className="flex h-10 w-full rounded-lg border border-neutral-600 bg-background px-3 py-2 text-xs text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <option value={3}>3 Monate</option>
+                        <option value={6}>6 Monate</option>
+                        <option value={12}>12 Monate</option>
+                      </select>
+                      {errors.mindestlaufzeitMonate && <p className="mt-1 text-xs text-destructive">{errors.mindestlaufzeitMonate.message}</p>}
+                    </div>
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <Label required className="text-xs">Leistungsbeschreibung</Label>
+                      <textarea
+                        {...register("leistungsbeschreibung")}
+                        rows={6}
+                        placeholder={"z.B.\nKanäle: Meta Ads, Google Ads, LinkedIn\nKontingent: 20 Std./Monat (Kampagnen-Setup, Creatives, Optimierung)\nReporting: monatlicher Report + Quartals-Call"}
+                        className="flex w-full rounded-lg border border-neutral-600 bg-background px-3 py-2 text-xs text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      />
+                      {errors.leistungsbeschreibung && <p className="mt-1 text-xs text-destructive">{errors.leistungsbeschreibung.message}</p>}
                     </div>
                   </div>
                 )}
@@ -1113,13 +1186,35 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                       <span className="font-medium">{currentZahlungsrhythmus === "jaehrlich" ? "Jährlich" : "Monatlich"}</span>
                     </div>
                     <div className="flex justify-between border-t border-border/40 pt-2">
-                      <span className="text-muted-foreground">Einmalgebühr:</span>
+                      <span className="text-muted-foreground">{currentTarif === "marketing" ? "Onboarding-Gebühr:" : "Einmalgebühr:"}</span>
                       <span className="font-semibold text-foreground">{formatPrice(watch("setupPreisBrutto"))}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Laufende Gebühr:</span>
+                      <span className="text-muted-foreground">{currentTarif === "marketing" ? "Monatliche Pauschale:" : "Laufende Gebühr:"}</span>
                       <span className="font-semibold text-foreground">{formatPrice(watch("laufendPreisBrutto"))}</span>
                     </div>
+                    {currentTarif === "marketing" && (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Mindestlaufzeit:</span>
+                          <span className="font-medium text-foreground">{watch("mindestlaufzeitMonate")} Monate ab Kick-off</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Stundensatz Mehrleistungen:</span>
+                          <span className="font-medium text-foreground">{formatPrice(watch("stundensatz") ?? 95)}/Std.</span>
+                        </div>
+                        {watch("werbebudgetRichtwert") != null && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Werbebudget-Richtwert:</span>
+                            <span className="font-medium text-foreground">{formatPrice(watch("werbebudgetRichtwert") ?? 0)}/Monat</span>
+                          </div>
+                        )}
+                        <div className="border-t border-border/40 pt-2">
+                          <span className="text-muted-foreground block mb-1">Leistungsbeschreibung:</span>
+                          <p className="font-medium text-foreground whitespace-pre-line">{watch("leistungsbeschreibung")}</p>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -1226,12 +1321,12 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                   Dein neuer Tarif wird: {currentTarif.charAt(0).toUpperCase() + currentTarif.slice(1).toLowerCase()}                </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-sm">
                   <div className="bg-background/40 p-4 rounded-lg border border-border">
-                    <span className="text-xs text-muted-foreground block uppercase font-semibold">Einmalgebühr</span>
+                    <span className="text-xs text-muted-foreground block uppercase font-semibold">{currentTarif === "marketing" ? "Onboarding-Gebühr" : "Einmalgebühr"}</span>
                     <span className="text-xl font-bold text-foreground">{formatPrice(watch("setupPreisBrutto"))}</span>
                     <span className="text-[10px] text-muted-foreground block mt-1">Zzgl. 19% MwSt.</span>
                   </div>
                   <div className="bg-background/40 p-4 rounded-lg border border-border">
-                    <span className="text-xs text-muted-foreground block uppercase font-semibold">Laufende Gebühr</span>
+                    <span className="text-xs text-muted-foreground block uppercase font-semibold">{currentTarif === "marketing" ? "Monatliche Pauschale" : "Laufende Gebühr"}</span>
                     <span className="text-xl font-bold text-foreground">{formatPrice(watch("laufendPreisBrutto"))}</span>
                     <span className="text-[10px] text-muted-foreground block mt-1">{currentZahlungsrhythmus === "jaehrlich" ? "Jährlich" : "Monatlich"}, zzgl. 19% MwSt.</span>
                   </div>
@@ -1285,7 +1380,7 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                   />
                   <div className="space-y-1 leading-none flex-1">
                     <Label className="cursor-pointer font-medium block">
-                      Ich habe die Allgemeinen Geschäftsbedingungen (AGB) zur Kenntnis genommen und akzeptiere diese. *
+                      Ich habe die Allgemeinen Geschäftsbedingungen (AGB) {currentTarif === "marketing" ? "(Teil A und Teil C)" : "(Teil A und Teil B)"} zur Kenntnis genommen und akzeptiere diese. *
                     </Label>
                     <p className="text-xs text-muted-foreground mt-1">Das Dokument wird Dir später erneut zugesandt.</p>
                     {errors.consentAgb && <p className="text-xs text-red-500 mt-1">{errors.consentAgb.message}</p>}
