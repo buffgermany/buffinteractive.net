@@ -575,7 +575,9 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           bank,
           kontoinhaber,
           salesUserId,
-          clientOrigin
+          clientOrigin,
+          customerUserId,
+          loginUrl
         } = body;
         const zahlungsrhythmus = tarif === "marketing" ? "monatlich" : body.zahlungsrhythmus;
         const labels = docLabels(tarif);
@@ -616,6 +618,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           .values({
             token,
             salesUserId: finalSalesUserId,
+            customerUserId: customerUserId ?? null,
             tarif: tarif as any,
             zahlungsrhythmus: zahlungsrhythmus as any,
             setupPreisBrutto: String(setupPreisBrutto),
@@ -644,6 +647,10 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
 
         const webUrl = getWebBaseUrl(headers as Record<string, string | undefined>, clientOrigin);
         const signingUrl = `${webUrl}/sales/order/sign/${token}`;
+
+        // When the caller minted a magic link, the email button logs the
+        // customer in and lands them on the signing page — one email, not two.
+        const emailCtaUrl = loginUrl || signingUrl;
 
         // Send email via Resend if configured
         const resend = getResend();
@@ -704,7 +711,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
                     </div>
 
                     <div style="text-align: center; margin: 36px 0;">
-                      <a href="${signingUrl}" style="display: inline-block; background-color: #CCFF00; color: #000000; font-weight: 700; font-size: 16px; padding: 16px 36px; border-radius: 12px; text-decoration: none; box-shadow: 0 4px 20px rgba(204, 255, 0, 0.25);">
+                      <a href="${emailCtaUrl}" style="display: inline-block; background-color: #CCFF00; color: #000000; font-weight: 700; font-size: 16px; padding: 16px 36px; border-radius: 12px; text-decoration: none; box-shadow: 0 4px 20px rgba(204, 255, 0, 0.25);">
                         Angebot jetzt online unterzeichnen ➔
                       </a>
                     </div>
@@ -712,7 +719,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
                     <p style="font-size: 13px; line-height: 1.5; color: #86868B; margin: 32px 0 0 0; text-align: center;">
                       Dieser Link ist gültig bis zum ${expiresAt.toLocaleDateString("de-DE")}.<br>
                       Falls der Button nicht funktioniert, kopiere diesen Link in Deinen Browser:<br>
-                      <a href="${signingUrl}" style="color: #CCFF00; word-break: break-all;">${signingUrl}</a>
+                      <a href="${emailCtaUrl}" style="color: #CCFF00; word-break: break-all;">${emailCtaUrl}</a>
                     </p>
                   </div>
                 </div>
@@ -765,7 +772,9 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
         bank: t.Optional(t.String()),
         kontoinhaber: t.Optional(t.String()),
         salesUserId: t.String(),
-        clientOrigin: t.Optional(t.String())
+        clientOrigin: t.Optional(t.String()),
+        customerUserId: t.Optional(t.String()),
+        loginUrl: t.Optional(t.String())
       })
     }
   )
@@ -1054,6 +1063,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
             signatureSepaB64,
             signatureContractB64,
             salesUserId: finalSalesUserId,
+            customerUserId: invite.customerUserId ?? null,
             clientIp: derivedClientIp || null,
             userAgent: derivedUserAgent || null,
             signedAt,
