@@ -14,6 +14,7 @@ interface PageProps {
   params: Promise<{
     token: string;
   }>;
+  searchParams: Promise<{ error?: string }>;
 }
 
 function InvalidLinkCard({ message }: { message: string }) {
@@ -61,8 +62,9 @@ function readLegalFile(filename: string): string {
   return `${filename} konnte nicht geladen werden.`;
 }
 
-export default async function RemoteSignOrderPage({ params }: PageProps) {
+export default async function RemoteSignOrderPage({ params, searchParams }: PageProps) {
   const { token } = await params;
+  const { error: verifyError } = await searchParams;
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
   let inviteData: RemoteInviteData | null = null;
@@ -129,7 +131,13 @@ export default async function RemoteSignOrderPage({ params }: PageProps) {
     const signingPath = `/sales/order/sign/${token}`;
 
     if (!session?.user) {
-      redirect(`/auth?from=${encodeURIComponent(signingPath)}`);
+      // A failed magic-link verification lands back here with ?error=, and
+      // this customer has no password. Carry the reason across so /auth can
+      // offer a fresh link instead of a password form they cannot use.
+      const authUrl = verifyError
+        ? `/auth?from=${encodeURIComponent(signingPath)}&error=${encodeURIComponent(verifyError)}`
+        : `/auth?from=${encodeURIComponent(signingPath)}`;
+      redirect(authUrl);
     }
 
     if (session.user.id !== customerUserId) {

@@ -26,7 +26,13 @@ export default function AuthPage() {
     searchParams.get('from') || searchParams.get('callbackUrl') || searchParams.get('redirectTo')
   );
 
-  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'link'>('login');
+  // A burnt or expired magic link sends the customer back here. They were
+  // invited, so they have no password — open on the link form, not the
+  // password form, and say why.
+  const verifyError = searchParams.get('error');
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'link'>(
+    verifyError ? 'link' : 'login'
+  );
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -309,6 +315,11 @@ export default function AuthPage() {
                       className="flex flex-col gap-5"
                     >
                       {serverError && <ServerError message={serverError} />}
+                      {verifyError && !linkSent && (
+                        <p className="text-sm text-[#CCFF00] leading-relaxed">
+                          Dieser Login-Link ist nicht mehr gültig. Fordere Dir unten einen neuen an.
+                        </p>
+                      )}
                       <p className="text-sm text-[#A0A0B0] leading-relaxed">
                         Wir schicken Dir einen Link, mit dem Du Dich ohne Passwort anmeldest.
                       </p>

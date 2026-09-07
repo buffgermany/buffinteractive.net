@@ -10,7 +10,7 @@ import { LegalScrollBox } from "@/components/shared/LegalScrollBox";
 import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/primitives";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { CheckCircle2, FileText, User, CreditCard, PenTool, ArrowLeft, ArrowRight, Heart, Tablet, Mail, Copy, Check, Send, Sparkles, ExternalLink } from "lucide-react";
+import { CheckCircle2, FileText, User, CreditCard, PenTool, ArrowLeft, ArrowRight, Heart, Tablet, Mail, Copy, Check, Send, Sparkles } from "lucide-react";
 
 import { validateIBAN } from "@/lib/utils";
 import { PRICING_CONFIG } from "@/config/pricing";
@@ -881,14 +881,6 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                             >
                               {copiedLink ? <Check className="w-4 h-4 text-emerald-500 mr-1" /> : <Copy className="w-4 h-4 mr-1" />}
                               {copiedLink ? "Kopiert!" : "Kopieren"}
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => window.open(inviteSentResult.signingUrl, "_blank")}
-                            >
-                              <ExternalLink className="w-4 h-4 mr-1 text-primary" />
-                              Öffnen
                             </Button>
                           </div>
                         </div>

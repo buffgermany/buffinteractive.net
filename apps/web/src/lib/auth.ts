@@ -60,6 +60,10 @@ export const auth = betterAuth({
     magicLink({
       // Matches the 14-day signing-request expiry in apps/api.
       expiresIn: 60 * 60 * 24 * 14,
+      // Corporate mail security (SafeLinks, Proofpoint) prefetches links before
+      // the recipient ever clicks. At the default of 1 that prefetch burns the
+      // link, and an invited customer has no password to fall back on.
+      allowedAttempts: 3,
       disableSignUp: true, // accounts are created explicitly, never by clicking a link
       sendMagicLink: async ({ email, url }) => {
         const capture = magicLinkCapture.getStore();
@@ -72,7 +76,7 @@ export const auth = betterAuth({
           to: email,
           subject: "Dein Login-Link für Buff",
           heading: "Dein Login-Link",
-          bodyHtml: "<p>Klicke auf den Button, um Dich anzumelden. Der Link ist 14 Tage gültig und kann einmal verwendet werden.</p>",
+          bodyHtml: "<p>Klicke auf den Button, um Dich anzumelden. Der Link ist 14 Tage gültig.</p>",
           ctaLabel: "Jetzt anmelden",
           ctaUrl: url,
         });
