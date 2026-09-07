@@ -826,6 +826,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           bank: invite.bank,
           kontoinhaber: invite.kontoinhaber,
           salesUserId: invite.salesUserId,
+          customerUserId: invite.customerUserId,
           expiresAt: invite.expiresAt
         }
       };

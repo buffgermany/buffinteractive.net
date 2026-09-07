@@ -73,6 +73,7 @@ export interface RemoteInviteData {
   stundensatz?: number | null;
   werbebudgetRichtwert?: number | null;
   salesUserId: string;
+  customerUserId?: string | null;
   expiresAt: string;
 }
 

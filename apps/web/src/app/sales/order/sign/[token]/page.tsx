@@ -1,5 +1,9 @@
 import fs from "fs";
 import path from "path";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { needsPassword } from "@/lib/account";
 import { RemoteInviteData } from "@/components/sales/RemoteOrderFormFlow";
 import { RemoteSignClientWrapper } from "@/components/sales/RemoteSignClientWrapper";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/primitives";
@@ -77,6 +81,53 @@ export default async function RemoteSignOrderPage({ params }: PageProps) {
         </div>
       </main>
     );
+  }
+
+  // Invites minted before account-backed offers have no customerUserId and
+  // keep the old anonymous token behaviour so nothing in flight breaks.
+  if (inviteData.customerUserId) {
+    const session = await auth.api
+      .getSession({ headers: await headers() })
+      .catch(() => null);
+
+    const signingPath = `/sales/order/sign/${token}`;
+
+    if (!session?.user) {
+      redirect(`/auth?from=${encodeURIComponent(signingPath)}`);
+    }
+
+    if (session.user.id !== inviteData.customerUserId) {
+      return (
+        <main className="min-h-screen bg-transparent text-foreground font-sans pt-16">
+          <div className="w-full max-w-2xl mx-auto py-12 px-4 relative z-10">
+            <Card className="border-2 border-destructive/40 shadow-xl text-center py-8">
+              <CardHeader className="space-y-4">
+                <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 border-2 border-destructive/30 flex items-center justify-center">
+                  <AlertTriangle className="w-8 h-8 text-destructive" />
+                </div>
+                <CardTitle className="text-2xl font-bold">Dieses Angebot gehört zu einem anderen Konto</CardTitle>
+                <CardDescription className="text-sm text-muted-foreground max-w-md mx-auto">
+                  Du bist als <span className="text-foreground font-medium">{session.user.email}</span> angemeldet.
+                  Melde Dich mit dem Konto an, an das dieses Angebot geschickt wurde.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <a
+                  href={`/auth?from=${encodeURIComponent(signingPath)}`}
+                  className="inline-block bg-primary text-primary-foreground font-bold uppercase tracking-wider px-6 py-3 rounded-xl"
+                >
+                  Konto wechseln
+                </a>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      );
+    }
+
+    if (await needsPassword(session.user.id)) {
+      redirect(`/auth/set-password?next=${encodeURIComponent(signingPath)}`);
+    }
   }
 
   const termsContent = readLegalFile("terms.md");

@@ -13,8 +13,13 @@ export default async function SalesOrderPage() {
     headers: reqHeaders
   }).catch(() => null);
 
+  // Public signup is open, so a session alone is not authorisation — anyone
+  // who registers would otherwise reach the contract sender.
   if (!session?.user) {
-    redirect("/auth");
+    redirect("/auth?from=/sales/order");
+  }
+  if (session.user.role !== "admin") {
+    redirect("/dashboard");
   }
 
   function readLegalFile(filename: string): string {
