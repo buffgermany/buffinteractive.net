@@ -38,6 +38,7 @@
   "Auth": {
     "login_title": "Bienvenido de nuevo.",
     "signup_title": "Empieza a ejecutar.",
+    "link_title": "Sin contraseña.",
     "email_label": "CORREO",
     "email_placeholder": "tu@empresa.com",
     "password_label": "CONTRASEÑA",

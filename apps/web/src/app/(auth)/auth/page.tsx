@@ -169,7 +169,7 @@ export default function AuthPage() {
               layout="position"
               className="text-3xl font-heading font-bold text-white mb-4 tracking-tight"
             >
-              {authMode === 'login' ? t('login_title') : t('signup_title')}
+              {authMode === 'login' ? t('login_title') : authMode === 'signup' ? t('signup_title') : t('link_title')}
             </motion.h1>
 
             {/* Content Area (Login vs Signup vs Link) */}
@@ -286,11 +286,18 @@ export default function AuthPage() {
                       onSubmit={handleSubmit(async (data) => {
                         setIsSubmitting(true);
                         setServerError(null);
-                        await signIn.magicLink({ email: data.email, callbackURL: redirectTo });
-                        // Always report success: revealing whether an account
-                        // exists would turn this form into an email oracle.
-                        setLinkSent(true);
-                        setIsSubmitting(false);
+                        try {
+                          await signIn.magicLink({ email: data.email, callbackURL: redirectTo });
+                        } catch (err) {
+                          // Swallow: a thrown error must look identical to
+                          // success, or the form becomes an email oracle for
+                          // enumerating accounts.
+                          console.error("Magic link error:", err);
+                        } finally {
+                          // Always report success, regardless of outcome above.
+                          setLinkSent(true);
+                          setIsSubmitting(false);
+                        }
                       })}
                       noValidate
                       className="flex flex-col gap-5"

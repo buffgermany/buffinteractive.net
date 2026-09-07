@@ -38,6 +38,7 @@
   "Auth": {
     "login_title": "Willkommen zurück.",
     "signup_title": "Zeit zu liefern.",
+    "link_title": "Ohne Passwort rein.",
     "email_label": "E-MAIL",
     "email_placeholder": "du@firma.de",
     "password_label": "PASSWORT",

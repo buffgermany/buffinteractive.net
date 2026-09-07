@@ -38,6 +38,7 @@
   "Auth": {
     "login_title": "Welcome back.",
     "signup_title": "Start executing.",
+    "link_title": "Skip the password.",
     "email_label": "EMAIL",
     "email_placeholder": "you@company.com",
     "password_label": "PASSWORD",
