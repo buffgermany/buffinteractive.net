@@ -1,6 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { magicLink } from "better-auth/plugins";
 import { db, schema } from "@platform/db";
+import { magicLinkCapture } from "./magic-link-capture";
+import { sendAuthEmail } from "./mail";
 
 // ============================================================
 // Better Auth — Server Instance
@@ -47,6 +50,30 @@ export const auth = betterAuth({
       },
     },
   },
+
+  plugins: [
+    magicLink({
+      // Matches the 14-day signing-request expiry in apps/api.
+      expiresIn: 60 * 60 * 24 * 14,
+      disableSignUp: true, // accounts are created explicitly, never by clicking a link
+      sendMagicLink: async ({ email, url }) => {
+        const capture = magicLinkCapture.getStore();
+        if (capture) {
+          // The caller is embedding this link in its own email.
+          capture.url = url;
+          return;
+        }
+        await sendAuthEmail({
+          to: email,
+          subject: "Dein Login-Link für Buff",
+          heading: "Dein Login-Link",
+          bodyHtml: "<p>Klicke auf den Button, um Dich anzumelden. Der Link ist 14 Tage gültig und kann einmal verwendet werden.</p>",
+          ctaLabel: "Jetzt anmelden",
+          ctaUrl: url,
+        });
+      },
+    }),
+  ],
 
   trustedOrigins: [
     process.env["BETTER_AUTH_URL"] ?? "http://localhost:3000",

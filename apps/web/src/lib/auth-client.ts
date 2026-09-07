@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/react";
-import { inferAdditionalFields } from "better-auth/client/plugins";
+import { inferAdditionalFields, magicLinkClient } from "better-auth/client/plugins";
 import type { Auth } from "./auth";
 
 // ============================================================
@@ -15,6 +15,7 @@ export const authClient: ReturnType<typeof createAuthClient> = createAuthClient(
       : (process.env["BETTER_AUTH_URL"] ?? "http://localhost:3000"),
   plugins: [
     inferAdditionalFields<Auth>(),
+    magicLinkClient(),
   ],
 });
 
