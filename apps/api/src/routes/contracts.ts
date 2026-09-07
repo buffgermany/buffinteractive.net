@@ -607,7 +607,7 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
           }
         }
 
-        const token = crypto.randomBytes(32).toString("hex");
+        const token = body.token ?? crypto.randomBytes(32).toString("hex");
         const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000); // 14 days
 
         const finalCompanyName = companyName || firma || null;
@@ -774,7 +774,8 @@ export const contractsRoutes = new Elysia({ prefix: "/v1" })
         salesUserId: t.String(),
         clientOrigin: t.Optional(t.String()),
         customerUserId: t.Optional(t.String()),
-        loginUrl: t.Optional(t.String())
+        loginUrl: t.Optional(t.String()),
+        token: t.Optional(t.String())
       })
     }
   )
