@@ -1,55 +1,32 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { db, schema, sql, desc, or } from "@platform/db";
+import { db, schema, eq, sql, desc, or, ilike } from "@platform/db";
+import { z } from "zod";
 
-export async function GET(req: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+const queryInput = z.object({
+  page: z.coerce.number().int().min(1).max(100000).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(50),
+  search: z.string().trim().max(200).default(""),
+});
 
-  if (!session || ((session.user as any).role !== "admin" && (session.user as any).role !== "ADMIN")) {
-    return NextResponse.json({ success: false, error: { code: "UNAUTHORIZED", message: "Admin access required" } }, { status: 401 });
-  }
-
+export async function GET(request: Request) {
+  const session = await auth.api.getSession({ headers: await headers(), query: { disableCookieCache: true } });
+  if (!session) return NextResponse.json({ success: false, error: { code: "UNAUTHORIZED", message: "Sign in first." } }, { status: 401 });
+  const [actor] = await db.select({ role: schema.users.role }).from(schema.users).where(eq(schema.users.id, session.user.id)).limit(1);
+  if (actor?.role !== "admin") return NextResponse.json({ success: false, error: { code: "FORBIDDEN", message: "Admin access required." } }, { status: 403 });
+  const parsed = queryInput.safeParse(Object.fromEntries(new URL(request.url).searchParams));
+  if (!parsed.success) return NextResponse.json({ success: false, error: { code: "VALIDATION_FAILED", message: "Invalid search or page." } }, { status: 400 });
+  const { page, limit, search } = parsed.data;
+  const condition = search ? or(ilike(schema.users.name, `%${search}%`), ilike(schema.users.email, `%${search}%`), ilike(schema.users.company, `%${search}%`)) : undefined;
   try {
-    const { searchParams } = new URL(req.url);
-    const page = Number(searchParams.get("page") || "1");
-    const limit = Number(searchParams.get("limit") || "50");
-    const search = searchParams.get("search") || "";
-    
-    const offset = (page - 1) * limit;
-
-    const condition = search ? or(
-        sql`${schema.users.name} ILIKE ${`%${search}%`}`,
-        sql`${schema.users.email} ILIKE ${`%${search}%`}`
-    ) : undefined;
-    
-    const rows = await db
-        .select()
-        .from(schema.users)
-        .where(condition)
-        .orderBy(desc(schema.users.createdAt))
-        .limit(limit)
-        .offset(offset);
-
-    // Get total count
-    const [countResult] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(schema.users)
-      .where(condition);
-      
-    return NextResponse.json({ 
-      success: true, 
-      data: {
-        users: rows,
-        total: Number(countResult?.count || 0),
-        page,
-        limit
-      } 
-    });
-  } catch (error: any) {
-    console.error("[GET /api/admin/users] Error:", error);
-    return NextResponse.json({ success: false, error: { code: "INTERNAL_ERROR", message: error.message } }, { status: 500 });
+    const [users, [count]] = await Promise.all([
+      db.select().from(schema.users).where(condition).orderBy(desc(schema.users.createdAt)).limit(limit).offset((page - 1) * limit),
+      db.select({ value: sql<number>`count(*)::int` }).from(schema.users).where(condition),
+    ]);
+    return NextResponse.json({ success: true, data: { users, total: count?.value ?? 0, page, limit } });
+  } catch (error) {
+    console.error("[admin/users] Search failed", error);
+    return NextResponse.json({ success: false, error: { code: "INTERNAL_ERROR", message: "Could not load customers. Try again." } }, { status: 500 });
   }
 }

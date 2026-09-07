@@ -1,141 +1,23 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { db, schema, eq, desc, sql } from "@platform/db";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives";
-import { ShoppingBag, Key, Users, DollarSign, Activity } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = { title: "Admin — Platform" };
-
+import { getAdminPortalUser } from "@/lib/portal";
+import { db, schema, sql, eq, desc, and } from "@platform/db";
+import { PageHeading, PortalLink, Status, Empty, date } from "@/components/portal/ui";
 export const dynamic = "force-dynamic";
-
-export default async function AdminOverviewPage() {
-  let totalUsers = [{ count: 0 }];
-  let totalOrders = [{ count: 0, revenue: 0 }];
-  let totalLicenses = [{ count: 0 }];
-  let activeLicenses = [{ count: 0 }];
-  let recentOrders: any[] = [];
-
-  try {
-    const [
-      u,
-      o,
-      l,
-      a,
-      r,
-    ] = await Promise.all([
-      db.select({ count: sql<number>`count(*)` }).from(schema.users),
-      db.select({ count: sql<number>`count(*)`, revenue: sql<number>`coalesce(sum(amount_cents), 0)` }).from(schema.orders).where(eq(schema.orders.status, "paid")),
-      db.select({ count: sql<number>`count(*)` }).from(schema.licenses),
-      db.select({ count: sql<number>`count(*)` }).from(schema.licenses).where(eq(schema.licenses.status, "active")),
-      db.select({ order: schema.orders, user: schema.users })
-        .from(schema.orders)
-        .innerJoin(schema.users, eq(schema.orders.userId, schema.users.id))
-        .orderBy(desc(schema.orders.createdAt))
-        .limit(8),
-    ]);
-    totalUsers = u;
-    totalOrders = o;
-    totalLicenses = l;
-    activeLicenses = a;
-    recentOrders = r;
-  } catch (error) {
-    console.error("Failed to load admin overview metrics:", error);
-  }
-
-  const stats = [
-    {
-      label: "Total users",
-      value: Number(totalUsers[0]?.count ?? 0).toLocaleString(),
-      icon: Users,
-      color: "text-sky-400 bg-sky-500/10",
-    },
-    {
-      label: "Revenue (paid)",
-      value: formatCurrency(Number(totalOrders[0]?.revenue ?? 0)),
-      icon: DollarSign,
-      color: "text-emerald-400 bg-emerald-500/10",
-    },
-    {
-      label: "Total licenses",
-      value: Number(totalLicenses[0]?.count ?? 0).toLocaleString(),
-      icon: Key,
-      color: "text-violet-400 bg-violet-500/10",
-    },
-    {
-      label: "Active licenses",
-      value: Number(activeLicenses[0]?.count ?? 0).toLocaleString(),
-      icon: Activity,
-      color: "text-amber-400 bg-amber-500/10",
-    },
-  ];
-
-  return (
-    <div className="space-y-8 p-6">
-      <div>
-        <h1 className="text-2xl font-bold">Admin Overview</h1>
-        <p className="text-sm text-muted-foreground">Platform health & business metrics</p>
-      </div>
-
-      {/* Stats grid */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map(({ label, value, icon: Icon, color }) => (
-          <Card key={label}>
-            <CardContent className="flex items-center gap-4 pt-6">
-              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${color}`}>
-                <Icon className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-xl font-bold">{value}</p>
-                <p className="text-xs text-muted-foreground">{label}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Recent orders */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <ShoppingBag className="h-4 w-4" />
-            Recent orders
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                  <th className="pb-3 pr-4 font-medium">Order ID</th>
-                  <th className="pb-3 pr-4 font-medium">Customer</th>
-                  <th className="pb-3 pr-4 font-medium">Amount</th>
-                  <th className="pb-3 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {recentOrders.map(({ order, user }) => (
-                  <tr key={order.id} className="py-3">
-                    <td className="py-3 pr-4 font-mono text-xs text-muted-foreground">
-                      {order.externalOrderId.slice(0, 12)}…
-                    </td>
-                    <td className="py-3 pr-4 truncate max-w-32">{user.email}</td>
-                    <td className="py-3 pr-4 font-semibold">{formatCurrency(order.amountCents, order.currency)}</td>
-                    <td className="py-3">
-                      <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${
-                        order.status === "paid" ? "bg-emerald-500/15 text-emerald-400" : "bg-secondary text-secondary-foreground"
-                      }`}>
-                        {order.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+export default async function AdminPage() {
+  await getAdminPortalUser();
+  const [[customers], [organizations], [plans], [offers], [conversations], recent] = await Promise.all([
+    db.select({ count: sql<number>`count(*)::int` }).from(schema.users).where(eq(schema.users.role, "user")),
+    db.select({ count: sql<number>`count(*)::int` }).from(schema.organizations),
+    db.select({ count: sql<number>`count(*)::int` }).from(schema.contracts).where(eq(schema.contracts.status, "active")),
+    db.select({ count: sql<number>`count(*)::int` }).from(schema.contractSigningRequests).where(and(eq(schema.contractSigningRequests.status, "pending"), sql`${schema.contractSigningRequests.expiresAt} > now()`)),
+    db.select({ count: sql<number>`count(*)::int` }).from(schema.conversations).where(eq(schema.conversations.status, "open")),
+    db.select({ conversation: schema.conversations, name: schema.users.name }).from(schema.conversations).innerJoin(schema.users, eq(schema.users.id, schema.conversations.customerUserId)).orderBy(desc(schema.conversations.updatedAt)).limit(6),
+  ]);
+  const metrics = [{ label: "Customers", value: customers?.count ?? 0, href: "/admin/users" }, { label: "Organizations", value: organizations?.count ?? 0, href: "/admin/organizations" }, { label: "Active plans", value: plans?.count ?? 0, href: "/admin/plans" }, { label: "Open conversations", value: conversations?.count ?? 0, href: "/admin/conversations" }];
+  return <><PageHeading title="Workspace overview" description="See where things stand and keep your customers moving forward."><PortalLink href="/sales/order">Create an offer</PortalLink></PageHeading>
+    <dl className="mb-12 grid grid-cols-2 gap-y-6 border-y border-border py-6 md:grid-cols-4">{metrics.map(metric => <div key={metric.label} className="px-3 first:pl-0"><dt className="text-sm text-muted-foreground">{metric.label}</dt><dd className="mt-2 text-3xl font-semibold tabular-nums"><PortalLink href={metric.href}><span className="text-3xl text-foreground">{metric.value}</span></PortalLink></dd></div>)}</dl>
+    <div className="grid gap-10 xl:grid-cols-3"><section className="xl:col-span-2"><div className="mb-5 flex items-center justify-between gap-3"><h2 className="text-xl font-semibold">Latest conversations</h2><PortalLink href="/admin/conversations">View inbox</PortalLink></div>
+      {!recent.length && <Empty title="The inbox is clear.">Start a conversation from a customer’s profile. Their replies will appear here.</Empty>}
+      <div className="divide-y divide-border">{recent.map(({ conversation, name }) => <article key={conversation.id} className="py-4"><div className="flex items-start justify-between gap-3"><PortalLink href={`/admin/conversations/${conversation.id}`}>{conversation.subject}</PortalLink><Status value={conversation.status} /></div><p className="mt-2 px-3 text-xs text-muted-foreground">{name} · {date(conversation.updatedAt)}</p></article>)}</div>
+    </section><aside className="space-y-8 xl:border-l xl:border-border xl:pl-8"><section><h2 className="text-lg font-semibold">Offers in progress</h2><p className="mt-3 text-sm leading-6 text-muted-foreground"><strong className="text-foreground">{offers?.count ?? 0}</strong> offers are awaiting a signature and have not expired.</p><PortalLink href="/sales/order">Prepare an offer</PortalLink></section><section className="border-t border-border pt-6"><h2 className="text-lg font-semibold">Customer management</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">Update contact details, assign an organization, or give a colleague admin access.</p><PortalLink href="/admin/users">Open customer directory</PortalLink><PortalLink href="/admin/organizations">Manage organizations</PortalLink></section></aside></div>
+  </>;
 }

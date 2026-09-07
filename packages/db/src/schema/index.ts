@@ -6,3 +6,5 @@ export * from "./licenses";
 export * from "./assets";
 export * from "./leads";
 export * from "./contracts";
+export * from "./organizations";
+export * from "./conversations";

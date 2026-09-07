@@ -16,6 +16,7 @@
     "db:push": "drizzle-kit push --force",
     "db:migrate:marketing": "bun apply_marketing_migration.ts",
     "db:migrate:customers": "bun apply_customer_account_migration.ts",
+    "db:migrate:portal": "bun apply_portal_migration.ts",
     "db:backfill:customers": "bun backfill_customer_user_id.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "tsc -p tsconfig.json --noEmit"

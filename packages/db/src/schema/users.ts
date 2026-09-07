@@ -1,4 +1,5 @@
 import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
+import { organizations } from "./organizations";
 
 // ============================================================
 // Better Auth base tables (generated via @better-auth/cli,
@@ -14,6 +15,7 @@ export const users = pgTable("users", {
   image: text("image"),
   company: text("company"),
   phone: text("phone"),
+  organizationId: text("organization_id").references(() => organizations.id, { onDelete: "set null" }),
   role: text("role", { enum: ["user", "admin"] })
     .notNull()
     .default("user"),
@@ -21,6 +23,7 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 }, (table) => [
   index("users_created_at_idx").on(table.createdAt),
+  index("users_organization_id_idx").on(table.organizationId),
 ]);
 
 export const sessions = pgTable("sessions", {

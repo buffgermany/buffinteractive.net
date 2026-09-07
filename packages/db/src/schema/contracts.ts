@@ -15,6 +15,7 @@ export const contractTarifEnum = pgEnum("contract_tarif", ["essential", "growth"
 export const contractPaymentCycleEnum = pgEnum("contract_payment_cycle", ["monatlich", "jaehrlich"]);
 
 export const contracts = pgTable("contracts", {
+  status: text("status", { enum: ["active", "paused", "ended"] }).notNull().default("active"),
   id: text("id")
     .primaryKey()
     .$defaultFn(() => createId()),
@@ -146,4 +147,3 @@ export type Contract = typeof contracts.$inferSelect;
 export type NewContract = typeof contracts.$inferInsert;
 export type ContractSigningRequest = typeof contractSigningRequests.$inferSelect;
 export type NewContractSigningRequest = typeof contractSigningRequests.$inferInsert;
-
