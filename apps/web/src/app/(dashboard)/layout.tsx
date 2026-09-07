@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { DashboardHeader } from "@/components/buff/DashboardHeader";
 import { headers as nextHeaders } from "next/headers";
+import { needsPassword } from "@/lib/account";
 
 
 export default async function DashboardLayout({
@@ -16,6 +17,10 @@ export default async function DashboardLayout({
 
   if (!session) {
     redirect("/auth?from=/dashboard");
+  }
+
+  if (await needsPassword(session.user.id)) {
+    redirect("/auth/set-password?next=/dashboard");
   }
 
   const headersList = await nextHeaders();
