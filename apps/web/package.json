@@ -8,7 +8,8 @@
     "build": "bun run --env-file=../../.env next build",
     "start": "node .next/standalone/server.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "bun --env-file=../../.env test"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.743.0",

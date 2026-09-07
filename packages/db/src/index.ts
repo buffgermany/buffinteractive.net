@@ -57,4 +57,4 @@ export { schema };
 export * from "./schema/index";
 
 // Re-export Drizzle utilities for use in consuming packages
-export { eq, and, or, not, desc, asc, sql, inArray, isNull, isNotNull } from "drizzle-orm";
+export { eq, and, or, not, desc, asc, sql, inArray, isNull, isNotNull, like, ilike } from "drizzle-orm";
