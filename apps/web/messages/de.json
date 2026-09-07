@@ -51,13 +51,12 @@
     "divider": "ODER",
     "toggle_login": "Sign In",
     "toggle_signup": "Sign Up",
+    "toggle_link": "Login-Link",
     "show_password": "Show",
     "hide_password": "Hide",
     "error_invalid_email": "Ungültige E-Mail Adresse.",
     "error_password_min": "Passwort muss mindestens 10 Zeichen lang sein.",
-    "error_name_min": "Name muss mindestens 2 Zeichen lang sein.",
-    "signup_disabled_title": "Registrierung deaktiviert",
-    "signup_disabled_description": "Signups sind temporär deaktiviert. Bitte kontaktieren Sie uns für Zugang."
+    "error_name_min": "Name muss mindestens 2 Zeichen lang sein."
   },
   "Contact": {
     "title": "Sparen wir uns den Smalltalk.",

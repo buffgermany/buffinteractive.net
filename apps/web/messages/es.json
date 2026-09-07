@@ -51,13 +51,12 @@
     "divider": "O",
     "toggle_login": "Sign In",
     "toggle_signup": "Sign Up",
+    "toggle_link": "Enlace de acceso",
     "show_password": "Mostrar",
     "hide_password": "Ocultar",
     "error_invalid_email": "Dirección de correo no válida.",
     "error_password_min": "La contraseña debe tener al menos 10 caracteres.",
-    "error_name_min": "El nombre debe tener al menos 2 caracteres.",
-    "signup_disabled_title": "Registro desactivado",
-    "signup_disabled_description": "Los registros están desactivados temporalmente. Por favor, contáctenos para obtener acceso."
+    "error_name_min": "El nombre debe tener al menos 2 caracteres."
   },
   "Contact": {
     "title": "Dejémonos de charlas.",

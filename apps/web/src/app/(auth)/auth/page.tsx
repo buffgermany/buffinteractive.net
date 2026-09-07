@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { Eye, EyeOff, Github, Loader2, AlertCircle } from "lucide-react";
+import { Github } from "lucide-react";
 import { Header } from "@/components/buff/Header";
 import { Footer } from "@/components/buff/Footer";
 import { useForm } from "react-hook-form";
@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { signIn, signUp } from "@/lib/auth-client";
 import { useRouter, useSearchParams } from "next/navigation";
+import { TextField, PasswordField, ServerError, SubmitButton } from "./_components/AuthFields";
 
 export default function AuthPage() {
   const t = useTranslations('Auth');
@@ -19,11 +20,11 @@ export default function AuthPage() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('from') || searchParams.get('callbackUrl') || searchParams.get('redirectTo') || "/dashboard";
 
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'link'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
-  const signupEnabled = false; // Toggle for later switch usage
+  const [linkSent, setLinkSent] = useState(false);
 
   // Zod Schemas
   const loginSchema = z.object({
@@ -38,6 +39,10 @@ export default function AuthPage() {
     password: z.string().min(10, { message: t('error_password_min') }),
   });
 
+  const linkSchema = z.object({
+    email: z.string().email({ message: t('error_invalid_email') }),
+  });
+
   type LoginFormValues = z.infer<typeof loginSchema>;
   type SignupFormValues = z.infer<typeof signupSchema>;
 
@@ -47,7 +52,9 @@ export default function AuthPage() {
     reset,
     formState: { errors, isValid },
   } = useForm<SignupFormValues>({
-    resolver: zodResolver(authMode === 'login' ? loginSchema : signupSchema) as any,
+    resolver: zodResolver(
+      authMode === 'login' ? loginSchema : authMode === 'signup' ? signupSchema : linkSchema
+    ) as any,
     mode: "onChange",
     defaultValues: {
         email: "",
@@ -61,12 +68,13 @@ export default function AuthPage() {
   useEffect(() => {
     reset();
     setServerError(null);
+    setLinkSent(false);
   }, [authMode, reset]);
 
   const onFormSubmit = async (data: any) => {
     setIsSubmitting(true);
     setServerError(null);
-    
+
     try {
         if (authMode === 'login') {
             const { error } = await signIn.email({
@@ -74,7 +82,7 @@ export default function AuthPage() {
                 password: data.password,
                 callbackURL: redirectTo
             });
-            
+
             if (error) {
                 setServerError(error.message || "An error occurred during sign in.");
             } else {
@@ -86,9 +94,10 @@ export default function AuthPage() {
                 email: data.email,
                 password: data.password,
                 name: data.name,
+                company: data.company || undefined,
                 callbackURL: redirectTo
             });
-            
+
             if (error) {
                 setServerError(error.message || "An error occurred during sign up.");
             } else {
@@ -107,65 +116,63 @@ export default function AuthPage() {
   return (
     <>
       <Header />
-      <div 
+      <div
         className="min-h-[130vh] w-full flex flex-col relative overflow-hidden bg-[#0A0A0A]"
       >
         <div className="flex-1 w-full flex items-center justify-center pt-48 pb-[30vh] relative z-10">
           {/* Static Deep Mesh Background */}
-          <div 
+          <div
             className="absolute inset-0 z-0 opacity-60 pointer-events-none"
             style={{
               background: `radial-gradient(circle at 50% 50%, rgba(26, 16, 37, 0.8) 0%, rgba(10, 10, 10, 1) 50%)`
             }}
           />
-          
+
           {/* Grain overlay for premium texture */}
-          <div 
+          <div
             className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none mix-blend-overlay"
             style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}
           />
 
           {/* Auth Card Container */}
-          <motion.div 
+          <motion.div
             layout
             className="relative z-10 max-w-md w-full mx-4 bg-[#2C2C2C]/20 backdrop-blur-2xl border border-white/5 rounded-3xl p-6 sm:p-8 shadow-2xl overflow-hidden"
           >
             {/* Toggle Controls */}
             <div className="flex bg-[#0A0A0A]/50 p-1.5 rounded-full mb-8 relative border border-white/5">
-              <button 
-                type="button"
-                onClick={() => setAuthMode('login')}
-                className={`flex-1 py-2 text-sm font-bold z-10 transition-colors duration-300 ${authMode === 'login' ? 'text-black' : 'text-[#A0A0B0] hover:text-white'}`}
-              >
-                {t('toggle_login')}
-              </button>
-              <button 
-                type="button"
-                onClick={() => setAuthMode('signup')}
-                className={`flex-1 py-2 text-sm font-bold z-10 transition-colors duration-300 ${authMode === 'signup' ? 'text-black' : 'text-[#A0A0B0] hover:text-white'}`}
-              >
-                {t('toggle_signup')}
-              </button>
-              
-              <motion.div 
-                className="absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-[#CCFF00] rounded-full z-0 shadow-lg"
+              {(['login', 'signup', 'link'] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setAuthMode(mode)}
+                  className={`flex-1 py-2 text-xs sm:text-sm font-bold z-10 transition-colors duration-300 ${
+                    authMode === mode ? 'text-black' : 'text-[#A0A0B0] hover:text-white'
+                  }`}
+                >
+                  {mode === 'login' ? t('toggle_login') : mode === 'signup' ? t('toggle_signup') : t('toggle_link')}
+                </button>
+              ))}
+
+              <motion.div
+                className="absolute top-1.5 bottom-1.5 w-[calc(33.333%-4px)] bg-[#CCFF00] rounded-full z-0 shadow-lg"
                 initial={false}
-                animate={{ 
-                  x: authMode === 'login' ? '4px' : 'calc(100% + 4px)' 
+                animate={{
+                  x: authMode === 'login' ? '4px' : authMode === 'signup' ? 'calc(100% + 4px)' : 'calc(200% + 4px)',
                 }}
                 transition={{ type: "spring", stiffness: 500, damping: 35 }}
               />
             </div>
 
             {/* Title */}
-            <motion.h1 
+            <motion.h1
               layout="position"
               className="text-3xl font-heading font-bold text-white mb-4 tracking-tight"
             >
               {authMode === 'login' ? t('login_title') : t('signup_title')}
             </motion.h1>
 
-            {/* Content Area (Login vs Signup) */}
+            {/* Content Area (Login vs Signup vs Link) */}
             <AnimatePresence mode="wait">
               {authMode === 'login' ? (
                 <motion.div
@@ -177,61 +184,33 @@ export default function AuthPage() {
                 >
                   <form onSubmit={handleSubmit(onFormSubmit)} noValidate className="flex flex-col gap-5">
                     {/* Server Error Message */}
-                    {serverError && (
-                      <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3 text-red-400 text-xs leading-relaxed">
-                        <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                        <span>{serverError}</span>
-                      </div>
-                    )}
+                    {serverError && <ServerError message={serverError} />}
 
-                    <div className="flex flex-col gap-2">
-                      <label className="text-[10px] uppercase tracking-widest text-[#A0A0B0] font-mono ml-1">
-                        {t('email_label')}
-                      </label>
-                      <input 
-                        {...register("email")}
-                        type="email" 
-                        placeholder={t('email_placeholder')}
-                        className={`w-full bg-[#0A0A0A]/50 border rounded-xl px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base text-white placeholder-white/30 focus:outline-none focus:border-[#CCFF00] focus:bg-[#0A0A0A] focus:ring-1 focus:ring-[#CCFF00] transition-all duration-300 ${errors.email ? 'border-red-500' : 'border-white/10'}`}
-                      />
-                      {errors.email && <span className="text-red-500 text-[10px] ml-1">{errors.email.message as string}</span>}
-                    </div>
+                    <TextField
+                      label={t('email_label')}
+                      type="email"
+                      placeholder={t('email_placeholder')}
+                      register={register("email")}
+                      error={errors.email?.message as string | undefined}
+                    />
 
-                    <div className="flex flex-col gap-2 relative">
-                      <label className="text-[10px] uppercase tracking-widest text-[#A0A0B0] font-mono ml-1">
-                        {t('password_label')}
-                      </label>
-                      <div className="relative">
-                        <input 
-                          {...register("password")}
-                          type={showPassword ? "text" : "password"} 
-                          placeholder={t('password_placeholder')}
-                          className={`w-full bg-[#0A0A0A]/50 border rounded-xl pl-4 sm:pl-5 pr-12 py-3 sm:py-3.5 text-sm sm:text-base text-white placeholder-white/30 focus:outline-none focus:border-[#CCFF00] focus:bg-[#0A0A0A] focus:ring-1 focus:ring-[#CCFF00] transition-all duration-300 ${errors.password ? 'border-red-500' : 'border-white/10'}`}
-                        />
-                        <button 
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-[#A0A0B0] hover:text-white transition-colors p-1"
-                          title={showPassword ? t('hide_password') : t('show_password')}
-                        >
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                      </div>
-                      {errors.password && <span className="text-red-500 text-[10px] ml-1">{errors.password.message as string}</span>}
-                    </div>
+                    <PasswordField
+                      label={t('password_label')}
+                      placeholder={t('password_placeholder')}
+                      register={register("password")}
+                      error={errors.password?.message as string | undefined}
+                      show={showPassword}
+                      onToggle={() => setShowPassword(!showPassword)}
+                    />
 
                     <div className="pt-4">
-                      <button 
-                        type="submit"
-                        disabled={isSubmitting || !isValid}
-                        className="w-full bg-[#CCFF00] hover:bg-[#D4FF33] text-black font-bold uppercase tracking-wider py-4 rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(204,255,0,0.3)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                      >
-                        {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : t('submit_login')}
-                      </button>
+                      <SubmitButton disabled={isSubmitting || !isValid} loading={isSubmitting}>
+                        {t('submit_login')}
+                      </SubmitButton>
                     </div>
                   </form>
                 </motion.div>
-              ) : (
+              ) : authMode === 'signup' ? (
                 <motion.div
                   key="signup-content"
                   initial={{ opacity: 0, y: 10 }}
@@ -239,90 +218,103 @@ export default function AuthPage() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
                 >
-                  {signupEnabled ? (
-                    <form onSubmit={handleSubmit(onFormSubmit)} noValidate className="flex flex-col gap-5">
-                       {/* Signup fields */}
-                       <div className="flex gap-4">
-                          <div className="flex flex-col gap-2 flex-1">
-                            <label className="text-[10px] uppercase tracking-widest text-[#A0A0B0] font-mono ml-1">
-                              {t('name_label')}
-                            </label>
-                            <input 
-                              {...register("name")}
-                              type="text" 
-                              placeholder={t('name_placeholder')}
-                              className={`w-full bg-[#0A0A0A]/50 border rounded-xl px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base text-white placeholder-white/30 focus:outline-none focus:border-[#CCFF00] focus:bg-[#0A0A0A] focus:ring-1 focus:ring-[#CCFF00] transition-all duration-300 ${errors.name ? 'border-red-500' : 'border-white/10'}`}
-                            />
-                            {errors.name && <span className="text-red-500 text-[10px] ml-1">{errors.name.message as string}</span>}
-                          </div>
-                          <div className="flex flex-col gap-2 flex-1">
-                            <label className="text-[10px] uppercase tracking-widest text-[#A0A0B0] font-mono ml-1">
-                              {t('company_label')}
-                            </label>
-                            <input 
-                              {...register("company")}
-                              type="text" 
-                              placeholder={t('company_placeholder')}
-                              className={`w-full bg-[#0A0A0A]/50 border rounded-xl px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base text-white placeholder-white/30 focus:outline-none focus:border-[#CCFF00] focus:bg-[#0A0A0A] focus:ring-1 focus:ring-[#CCFF00] transition-all duration-300 ${errors.company ? 'border-red-500' : 'border-white/10'}`}
-                            />
-                            {errors.company && <span className="text-red-500 text-[10px] ml-1">{errors.company.message as string}</span>}
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          <label className="text-[10px] uppercase tracking-widest text-[#A0A0B0] font-mono ml-1">
-                            {t('email_label')}
-                          </label>
-                          <input 
-                            {...register("email")}
-                            type="email" 
-                            placeholder={t('email_placeholder')}
-                            className={`w-full bg-[#0A0A0A]/50 border rounded-xl px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base text-white placeholder-white/30 focus:outline-none focus:border-[#CCFF00] focus:bg-[#0A0A0A] focus:ring-1 focus:ring-[#CCFF00] transition-all duration-300 ${errors.email ? 'border-red-500' : 'border-white/10'}`}
+                  <form onSubmit={handleSubmit(onFormSubmit)} noValidate className="flex flex-col gap-5">
+                     {/* Server Error Message */}
+                     {serverError && <ServerError message={serverError} />}
+
+                     {/* Signup fields */}
+                     <div className="flex gap-4">
+                        <div className="flex-1">
+                          <TextField
+                            label={t('name_label')}
+                            placeholder={t('name_placeholder')}
+                            register={register("name")}
+                            error={errors.name?.message as string | undefined}
                           />
-                          {errors.email && <span className="text-red-500 text-[10px] ml-1">{errors.email.message as string}</span>}
                         </div>
-                        <div className="flex flex-col gap-2 relative">
-                          <label className="text-[10px] uppercase tracking-widest text-[#A0A0B0] font-mono ml-1">
-                            {t('password_label')}
-                          </label>
-                          <div className="relative">
-                            <input 
-                              {...register("password")}
-                              type={showPassword ? "text" : "password"} 
-                              placeholder={t('password_placeholder')}
-                              className={`w-full bg-[#0A0A0A]/50 border rounded-xl pl-4 sm:pl-5 pr-12 py-3 sm:py-3.5 text-sm sm:text-base text-white placeholder-white/30 focus:outline-none focus:border-[#CCFF00] focus:bg-[#0A0A0A] focus:ring-1 focus:ring-[#CCFF00] transition-all duration-300 ${errors.password ? 'border-red-500' : 'border-white/10'}`}
-                            />
-                            <button 
-                              type="button"
-                              onClick={() => setShowPassword(!showPassword)}
-                              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#A0A0B0] hover:text-white transition-colors p-1"
-                              title={showPassword ? t('hide_password') : t('show_password')}
-                            >
-                              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                            </button>
-                          </div>
-                          {errors.password && <span className="text-red-500 text-[10px] ml-1">{errors.password.message as string}</span>}
+                        <div className="flex-1">
+                          <TextField
+                            label={t('company_label')}
+                            placeholder={t('company_placeholder')}
+                            register={register("company")}
+                            error={errors.company?.message as string | undefined}
+                          />
                         </div>
-                        <div className="pt-4">
-                          <button 
-                            type="submit"
-                            disabled={isSubmitting || !isValid}
-                            className="w-full bg-[#CCFF00] hover:bg-[#D4FF33] text-black font-bold uppercase tracking-wider py-4 rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(204,255,0,0.3)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                          >
-                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : t('submit_signup')}
-                          </button>
-                        </div>
-                    </form>
-                  ) : (
-                    <div className="py-8 px-6 bg-[#CCFF00]/5 border border-[#CCFF00]/20 rounded-2xl flex flex-col items-center text-center gap-4 text-[#CCFF00]">
-                      <AlertCircle className="w-10 h-10 opacity-50" />
-                      <div className="flex flex-col gap-2">
-                        <span className="text-lg font-bold tracking-tight">{t('signup_disabled_title')}</span>
-                        <span className="text-sm opacity-80 leading-relaxed max-w-[240px] mx-auto">{t('signup_disabled_description')}</span>
                       </div>
+
+                      <TextField
+                        label={t('email_label')}
+                        type="email"
+                        placeholder={t('email_placeholder')}
+                        register={register("email")}
+                        error={errors.email?.message as string | undefined}
+                      />
+
+                      <PasswordField
+                        label={t('password_label')}
+                        placeholder={t('password_placeholder')}
+                        register={register("password")}
+                        error={errors.password?.message as string | undefined}
+                        show={showPassword}
+                        onToggle={() => setShowPassword(!showPassword)}
+                      />
+
+                      <div className="pt-4">
+                        <SubmitButton disabled={isSubmitting || !isValid} loading={isSubmitting}>
+                          {t('submit_signup')}
+                        </SubmitButton>
+                      </div>
+                  </form>
+                </motion.div>
+              ) : authMode === 'link' ? (
+                <motion.div
+                  key="link-content"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                >
+                  {linkSent ? (
+                    <div className="py-8 px-6 bg-[#CCFF00]/5 border border-[#CCFF00]/20 rounded-2xl text-center text-[#CCFF00]">
+                      <p className="text-lg font-bold tracking-tight mb-2">Link ist unterwegs</p>
+                      <p className="text-sm opacity-80 leading-relaxed">
+                        Falls ein Konto mit dieser Adresse existiert, findest Du gleich einen Login-Link in Deinem Postfach.
+                      </p>
                     </div>
+                  ) : (
+                    <form
+                      onSubmit={handleSubmit(async (data) => {
+                        setIsSubmitting(true);
+                        setServerError(null);
+                        await signIn.magicLink({ email: data.email, callbackURL: redirectTo });
+                        // Always report success: revealing whether an account
+                        // exists would turn this form into an email oracle.
+                        setLinkSent(true);
+                        setIsSubmitting(false);
+                      })}
+                      noValidate
+                      className="flex flex-col gap-5"
+                    >
+                      {serverError && <ServerError message={serverError} />}
+                      <p className="text-sm text-[#A0A0B0] leading-relaxed">
+                        Wir schicken Dir einen Link, mit dem Du Dich ohne Passwort anmeldest.
+                      </p>
+                      <TextField
+                        label={t('email_label')}
+                        type="email"
+                        placeholder={t('email_placeholder')}
+                        register={register("email")}
+                        error={errors.email?.message as string | undefined}
+                      />
+                      <div className="pt-4">
+                        <SubmitButton disabled={isSubmitting} loading={isSubmitting}>
+                          Login-Link senden
+                        </SubmitButton>
+                      </div>
+                    </form>
                   )}
                 </motion.div>
-              )}
+              ) : null}
             </AnimatePresence>
 
             <motion.div layout="position" className="mt-8">

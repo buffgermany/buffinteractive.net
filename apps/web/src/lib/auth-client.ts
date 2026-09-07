@@ -8,7 +8,7 @@ import type { Auth } from "./auth";
 // are typed correctly in useSession() and getSession() hooks.
 // ============================================================
 
-export const authClient: ReturnType<typeof createAuthClient> = createAuthClient({
+export const authClient = createAuthClient({
   baseURL:
     typeof window !== "undefined"
       ? window.location.origin

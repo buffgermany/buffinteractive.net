@@ -51,13 +51,12 @@
     "divider": "OR",
     "toggle_login": "Sign In",
     "toggle_signup": "Sign Up",
+    "toggle_link": "Login link",
     "show_password": "Show",
     "hide_password": "Hide",
     "error_invalid_email": "Invalid email address.",
     "error_password_min": "Password must be at least 10 characters long.",
-    "error_name_min": "Name must be at least 2 characters long.",
-    "signup_disabled_title": "Registration disabled",
-    "signup_disabled_description": "Signups are temporarily disabled. Please contact us for access."
+    "error_name_min": "Name must be at least 2 characters long."
   },
   "Contact": {
     "title": "Let's cut the small talk.",
