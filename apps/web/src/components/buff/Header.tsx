@@ -17,7 +17,9 @@ import {
 	Globe,
 	Menu,
 	X,
-	ArrowUpRight
+	ArrowUpRight,
+	LayoutDashboard,
+	LogIn
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
@@ -248,7 +250,7 @@ const MENUS: Record<string, React.FC<{ onLinkClick?: () => void }>> = {
 
 export function Header() {
 	const t = useTranslations("Header");
-	const { data: session } = useSession();
+	const { data: session, isPending: isSessionPending } = useSession();
 	const pathname = usePathname();
 	const locale = useLocale();
 	const { scrollY } = useScroll();
@@ -409,6 +411,21 @@ export function Header() {
 
 					{/* CTA & Mobile Toggle */}
 					<div className="flex items-center gap-4 z-[60]">
+						{/* Rendered only once the session resolves, so a signed-in
+						    visitor never sees "Login" flash before "Dashboard". */}
+						{!isSessionPending && (
+							<Magnetic>
+								<Link
+									href={session ? "/dashboard" : "/auth"}
+									prefetch={true}
+									className="hidden sm:flex items-center gap-2 px-5 py-2 rounded-full border border-white/15 text-sm font-bold text-foreground hover:border-primary/40 hover:text-primary transition-colors"
+								>
+									{session ? <LayoutDashboard size={14} /> : <LogIn size={14} />}
+									{session ? t("nav_dashboard") : t("nav_login")}
+								</Link>
+							</Magnetic>
+						)}
+
 						<Magnetic>
 							<Link href="#contact" prefetch={true} className="hidden sm:block">
 								<div className="px-6 py-2 bg-primary text-primary-foreground font-bold rounded-full text-sm hover:scale-105 transition-transform">

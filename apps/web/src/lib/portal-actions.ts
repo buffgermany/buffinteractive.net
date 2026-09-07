@@ -10,9 +10,9 @@ import { canAccessConversation, conversationStatusInput, messageInput, organizat
 
 export type ActionState = { error?: string; success?: string };
 function actionError(error: unknown): ActionState {
-  if (error instanceof ZodError) return { error: error.issues[0]?.message ?? "Check the form fields." };
+  if (error instanceof ZodError) return { error: error.issues[0]?.message ?? "Bitte prüfe die Formularfelder." };
   console.error("[portal] Mutation failed", error);
-  return { error: "Could not save your changes. Check your access and form fields, then try again." };
+  return { error: "Deine Änderungen konnten nicht gespeichert werden. Prüfe Deine Berechtigung und die Formularfelder und versuch es erneut." };
 }
 function refreshPortal() {
   revalidatePath("/dashboard", "layout");
@@ -20,7 +20,7 @@ function refreshPortal() {
 }
 async function getAdmin() {
   const user = await getPortalUser();
-  if (user.role !== "admin") throw new Error("Admin access required.");
+  if (user.role !== "admin") throw new Error("Dafür brauchst Du Admin-Rechte.");
   return user;
 }
 
@@ -33,16 +33,16 @@ export async function saveUser(id: string, _state: ActionState, form: FormData):
       await db.transaction(async tx => {
         if (data.organizationId) {
           const [organization] = await tx.select().from(schema.organizations).where(eq(schema.organizations.id, data.organizationId)).limit(1);
-          if (!organization) throw new Error("Organization not found.");
+          if (!organization) throw new Error("Organisation nicht gefunden.");
           data.company = organization.name;
         }
         const [existing] = await tx.select({ id: schema.users.id }).from(schema.users).where(sql`lower(${schema.users.email}) = ${data.email}`).limit(1);
-        if (existing) throw new Error("This email already has an account.");
+        if (existing) throw new Error("Für diese E-Mail-Adresse gibt es bereits ein Konto.");
         await tx.insert(schema.users).values({ ...data, id: createId(), emailVerified: false });
       });
     }
     refreshPortal();
-    return { success: "Customer saved." };
+    return { success: "Kunde gespeichert." };
   } catch (error) { return actionError(error); }
 }
 
@@ -53,11 +53,11 @@ export async function saveOrganization(id: string, _state: ActionState, form: Fo
     await db.transaction(async tx => {
       if (!id) { await tx.insert(schema.organizations).values(data); return; }
       const [updated] = await tx.update(schema.organizations).set({ ...data, updatedAt: new Date() }).where(eq(schema.organizations.id, id)).returning();
-      if (!updated) throw new Error("Organization not found.");
+      if (!updated) throw new Error("Organisation nicht gefunden.");
       await tx.update(schema.users).set({ company: data.name, updatedAt: new Date() }).where(eq(schema.users.organizationId, id));
     });
     refreshPortal();
-    return { success: "Organization saved." };
+    return { success: "Organisation gespeichert." };
   } catch (error) { return actionError(error); }
 }
 
@@ -66,9 +66,9 @@ export async function setPlanStatus(id: string, _state: ActionState, form: FormD
   try {
     const status = planStatusInput.parse(form.get("status"));
     const [updated] = await db.update(schema.contracts).set({ status }).where(eq(schema.contracts.id, id)).returning({ id: schema.contracts.id });
-    if (!updated) return { error: "Plan not found." };
+    if (!updated) return { error: "Tarif nicht gefunden." };
     refreshPortal();
-    return { success: "Plan status saved. Billing changes must be handled separately." };
+    return { success: "Tarifstatus gespeichert. Änderungen an der Abrechnung musst Du separat vornehmen." };
   } catch (error) { return actionError(error); }
 }
 
@@ -80,10 +80,10 @@ export async function startConversation(_state: ActionState, form: FormData): Pr
     const body = messageInput.parse(form.get("body"));
     const customerUserId = user.role === "admin" ? String(form.get("customerUserId") || user.id) : user.id;
     const [customer] = await db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.id, customerUserId)).limit(1);
-    if (!customer) return { error: "Choose an existing customer." };
+    if (!customer) return { error: "Wähle einen vorhandenen Kunden aus." };
     id = await db.transaction(async tx => {
       const [conversation] = await tx.insert(schema.conversations).values({ subject, customerUserId }).returning();
-      if (!conversation) throw new Error("Conversation could not be created.");
+      if (!conversation) throw new Error("Das Gespräch konnte nicht angelegt werden.");
       await tx.insert(schema.conversationMessages).values({ conversationId: conversation.id, authorId: user.id, body });
       return conversation.id;
     });
@@ -98,13 +98,13 @@ export async function replyToConversation(id: string, _state: ActionState, form:
     const body = messageInput.parse(form.get("body"));
     await db.transaction(async tx => {
       const [conversation] = await tx.select().from(schema.conversations).where(eq(schema.conversations.id, id)).for("update");
-      if (!conversation || !canAccessConversation(user, conversation.customerUserId)) throw new Error("Conversation not found.");
-      if (conversation.status !== "open") throw new Error("Reopen this conversation before replying.");
+      if (!conversation || !canAccessConversation(user, conversation.customerUserId)) throw new Error("Gespräch nicht gefunden.");
+      if (conversation.status !== "open") throw new Error("Öffne dieses Gespräch wieder, bevor Du antwortest.");
       await tx.insert(schema.conversationMessages).values({ conversationId: id, authorId: user.id, body });
       await tx.update(schema.conversations).set({ updatedAt: new Date() }).where(eq(schema.conversations.id, id));
     });
     refreshPortal();
-    return { success: "Message sent." };
+    return { success: "Nachricht gesendet." };
   } catch (error) { return actionError(error); }
 }
 
@@ -116,8 +116,8 @@ export async function setConversationStatus(id: string, _state: ActionState, for
       eq(schema.conversations.id, id),
       user.role === "admin" ? undefined : eq(schema.conversations.customerUserId, user.id),
     )).returning({ id: schema.conversations.id });
-    if (!updated) return { error: "Conversation not found." };
+    if (!updated) return { error: "Gespräch nicht gefunden." };
     refreshPortal();
-    return { success: status === "closed" ? "Conversation closed." : "Conversation reopened." };
+    return { success: status === "closed" ? "Gespräch geschlossen." : "Gespräch wieder geöffnet." };
   } catch (error) { return actionError(error); }
 }

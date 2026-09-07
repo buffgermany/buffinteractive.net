@@ -6,5 +6,5 @@ import { Button } from "@/components/ui/primitives";
 export function RefreshMessages() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  return <Button variant="outline" disabled={isPending} onClick={() => startTransition(() => router.refresh())}><RefreshCw size={14} />{isPending ? "Refreshing…" : "Refresh"}</Button>;
+  return <Button variant="outline" disabled={isPending} onClick={() => startTransition(() => router.refresh())}><RefreshCw size={14} />{isPending ? "Wird aktualisiert…" : "Aktualisieren"}</Button>;
 }

@@ -16,8 +16,8 @@ export const organizationInput = z.object({
   address: optionalText(1000),
   notes: optionalText(5000),
 });
-export const messageInput = z.string().trim().min(1, "Write a message first.").max(10000);
-export const subjectInput = z.string().trim().min(1, "Add a subject.").max(160);
+export const messageInput = z.string().trim().min(1, "Schreib zuerst eine Nachricht.").max(10000);
+export const subjectInput = z.string().trim().min(1, "Gib einen Betreff an.").max(160);
 export const planStatusInput = z.enum(["active", "paused", "ended"]);
 export const conversationStatusInput = z.enum(["open", "closed"]);
 
