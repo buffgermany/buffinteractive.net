@@ -5,7 +5,8 @@ import {
   pgEnum,
   boolean,
   decimal,
-  integer
+  integer,
+  index
 } from "drizzle-orm/pg-core";
 import { createId } from "@paralleldrive/cuid2";
 import { users } from "./users";
@@ -62,6 +63,11 @@ export const contracts = pgTable("contracts", {
   salesUserId: text("sales_user_id")
     .notNull()
     .references(() => users.id, { onDelete: "restrict" }),
+
+  // The customer who signed. Nullable: rows predating account-backed offers
+  // have no linked account and stay invisible to dashboard queries.
+  customerUserId: text("customer_user_id")
+    .references(() => users.id, { onDelete: "set null" }),
   signedAt: timestamp("signed_at", { withTimezone: true }).notNull().defaultNow(),
   clientIp: text("client_ip"),
   userAgent: text("user_agent"),
@@ -71,7 +77,9 @@ export const contracts = pgTable("contracts", {
   pdfFilename: text("pdf_filename").notNull(),
   emailSentAt: timestamp("email_sent_at", { withTimezone: true }),
 
-});
+}, (table) => [
+  index("contracts_customer_user_id_idx").on(table.customerUserId),
+]);
 
 
 export const contractSigningRequestStatusEnum = pgEnum("contract_signing_request_status", [
@@ -91,6 +99,9 @@ export const contractSigningRequests = pgTable("contract_signing_requests", {
   salesUserId: text("sales_user_id")
     .notNull()
     .references(() => users.id, { onDelete: "restrict" }),
+
+  customerUserId: text("customer_user_id")
+    .references(() => users.id, { onDelete: "set null" }),
 
   tarif: contractTarifEnum("tarif").notNull(),
   zahlungsrhythmus: contractPaymentCycleEnum("zahlungsrhythmus").notNull(),
@@ -126,7 +137,10 @@ export const contractSigningRequests = pgTable("contract_signing_requests", {
 
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  index("csr_customer_user_id_idx").on(table.customerUserId),
+  index("csr_token_idx").on(table.token),
+]);
 
 export type Contract = typeof contracts.$inferSelect;
 export type NewContract = typeof contracts.$inferInsert;
