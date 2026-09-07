@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { signIn, signUp } from "@/lib/auth-client";
+import { safeNext } from "@/lib/safe-next";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TextField, PasswordField, ServerError, SubmitButton } from "./_components/AuthFields";
 
@@ -18,7 +19,12 @@ export default function AuthPage() {
   const t = useTranslations('Auth');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('from') || searchParams.get('callbackUrl') || searchParams.get('redirectTo') || "/dashboard";
+  // Every one of these lands in router.push and in magic-link callbackURL, so
+  // an unchecked value is an open redirect on the page the signing gate sends
+  // denied visitors to.
+  const redirectTo = safeNext(
+    searchParams.get('from') || searchParams.get('callbackUrl') || searchParams.get('redirectTo')
+  );
 
   const [authMode, setAuthMode] = useState<'login' | 'signup' | 'link'>('login');
   const [showPassword, setShowPassword] = useState(false);
