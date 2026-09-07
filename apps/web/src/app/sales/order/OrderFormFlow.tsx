@@ -5,6 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { SignaturePad } from "@/components/shared/SignaturePad";
+import { CustomerPicker } from "@/components/sales/CustomerPicker";
 import { LegalScrollBox } from "@/components/shared/LegalScrollBox";
 import { Button, Input, Label, Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/primitives";
 import ReactMarkdown from "react-markdown";
@@ -303,9 +304,10 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
     }
     setIsSendingInvite(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
       const clientOrigin = typeof window !== "undefined" ? window.location.origin : undefined;
-      const res = await fetch(`${apiUrl}/v1/contracts/create-invite`, {
+      // Same-origin: the web route resolves the account and mints the magic
+      // link before delegating to apps/api.
+      const res = await fetch(`/api/sales/invite`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -713,10 +715,18 @@ export function OrderFormFlow({ termsContent, avvContent, sepaContent, salesUser
                     <div className="space-y-3">
                       <div className="space-y-1">
                         <Label required className="text-xs">E-Mail-Adresse des Kunden (für Signatur & Vertrag)</Label>
-                        <Input
-                          type="email"
-                          {...register("email")}
-                          placeholder="kunde@firma.de"
+                        <CustomerPicker
+                          value={watch("email") ?? ""}
+                          onChange={(email) => setValue("email", email, { shouldValidate: true })}
+                          onSelect={(customer) => {
+                            if (!customer) return;
+                            if (!watch("ansprechpartner") && customer.name) {
+                              setValue("ansprechpartner", customer.name);
+                            }
+                            if (!watch("firma") && customer.company) {
+                              setValue("firma", customer.company);
+                            }
+                          }}
                         />
                       </div>
 
