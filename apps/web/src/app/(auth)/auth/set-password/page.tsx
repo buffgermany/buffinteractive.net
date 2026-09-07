@@ -2,17 +2,13 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { needsPassword } from "@/lib/account";
+import { safeNext } from "@/lib/safe-next";
 import { SetPasswordForm } from "./SetPasswordForm";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Passwort festlegen" };
 
-/** Only relative paths are honoured, so `next` cannot become an open redirect. */
-function safeNext(raw: string | undefined): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/dashboard";
-  return raw;
-}
 
 export default async function SetPasswordPage({
   searchParams,
