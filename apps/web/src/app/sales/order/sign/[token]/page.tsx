@@ -101,7 +101,17 @@ export default async function RemoteSignOrderPage({ params }: PageProps) {
       where: (tbl, { eq }) => eq(tbl.token, token),
       columns: { customerUserId: true },
     });
-    customerUserId = csr?.customerUserId ?? null;
+    // A legacy invite is a row that EXISTS with a null column. A missing row
+    // is a different state: apps/api just resolved this token, so the two
+    // services disagree about the database. Deny rather than treat that
+    // disagreement as legacy.
+    if (!csr) {
+      console.error("[RemoteSignOrderPage] Invite resolved by apps/api is absent locally:", token);
+      return (
+        <InvalidLinkCard message="Dieses Angebot konnte nicht geprüft werden. Bitte kontaktiere uns." />
+      );
+    }
+    customerUserId = csr.customerUserId;
   } catch (err) {
     console.error("[RemoteSignOrderPage] Ownership lookup failed:", err);
     return (

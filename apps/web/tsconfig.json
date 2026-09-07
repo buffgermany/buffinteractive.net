@@ -47,7 +47,10 @@
       ]
     },
     "allowJs": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "declaration": false,
+    "declarationMap": false,
+    "composite": false
   },
   "include": [
     "**/*.ts",

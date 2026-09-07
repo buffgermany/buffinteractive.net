@@ -25,7 +25,7 @@ import { db, schema } from "@platform/db";
 import { eq } from "drizzle-orm";
 
 async function main() {
-  console.log("Database URL configured:", !!process.env.DATABASE_URL);
+  console.log("Database URL configured:", !!process.env["DATABASE_URL"]);
 
   const usersToCreate = [
     {
