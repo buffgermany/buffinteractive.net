@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { needsPassword } from "@/lib/account";
+import { db } from "@platform/db";
 import { RemoteInviteData } from "@/components/sales/RemoteOrderFormFlow";
 import { RemoteSignClientWrapper } from "@/components/sales/RemoteSignClientWrapper";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/primitives";
@@ -13,6 +14,34 @@ interface PageProps {
   params: Promise<{
     token: string;
   }>;
+}
+
+function InvalidLinkCard({ message }: { message: string }) {
+  return (
+    <main className="min-h-screen bg-transparent text-foreground font-sans pt-16">
+      <div className="w-full max-w-2xl mx-auto py-12 px-4 relative z-10">
+        <Card className="border-2 border-destructive/40 shadow-xl text-center py-8">
+          <CardHeader className="space-y-4">
+            <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 border-2 border-destructive/30 flex items-center justify-center">
+              <AlertTriangle className="w-8 h-8 text-destructive" />
+            </div>
+            <CardTitle className="text-2xl font-bold">Link ungültig oder abgelaufen</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground max-w-md mx-auto">
+              {message}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-4">
+            <div className="bg-muted/50 p-4 rounded-xl text-xs text-muted-foreground max-w-md mx-auto">
+              Falls Du Fragen hast oder einen neuen Signatur-Link benötigst, kontaktiere bitte Deinen Ansprechpartner oder schreibe uns an:
+              <a href="mailto:service@buffinteractive.net" className="font-semibold text-primary block mt-1 underline">
+                service@buffinteractive.net
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
+  );
 }
 
 function readLegalFile(filename: string): string {
@@ -56,36 +85,33 @@ export default async function RemoteSignOrderPage({ params }: PageProps) {
   }
 
   if (!inviteData) {
+    return <InvalidLinkCard message={errorMessage} />;
+  }
+
+  // Authorization must not trust apps/api's echoed customerUserId: apps/api
+  // is a separate, unauthenticated deploy that can briefly lag this app
+  // (partial deploy, rollback), and a stale API returning the field as
+  // undefined would silently fail this gate open. Read ownership straight
+  // from the DB, keyed by the same token, so the gate can't be fooled by a
+  // lagging sibling service. A DB error here fails closed (denies) rather
+  // than falling through to the anonymous legacy path.
+  let customerUserId: string | null;
+  try {
+    const csr = await db.query.contractSigningRequests.findFirst({
+      where: (tbl, { eq }) => eq(tbl.token, token),
+      columns: { customerUserId: true },
+    });
+    customerUserId = csr?.customerUserId ?? null;
+  } catch (err) {
+    console.error("[RemoteSignOrderPage] Ownership lookup failed:", err);
     return (
-      <main className="min-h-screen bg-transparent text-foreground font-sans pt-16">
-        <div className="w-full max-w-2xl mx-auto py-12 px-4 relative z-10">
-          <Card className="border-2 border-destructive/40 shadow-xl text-center py-8">
-            <CardHeader className="space-y-4">
-              <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 border-2 border-destructive/30 flex items-center justify-center">
-                <AlertTriangle className="w-8 h-8 text-destructive" />
-              </div>
-              <CardTitle className="text-2xl font-bold">Link ungültig oder abgelaufen</CardTitle>
-              <CardDescription className="text-sm text-muted-foreground max-w-md mx-auto">
-                {errorMessage}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-4">
-              <div className="bg-muted/50 p-4 rounded-xl text-xs text-muted-foreground max-w-md mx-auto">
-                Falls Du Fragen hast oder einen neuen Signatur-Link benötigst, kontaktiere bitte Deinen Ansprechpartner oder schreibe uns an:
-                <a href="mailto:service@buffinteractive.net" className="font-semibold text-primary block mt-1 underline">
-                  service@buffinteractive.net
-                </a>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
+      <InvalidLinkCard message="Beim Prüfen dieses Angebots ist ein Fehler aufgetreten. Bitte versuche es später erneut oder kontaktiere uns." />
     );
   }
 
   // Invites minted before account-backed offers have no customerUserId and
   // keep the old anonymous token behaviour so nothing in flight breaks.
-  if (inviteData.customerUserId) {
+  if (customerUserId) {
     const session = await auth.api
       .getSession({ headers: await headers() })
       .catch(() => null);
@@ -96,7 +122,7 @@ export default async function RemoteSignOrderPage({ params }: PageProps) {
       redirect(`/auth?from=${encodeURIComponent(signingPath)}`);
     }
 
-    if (session.user.id !== inviteData.customerUserId) {
+    if (session.user.id !== customerUserId) {
       return (
         <main className="min-h-screen bg-transparent text-foreground font-sans pt-16">
           <div className="w-full max-w-2xl mx-auto py-12 px-4 relative z-10">
