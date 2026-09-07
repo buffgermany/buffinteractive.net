@@ -11,11 +11,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { signIn, signUp } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AuthPage() {
   const t = useTranslations('Auth');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('from') || searchParams.get('callbackUrl') || searchParams.get('redirectTo') || "/dashboard";
+
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,13 +72,13 @@ export default function AuthPage() {
             const { error } = await signIn.email({
                 email: data.email,
                 password: data.password,
-                callbackURL: "/dashboard"
+                callbackURL: redirectTo
             });
             
             if (error) {
                 setServerError(error.message || "An error occurred during sign in.");
             } else {
-                router.push("/dashboard");
+                router.push(redirectTo);
                 router.refresh();
             }
         } else {
@@ -83,13 +86,13 @@ export default function AuthPage() {
                 email: data.email,
                 password: data.password,
                 name: data.name,
-                callbackURL: "/dashboard"
+                callbackURL: redirectTo
             });
             
             if (error) {
                 setServerError(error.message || "An error occurred during sign up.");
             } else {
-                router.push("/dashboard");
+                router.push(redirectTo);
                 router.refresh();
             }
         }
