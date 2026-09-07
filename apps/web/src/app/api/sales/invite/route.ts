@@ -28,7 +28,15 @@ export async function POST(request: Request) {
     throw err;
   }
 
-  const body = await request.json();
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "Ungültige Anfrage." },
+      { status: 400 }
+    );
+  }
   const customerEmail: string = (body.customerEmail ?? "").trim();
 
   if (!customerEmail.includes("@")) {
