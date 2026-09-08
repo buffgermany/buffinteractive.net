@@ -9,7 +9,7 @@ import { Footer } from "@/components/buff/Footer";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { signIn, signUp } from "@/lib/auth-client";
+import { signIn, signUp, getSession } from "@/lib/auth-client";
 import { safeNext } from "@/lib/safe-next";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TextField, PasswordField, ServerError, SubmitButton } from "./_components/AuthFields";
@@ -18,10 +18,9 @@ export default function AuthPage() {
   const t = useTranslations('Auth');
   const router = useRouter();
   const searchParams = useSearchParams();
-  // Every one of these lands in router.push and in magic-link callbackURL, so
-  // an unchecked value is an open redirect on the page the signing gate sends
-  // denied visitors to.
-  const redirectTo = safeNext(
+
+  // Sanitize redirect target to prevent open redirects
+  const explicitFrom = safeNext(
     searchParams.get('from') || searchParams.get('callbackUrl') || searchParams.get('redirectTo')
   );
 
@@ -82,6 +81,25 @@ export default function AuthPage() {
     setLinkSent(false);
   }, [authMode, reset]);
 
+  const handleRedirect = async () => {
+    if (explicitFrom) {
+      router.push(explicitFrom);
+      router.refresh();
+      return;
+    }
+
+    // Check user role
+    const sessionRes = await getSession();
+    const userRole = (sessionRes?.data?.user as any)?.role;
+
+    if (userRole === "admin") {
+      router.push("/admin");
+    } else {
+      router.push("/dashboard");
+    }
+    router.refresh();
+  };
+
   const onFormSubmit = async (data: any) => {
     setIsSubmitting(true);
     setServerError(null);
@@ -91,14 +109,12 @@ export default function AuthPage() {
             const { error } = await signIn.email({
                 email: data.email,
                 password: data.password,
-                callbackURL: redirectTo
             });
 
             if (error) {
                 setServerError(error.message || "An error occurred during sign in.");
             } else {
-                router.push(redirectTo);
-                router.refresh();
+                await handleRedirect();
             }
         } else {
             const { error } = await signUp.email({
@@ -106,14 +122,12 @@ export default function AuthPage() {
                 password: data.password,
                 name: data.name,
                 company: data.company || undefined,
-                callbackURL: redirectTo
             });
 
             if (error) {
                 setServerError(error.message || "An error occurred during sign up.");
             } else {
-                router.push(redirectTo);
-                router.refresh();
+                await handleRedirect();
             }
         }
     } catch (err: any) {
