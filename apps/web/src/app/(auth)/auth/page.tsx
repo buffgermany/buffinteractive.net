@@ -81,21 +81,32 @@ export default function AuthPage() {
     setLinkSent(false);
   }, [authMode, reset]);
 
-  const handleRedirect = async () => {
-    if (explicitFrom) {
-      router.push(explicitFrom);
-      router.refresh();
-      return;
+  // If already logged in, redirect based on role immediately
+  useEffect(() => {
+    getSession({ query: { disableCookieCache: true } }).then((res) => {
+      const existingRole = (res?.data?.user as any)?.role;
+      if (existingRole) {
+        handleRedirect(existingRole);
+      }
+    });
+  }, []);
+
+  const handleRedirect = async (providedRole?: string) => {
+    let userRole = providedRole;
+
+    if (!userRole) {
+      const sessionRes = await getSession({ query: { disableCookieCache: true } });
+      userRole = (sessionRes?.data?.user as any)?.role;
     }
 
-    // Check user role
-    const sessionRes = await getSession();
-    const userRole = (sessionRes?.data?.user as any)?.role;
-
     if (userRole === "admin") {
-      router.push("/admin");
+      // Admin users should always go to /admin (unless they came specifically from an admin subpage)
+      const target = explicitFrom && explicitFrom.startsWith("/admin") ? explicitFrom : "/admin";
+      router.push(target);
     } else {
-      router.push("/dashboard");
+      // Customer users go to requested explicit page if non-admin, otherwise /dashboard
+      const target = explicitFrom && !explicitFrom.startsWith("/admin") ? explicitFrom : "/dashboard";
+      router.push(target);
     }
     router.refresh();
   };
@@ -106,7 +117,7 @@ export default function AuthPage() {
 
     try {
         if (authMode === 'login') {
-            const { error } = await signIn.email({
+            const { data: resData, error } = await signIn.email({
                 email: data.email,
                 password: data.password,
             });
@@ -114,10 +125,11 @@ export default function AuthPage() {
             if (error) {
                 setServerError(error.message || "An error occurred during sign in.");
             } else {
-                await handleRedirect();
+                const userRole = (resData?.user as any)?.role;
+                await handleRedirect(userRole);
             }
         } else {
-            const { error } = await signUp.email({
+            const { data: resData, error } = await signUp.email({
                 email: data.email,
                 password: data.password,
                 name: data.name,
@@ -127,7 +139,8 @@ export default function AuthPage() {
             if (error) {
                 setServerError(error.message || "An error occurred during sign up.");
             } else {
-                await handleRedirect();
+                const userRole = (resData?.user as any)?.role;
+                await handleRedirect(userRole);
             }
         }
     } catch (err: any) {
